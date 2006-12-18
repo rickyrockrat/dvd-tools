@@ -1,0 +1,47 @@
+1.2 ?
+- corrected bug when keeping original sound
+- multiple audio track support (but no more than 2 because of tcmplex)
+- consequently change sound setting page
+- added mpeg2enc encoder option
+- added mplex muxer option
+- added secondary audio track to mux
+- added subtitle spumuxing after muxing (must have dvdauthor installed)
+
+1.1
+- kompilation bug (scr.h)
++ Gamma correction widget
++ save dialog size
++ splash screen (Border selection dialog)
+
+1.0
+- all kill bugs
+- ffmpeg script generation bug
++ menu icon
+
+1.0beta1
+- all crashing bugs (I think ;-))
+- kill ffmpeg bug
+- mpeg bug
+- compilation bug
+- other bugs
++ converting to surround added (in testing)
++ progress bar supports
+
+1.0alfa3
+- border selector bugs (position etc.)
+- crashing by "start"
+- /bin/bash replaced with sh
+- other found bugs
++ qconf build system
++ langugages trnslation german and russian
++ menu entry
+
+
+1.0alfa2
+- Mplexing->Audio/Video sync bug 
+- Pprogress bar bugs (NOT ALL)
+- Process dialog -> status bar bug
+- Other bugs
++ ['] replaced with ["] ;-)
++ mpeg 1/2 support
++ wmv support

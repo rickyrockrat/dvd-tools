@@ -1,0 +1,14 @@
+So you can install QCreateVOB:
+
+# ./configure 		#(--prefix=/your/prefix)
+# make
+# su -c "make install"
+or
+# sudo make install
+
+Menu entry will be installader automaticly in your KDE Prefix! ;-)
+
+Intall without chonfigure:
+# qmake
+# make
+# su -c "make install"

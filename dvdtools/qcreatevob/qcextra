@@ -1,0 +1,118 @@
+#!/bin/sh
+. qcsettings
+. qccheck
+rm -f "$CONFIG_OUT"
+
+errmsg () {
+ echo "$*" > /dev/stderr
+}
+
+test_bin () {
+ for p in $(echo $PATH | sed "s/:/\ /g"); do
+  if [ -x "$p/$1" ]; then 
+  echo "Checking for $1 ... $p/$1"
+  if test "$CONFIG" = "yes"; then
+    CONF_FILTER=`echo $PROG | sed 's#-#_#'`
+    echo -e "#define $CONF_FILTER \"$(which $1)\"" >> "$CONFIG_OUT"
+  fi
+  return 0
+  fi
+ done
+
+ if test "$STATUS" = "need"; then
+  errmsg "Program '$PROG' is missing, please install it first."
+  errmsg "A full list of tools needed can be found in README file"
+  errmsg ""
+  errmsg "***"
+  errmsg "what is $1: $DESCREPTION"
+  errmsg "HOMEPAGE: $HOMEPAGE"
+ else
+  errmsg "WARNING: can't find $FILE."
+  errmsg "$prog is recomended for this applikation."
+  errmsg ""
+  errmsg "***"
+  errmsg "what is $1: $DESCREPTION"
+  errmsg "HOMEPAGE: $HOMEPAGE"
+ fi
+ return 1
+}
+
+test_file () {
+  if [ -e "$1" ]; then 
+  echo "Checking for $PROG ... found"
+  if test "$CONFIG" = "yes"; then
+  CONF_FILTER=`echo $PROG | sed 's#-#_#'`
+  echo -e "#define $CONF_FILTER \"$1\"" >> "$CONFIG_OUT"
+  fi
+  return 0
+  fi
+ errmsg "file '$PROG' is missing, It is needed by $NAME-$VERSION"
+ errmsg "A full list of tools needed can be found in README file"
+ errmsg "***"
+ errmsg "what is $1: $DESCREPTION"
+ errmsg "HOMEPAGE: $HOMEPAGE"
+ return 1
+}
+
+test_dir () {
+  if [ -d "$1" ]; then 
+  echo "Checking for $PROG ... found"
+  return 0
+  fi
+ errmsg "Directory '$1' is missing, It is needed by $NAME-$VERSION"
+ errmsg "A full list of tools needed can be found in README file"
+ errmsg "***"
+ errmsg "what is $1: $DESCREPTION"
+ errmsg "Homepage: $HOMEPAGE"
+ return 1
+}
+
+check_dep () {
+ for prog in $PROGLIST; do
+## Clean var.
+TYPE=""
+HOMEPAGE=""
+DESCREPTION=""
+FILE=""
+FILE_PATH=""
+CONFIG=""
+STATUS=""
+
+## Begin check
+  QC_$prog
+  PROG="$prog"
+
+## Check PATHs
+  if test "$TYPE" = "bin"; then
+    if test "$STATUS" = "need"; then
+      test_bin "$FILE" || exit 0;
+    else
+      test_bin "$FILE";
+    fi
+  fi
+
+## Check Files
+  if test "$TYPE" = "file"; then
+    if test "$STATUS" = "need"; then
+     test_file "$FILE_PATH/$prog" || exit 0;
+    else
+     test_file "$FILE_PATH/$prog";
+    fi
+  fi
+
+## Check Dirs
+  if test "$TYPE" = "dir"; then
+   if test "$STATUS" = "need"; then
+    test_dir "$FILE_PATH" || exit 0;
+   else
+    test_dir "$FILE_PATH";
+   fi
+  fi
+ done
+ return 0
+}
+
+check_dep
+if test -x extra.sh; then
+sh extra.sh
+fi

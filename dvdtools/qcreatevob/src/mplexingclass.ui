@@ -1,0 +1,529 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>mplexingclass</class>
+<widget class="QWidget">
+    <property name="name">
+        <cstring>mplexingclass</cstring>
+    </property>
+    <property name="enabled">
+        <bool>true</bool>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>374</width>
+            <height>277</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>mplexing</string>
+    </property>
+    <vbox>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <property name="margin">
+            <number>0</number>
+        </property>
+        <widget class="QGroupBox">
+            <property name="name">
+                <cstring>groupBox7</cstring>
+            </property>
+            <property name="title">
+                <string>In</string>
+            </property>
+            <vbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QLayoutWidget">
+                    <property name="name">
+                        <cstring>layout76</cstring>
+                    </property>
+                    <hbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QRadioButton">
+                            <property name="name">
+                                <cstring>tcmplexTool</cstring>
+                            </property>
+                            <property name="text">
+                                <string>&amp;tcmplex</string>
+                            </property>
+                            <property name="accel">
+                                <string>Alt+T</string>
+                            </property>
+                            <property name="checked">
+                                <bool>true</bool>
+                            </property>
+                            <property name="toolTip" stdset="0">
+                                <string>Trancode mplex</string>
+                            </property>
+                        </widget>
+                        <widget class="QRadioButton">
+                            <property name="name">
+                                <cstring>mplexTool</cstring>
+                            </property>
+                            <property name="enabled">
+                                <bool>true</bool>
+                            </property>
+                            <property name="text">
+                                <string>&amp;mplex</string>
+                            </property>
+                            <property name="accel">
+                                <string>Alt+M</string>
+                            </property>
+                            <property name="checked">
+                                <bool>false</bool>
+                            </property>
+                            <property name="toolTip" stdset="0">
+                                <string>mjpeg mplex</string>
+                            </property>
+                        </widget>
+                        <spacer>
+                            <property name="name">
+                                <cstring>spacer4_2</cstring>
+                            </property>
+                            <property name="orientation">
+                                <enum>Horizontal</enum>
+                            </property>
+                            <property name="sizeType">
+                                <enum>Expanding</enum>
+                            </property>
+                            <property name="sizeHint">
+                                <size>
+                                    <width>190</width>
+                                    <height>20</height>
+                                </size>
+                            </property>
+                        </spacer>
+                        <widget class="QCheckBox">
+                            <property name="name">
+                                <cstring>remCheckBox_2</cstring>
+                            </property>
+                            <property name="text">
+                                <string>R&amp;emove temp</string>
+                            </property>
+                            <property name="accel">
+                                <string>Alt+E</string>
+                            </property>
+                            <property name="checked">
+                                <bool>true</bool>
+                            </property>
+                            <property name="toolTip" stdset="0">
+                                <string>Remove temp files</string>
+                            </property>
+                        </widget>
+                    </hbox>
+                </widget>
+                <widget class="QLayoutWidget">
+                    <property name="name">
+                        <cstring>layout47</cstring>
+                    </property>
+                    <hbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>textLabel1_2_4_2_2_2_2</cstring>
+                            </property>
+                            <property name="text">
+                                <string>&amp;Video input:</string>
+                            </property>
+                            <property name="buddy" stdset="0">
+                                <cstring>videoInFileLine</cstring>
+                            </property>
+                        </widget>
+                        <widget class="QLineEdit">
+                            <property name="name">
+                                <cstring>videoInFileLine</cstring>
+                            </property>
+                            <property name="text">
+                                <string></string>
+                            </property>
+                            <property name="toolTip" stdset="0">
+                                <string>Video file (m2v)</string>
+                            </property>
+                        </widget>
+                        <widget class="QToolButton">
+                            <property name="name">
+                                <cstring>openM2VBtn</cstring>
+                            </property>
+                            <property name="text">
+                                <string>...</string>
+                            </property>
+                            <property name="toolTip" stdset="0">
+                                <string>Open a m2v file</string>
+                            </property>
+                        </widget>
+                    </hbox>
+                </widget>
+                <widget class="QLayoutWidget">
+                    <property name="name">
+                        <cstring>layout244</cstring>
+                    </property>
+                    <hbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>lblAudioInputs</cstring>
+                            </property>
+                            <property name="text">
+                                <string>Au&amp;dio inputs :</string>
+                            </property>
+                            <property name="buddy" stdset="0">
+                                <cstring>tableAudioInputs</cstring>
+                            </property>
+                        </widget>
+                        <spacer>
+                            <property name="name">
+                                <cstring>spacer52</cstring>
+                            </property>
+                            <property name="orientation">
+                                <enum>Horizontal</enum>
+                            </property>
+                            <property name="sizeType">
+                                <enum>Expanding</enum>
+                            </property>
+                            <property name="sizeHint">
+                                <size>
+                                    <width>30</width>
+                                    <height>20</height>
+                                </size>
+                            </property>
+                        </spacer>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>addAudioBtn</cstring>
+                            </property>
+                            <property name="text">
+                                <string>&amp;Add Audio</string>
+                            </property>
+                            <property name="accel">
+                                <string>Alt+A</string>
+                            </property>
+                            <property name="iconSet">
+                                <iconset>image0</iconset>
+                            </property>
+                            <property name="toolTip" stdset="0">
+                                <string>Create script for this options</string>
+                            </property>
+                        </widget>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>removeAudioBtn</cstring>
+                            </property>
+                            <property name="text">
+                                <string>&amp;Remove</string>
+                            </property>
+                            <property name="accel">
+                                <string>Alt+R</string>
+                            </property>
+                            <property name="iconSet">
+                                <iconset>image1</iconset>
+                            </property>
+                            <property name="toolTip" stdset="0">
+                                <string>Remove selected scrpt</string>
+                            </property>
+                        </widget>
+                    </hbox>
+                </widget>
+                <widget class="QTable">
+                    <column>
+                        <property name="text">
+                            <string>File</string>
+                        </property>
+                    </column>
+                    <column>
+                        <property name="text">
+                            <string>Choose</string>
+                        </property>
+                    </column>
+                    <property name="name">
+                        <cstring>tableAudioInputs</cstring>
+                    </property>
+                    <property name="numRows">
+                        <number>2</number>
+                    </property>
+                    <property name="numCols">
+                        <number>2</number>
+                    </property>
+                </widget>
+            </vbox>
+        </widget>
+        <widget class="QGroupBox">
+            <property name="name">
+                <cstring>groupBox8</cstring>
+            </property>
+            <property name="title">
+                <string>Out</string>
+            </property>
+            <vbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QLayoutWidget">
+                    <property name="name">
+                        <cstring>layout197</cstring>
+                    </property>
+                    <hbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>textLabel2_4</cstring>
+                            </property>
+                            <property name="text">
+                                <string>Si&amp;ze(-S):</string>
+                            </property>
+                            <property name="buddy" stdset="0">
+                                <cstring>sizeLine</cstring>
+                            </property>
+                        </widget>
+                        <widget class="QLineEdit">
+                            <property name="name">
+                                <cstring>sizeLine</cstring>
+                            </property>
+                            <property name="enabled">
+                                <bool>false</bool>
+                            </property>
+                            <property name="text">
+                                <string>0</string>
+                            </property>
+                            <property name="toolTip" stdset="0">
+                                <string>split output file (supported only by mplex)</string>
+                            </property>
+                        </widget>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>textLabel2_4_2_3</cstring>
+                            </property>
+                            <property name="text">
+                                <string>&amp;Audio/Video Sync(-O):</string>
+                            </property>
+                            <property name="buddy" stdset="0">
+                                <cstring>syncBox</cstring>
+                            </property>
+                        </widget>
+                        <widget class="QSpinBox">
+                            <property name="name">
+                                <cstring>syncBox</cstring>
+                            </property>
+                            <property name="maxValue">
+                                <number>99999999</number>
+                            </property>
+                            <property name="minValue">
+                                <number>-999999999</number>
+                            </property>
+                        </widget>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>textLabel2_4_2_2_2</cstring>
+                            </property>
+                            <property name="text">
+                                <string>Msec</string>
+                            </property>
+                        </widget>
+                    </hbox>
+                </widget>
+                <widget class="QLayoutWidget">
+                    <property name="name">
+                        <cstring>layout22</cstring>
+                    </property>
+                    <hbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>textLabel1_2_4_2_2_2</cstring>
+                            </property>
+                            <property name="text">
+                                <string>&amp;Out File (-o):</string>
+                            </property>
+                            <property name="buddy" stdset="0">
+                                <cstring>outFileLine</cstring>
+                            </property>
+                        </widget>
+                        <widget class="QLayoutWidget">
+                            <property name="name">
+                                <cstring>layout21</cstring>
+                            </property>
+                            <hbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <widget class="QLineEdit">
+                                    <property name="name">
+                                        <cstring>outFileLine</cstring>
+                                    </property>
+                                    <property name="text">
+                                        <string></string>
+                                    </property>
+                                    <property name="toolTip" stdset="0">
+                                        <string>Output file (vob file)</string>
+                                    </property>
+                                </widget>
+                                <widget class="QToolButton">
+                                    <property name="name">
+                                        <cstring>saveBtn</cstring>
+                                    </property>
+                                    <property name="text">
+                                        <string>...</string>
+                                    </property>
+                                    <property name="toolTip" stdset="0">
+                                        <string>Save vob file</string>
+                                    </property>
+                                </widget>
+                            </hbox>
+                        </widget>
+                    </hbox>
+                </widget>
+            </vbox>
+        </widget>
+    </vbox>
+</widget>
+<images>
+    <image name="image0">
+        <data format="PNG" length="1386">89504e470d0a1a0a0000000d4948445200000018000000180806000000e0773df800000531494441544889b5964b6c1d571980bff39efbb263bb8e53f2522031342a29a42da088464a15822a905037153b8284845a41372c0a429580355d00158f0d8b542d6d4550ba01a224550529ae9ba66d5c872438b1eb07f18dafafef6bee6be6ce1c16d758ad943a151223fd73461a9deffbff73741ec27bcffff31177fc9fbf7b9c2d7b1f22bb6d1c931f01ef89c3559acbd7a85e3f4ff3d6ccff26183df008db8f3cc9d0f8113b38e4b281c51941927a3ab1a7d56c9386b516f57f9d158b677fe957af9cfb7802971f61df633fd77b8e1c3ff4d94ff08d07b6f1e0f808bbb7e6c9394de23de55a97ab4b355e7dafc82b6f1659bcb9e6c5d2abbfe3dac91ff9b855fde872f2637bf9f24f2f7ee67b7ff5cfbf36e72b8dae8f7ba96f767abed68c7c358c7cb519f9462bf29d38f1dd38f15717abfefbbf7dd3671efba3570f3dfd0f911ddefd41a6da80bbc2a8fce20f5e3970ff970efeea3b07f8dc9e21ca8d8852bd43258ca8b562eaeb516dc6ac35baac35ba682d397cef18792778e3a6db2907777f21599afc1369aff321813b78fc17f9bd87bff6dda33b191dccf0fe4a9372a34bb9116d1a2bb52ec54a879da3398ae590856878a792044971ea348006d063f73e1cec3bf6edb182a415a54c5c5b25ea793c203cfd767db6bcef7f7b587f8194900f3463435972a64e7acfd71fef2d4ebc9c946f4c6880ecf8d1e3d95c41099932bd14e2b464dfdd79022bb9d3329142500e232ecd37a8843159a78983accbec7df87858be31a1852b8c66771d3c1a184891ccad7638f4e9617ef2cdfd482148ef60904250aa77f9d6b36f73ab11e39c457941b2fbc163cd8b2786a5d9b2fd9e6060782c700a1758bc50ccac74985b696f00360b808b73754acd04a93599c0e0ac2233b475bb2e6cfd94d4b991ed36c8486b0dce59b219cb6a98f2eb738b7c9c4d64a1dce1d9338b08a5c804161738acd35897312a77d70e2995b2d61aac3304ce12048e2d03192666435e9a5cd9141ef53ccf9c5ea4dcf614721982c0e19cc11983b106a994933e6ed59404630cc6699c330481219f75bc786195d952e723052f5d58e5d2529ba1810017f493b4ae0f5752781fb5aa32aadebc4e1ab5b5d618a331d6e09c2197b57452c989c9f26d87eaf2cd36a7a6aa0ce4d7b376066b355a6b94d1d06b87516df97d19d78a739dd2ec15690c5a2b8c51586b71ce315808b8b41c71e66ae343f07a27e5f76fac914a4d36e370ce61adc5188dd612651ced5bd7de4b5a9545894f9b95cb674f7aa10081d40a6d14ce6982f5493f3915325f8937047f78a7c642dd3390733867714ea38d422a054290a62995e933a780a60428bffbe713b585a9eb5e19f01e25255a6bacd5e4329676aa3839dd026062bec3c442cc96f5a1b156a3b4464a0978bc72546e5cb8bc367df67958df8b7c12d5dbab0ba5bbee3bf6a80d32522b81360aa5355a2bac5194db9e46047f9f8f8891182dfb5001de7be2b847b707f5b55274e5851f3e19559727370400ddcabfa7a3b06a86f71f3eac8d458a7e255249b414482599ada6c45ea0a40001a9872449e94631dd041a61937fbef8f4cf2a57cfffe6bfdc0d014063e9f2f9b03817e677dd77c81646ac4f7be03d7efd5c92783c9e3449e925493feba84737d194e667ea53cf3df5e3d2a5d3cf00e96d0540da5c9e79fdd6d4b9494cee936678c72e61b3780fbd24a197a4c4bd7e44097462a8ad95fdecdf5e7e6deab9a79e68cc4fbdf041386c7ee80f1476ecffcab6cf7ff5d1917d0fdc5f18dbb343bb4c0010779aed46716ea93c73e1ade2db7f39152ecf9c036ab783dce956d1af52c8adca6547b5cb0d82a7d76dd6926ebb844f578064b3ceff01de996d24f4463f900000000049454e44ae426082</data>
+    </image>
+    <image name="image1">
+        <data format="PNG" length="1419">89504e470d0a1a0a0000000d4948445200000018000000180806000000e0773df800000552494441544889b5955b8c955715c77ffbf6edef5c86b93117991946ca302d6da196812a28a434535ab589e925bc16a349b5a17dd0876a4c1ff4591fd40735a62f3636a611d33e692350d2a0406d9b3805810e85b633cc1c983973ce99f39dcb77dd3e0c4c3016c798b89295ececbdd7ffbfd765af259c73fc3f45ac795efccc385d637bc90f8e638abde01c71b04863fe22d54b27695c9bfedf08fab67f99a1fdcfd33dbedfebecb679dfc31a419a39dab1a3d9689105b526cb1f1c1533477fe616cf1ffbef086cb1972d077fac37ed3fb467db06beb673905de3bd8cf61729584dea1ce55ac885d91ac7df2ff1fadb2566e6969c983dfe2b2e1ef9be8b9bd5dbbb531c18e34b3f7cf7aec37f72bf3d71c555eaa18b93cc35da89ab3522570d22576d44aede8c5c3b4e5d18a7eec24cd53df7cbb75deee0ef9ddafbe25f45be67f4564cb50a6e3bfae4e7bffbfaf6892fecf8f937b7f3b94ddd94eb110bcb6d2a4144ad19536bc4541b31b566cc523d64a91ea2b564dfbd0314ade0f49c1d919da30fa4b367fe4096b4ff85c0ee38f4d3e2d8beaf3e3339425f678e8fae3728d743caf588723d62717985246827942a2d968295fdebb59052a5cd485f815239e093a8674449fcb434f5068006d003f73ee46f39f0f5810e4933ca38fdc122ce0984006e547118673cb17b98812e9f978e5ec639871462258b0e3c2319e8ce5330cb645b1ffb763273ead5b4fce1290d901f9f3c942f74282133ce5d0d50370d6f48334cd97d672f13633d4801a3fd458e9cbe4ac15f0d0052082a414cde6a623f6f73630f1d0aca1f9ed2c276f4e537ee98f40d6448e6aa11464b009c8328c918ecf479fac151e40dd2a7f60c73e27c990b57037cb3725708085a09d67a28274847771d68bcfb9b1e69ba86b6faeb7a067cabb0be47e4e48a6692762648513cf795cd0cf7e6565fbb2ea739fce866a4d6b45241e424ed54e09422e71baca7c875f70fe98efecd52177a873c3f273dcf60ad87f50c5a69b4d1c499e4a9dd434c6e5bff6f25fdc0581707f70c1123515aa38dc1b71ed6b77856e3d99c5185f5c35a2ae5799ec1b31adf18b456082168c719139b3b797672e36dffcd371e1c666ab6c5f4b516be9138e78893048420f152a45256bab85953128c3118abb1d6a03dcdfa2e9fef3c3ac2ba9cba2d41674e73f8e1113a8b16e3693c6bf0acc1780625857351b32aa3eadc25b2a8a5b5c6188df156dc7dfa8b83dc3354b82df84dd9f9d9224feeea476883e769b4d628a3216905516dfe2319d74a57da0b97cfcb1be1412ab66e28f2d8f6ee35c16fca13f7f730d49343288dd612652cad6b17df4f9b95198dcb1a9573478f0cdeb3770780318a2081e3979a143d49b6c6b85012161b098990182d491241966554cefef935a02100942d0e6ffbd64b6f6eb873622c6f05d6f37052a19564ed91e148d20c91658461482382d9a9b7ce9dfdf533075c1acd29009746cbadc54f16d6df77e071cfe6a45102df6a3c735315d6a8d5b56724c6288c5648095240922484092c2f2d44e75ff9def35175fe0cdcd2ecc2cad5b35150353d77efdba78d87140e252552499414ab6b290542acf429e7204b33a228264ca11e34f8c7ef5efc51e5c2c95fac86f05667ebb3e74e06a52b4171e37d7bbc8e5ecf6509388743e000e71c997364694692a6c47142182584a966e1e3e9e5a9975ff8c1c2dfdff809907d2a019035e6a7ff726dead8194ce10ed333bc5178799c83244d49d28c3859d12885760cb5a5b2bbfcd6ab27a65e7ee1d9fac753afdc0ace1a195cd7317cf7c383f73ff278ef969d131d039b86b5cdf90071bbd1aa97aecc96a7fff64ee9bd3fbe16cc4f1f036a9f06b25689ac782964bfb2f93e6d0b9de048c2462d0d5b0bb8ec3a90fe27e37f02379b4ba14add6b8d0000000049454e44ae426082</data>
+    </image>
+</images>
+<connections>
+    <connection>
+        <sender>mplexTool</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>sizeLine</receiver>
+        <slot>setEnabled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>mplexTool</sender>
+        <signal>clicked()</signal>
+        <receiver>mplexingclass</receiver>
+        <slot>disableTcmplex()</slot>
+    </connection>
+    <connection>
+        <sender>mplexTool</sender>
+        <signal>clicked()</signal>
+        <receiver>mplexingclass</receiver>
+        <slot>writeSet()</slot>
+    </connection>
+    <connection>
+        <sender>openM2VBtn</sender>
+        <signal>clicked()</signal>
+        <receiver>mplexingclass</receiver>
+        <slot>openm2v()</slot>
+    </connection>
+    <connection>
+        <sender>outFileLine</sender>
+        <signal>textChanged(const QString&amp;)</signal>
+        <receiver>mplexingclass</receiver>
+        <slot>writeSet()</slot>
+    </connection>
+    <connection>
+        <sender>outFileLine</sender>
+        <signal>textChanged(const QString&amp;)</signal>
+        <receiver>mplexingclass</receiver>
+        <slot>vobSelected()</slot>
+    </connection>
+    <connection>
+        <sender>remCheckBox_2</sender>
+        <signal>clicked()</signal>
+        <receiver>mplexingclass</receiver>
+        <slot>writeSet()</slot>
+    </connection>
+    <connection>
+        <sender>saveBtn</sender>
+        <signal>clicked()</signal>
+        <receiver>mplexingclass</receiver>
+        <slot>saveVob()</slot>
+    </connection>
+    <connection>
+        <sender>sizeLine</sender>
+        <signal>textChanged(const QString&amp;)</signal>
+        <receiver>mplexingclass</receiver>
+        <slot>writeSet()</slot>
+    </connection>
+    <connection>
+        <sender>tcmplexTool</sender>
+        <signal>clicked()</signal>
+        <receiver>mplexingclass</receiver>
+        <slot>disableMplex()</slot>
+    </connection>
+    <connection>
+        <sender>tcmplexTool</sender>
+        <signal>clicked()</signal>
+        <receiver>mplexingclass</receiver>
+        <slot>writeSet()</slot>
+    </connection>
+    <connection>
+        <sender>videoInFileLine</sender>
+        <signal>textChanged(const QString&amp;)</signal>
+        <receiver>mplexingclass</receiver>
+        <slot>writeSet()</slot>
+    </connection>
+    <connection>
+        <sender>addAudioBtn</sender>
+        <signal>clicked()</signal>
+        <receiver>mplexingclass</receiver>
+        <slot>newAudio()</slot>
+    </connection>
+    <connection>
+        <sender>removeAudioBtn</sender>
+        <signal>clicked()</signal>
+        <receiver>mplexingclass</receiver>
+        <slot>delAudio()</slot>
+    </connection>
+</connections>
+<includes>
+    <include location="global" impldecl="in implementation">qfiledialog.h</include>
+    <include location="global" impldecl="in implementation">qregexp.h</include>
+    <include location="global" impldecl="in implementation">qstringlist.h</include>
+    <include location="global" impldecl="in implementation">qfile.h</include>
+    <include location="global" impldecl="in declaration">qmessagebox.h</include>
+    <include location="local" impldecl="in declaration">tablebutton.h</include>
+    <include location="local" impldecl="in implementation">mplexingclass.ui.h</include>
+</includes>
+<variables>
+    <variable access="private">QString vobFileStr;</variable>
+    <variable access="private">QString tmpDirStr;</variable>
+    <variable access="public">QString vobPathStr;</variable>
+    <variable access="private">QString m2vFile;</variable>
+    <variable access="private">QString inputFileName;</variable>
+</variables>
+<signals>
+    <signal>errorSignal();</signal>
+    <signal>writeSettings();</signal>
+</signals>
+<slots>
+    <slot>addAudio( int row )</slot>
+    <slot>clearAudioInput()</slot>
+    <slot>main( const QString tmpdir, const QString inputfilename )</slot>
+    <slot>openm2v()</slot>
+    <slot>openac3(int,int)</slot>
+    <slot>saveVob()</slot>
+    <slot returnType="QString">createScript()</slot>
+    <slot>vobSelected()</slot>
+    <slot>disableMplex()</slot>
+    <slot>disableTcmplex()</slot>
+    <slot>changeVobFile( QString inputPath, QString inputName )</slot>
+    <slot>writeSet()</slot>
+    <slot returnType="QString">removeTmp()</slot>
+    <slot>newAudio()</slot>
+    <slot>delAudio()</slot>
+</slots>
+<functions>
+    <function returnType="QString">getSync()</function>
+    <function returnType="bool">mplexAccepInput()</function>
+    <function returnType="QString">getVobPath()</function>
+    <function returnType="bool">mplexToolCheckded()</function>
+</functions>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>

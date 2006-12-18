@@ -1,0 +1,71 @@
+#!/bin/sh
+
+PROGLIST="ffmpeg mplayer mjpegtools multimux sox transcode sh"
+
+QC_ffmpeg () {
+TYPE="bin"
+HOMEPAGE="http://sourceforge.net/projects/ffmpeg/"
+DESCREPTION="FFmpeg is an audio/video conversion tool. It includes libavcodec, the leading open source codec library. An experimental streaming server for live broadcasts is also included."
+FILE="ffmpeg"
+CONFIG="no"
+STATUS="need"
+}
+
+QC_mplayer () {
+TYPE="bin"
+HOMEPAGE="http://www.mplayerhq.hu/homepage/design7/news.html"
+DESCREPTION="MPlayer is a movie player for Linux (runs on many other Unices, and non-x86 CPUs, see the documentation). It plays most MPEG, VOB, AVI, Ogg/OGM, VIVO, ASF/WMA/WMV, QT/MOV/MP4, FLI, RM, NuppelVideo, YUV4MPEG, FILM, RoQ, PVA files, supported by many native, XAnim, and Win32 DLL codecs. You can watch VideoCD, SVCD, DVD, 3ivx, DivX 3/4/5 and even WMV movies, too (without the avifile library)."
+FILE="mencoder"
+CONFIG="no"
+STATUS="recomended"
+}
+
+QC_mjpegtools () {
+TYPE="bin"
+HOMEPAGE="http://mjpeg.sourceforge.net/"
+DESCREPTION="The mjpeg programs are a set of tools that can do recording of videos and playback, simple cut-and-paste editing and the MPEG compression of audio and video under Linux."
+FILE="mplex"
+CONFIG="no"
+STATUS="need"
+}
+
+QC_multimux () {
+TYPE="bin"
+HOMEPAGE="http://home.zonnet.nl/panteltje/dvd/"
+DESCREPTION="combines up to 8 audio mono wave ch. into one big multi ch. wave file."
+FILE="multimux"
+CONFIG="no"
+STATUS=""
+STATUS="need"
+}
+
+QC_sox () {
+TYPE="bin"
+HOMEPAGE="http://sox.sourceforge.net"
+DESCREPTION="The swiss army knife of sound processing programs"
+FILE="sox"
+CONFIG="no"
+STATUS=""
+STATUS="need"
+}
+
+QC_transcode () {
+TYPE="bin"
+HOMEPAGE="http://www.transcoding.org/cgi-bin/transcode"
+DESCREPTION="video stream processing tool"
+FILE="transcode"
+CONFIG="no"
+STATUS=""
+STATUS="need"
+}
+
+QC_sh () {
+TYPE="bin"
+HOMEPAGE="Unknow"
+DESCREPTION="not aviable"
+FILE="sh"
+FILE_PATH="/bin"
+CONFIG="no"
+STATUS=""
+STATUS="need"
+}

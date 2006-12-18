@@ -1,0 +1,2 @@
+g++ -c -pipe -Wall -W -O2 -fomit-frame-pointer -pipe -march=i586 -mtune=pentiumpro -D_REENTRANT  -DX11_INC='"/usr/X11R6/include"' -DX11_LIBDIR='"/usr/X11R6/lib"' -DX11_LIB='"-lXext -lX11 -lm"' -DCC='"gcc"' -DQT_NO_DEBUG -DQT_THREAD_SUPPORT -DQT_SHARED -I/usr/lib/qt3/mkspecs/default -I. -I/usr/lib/qt3//include -I/usr/X11R6/include -o conf.o conf.cpp
+g++  -o conf conf.o    -L/usr/lib/qt3//lib -L/usr/X11R6/lib -lqt-mt -lXext -lX11 -lm -lpthread

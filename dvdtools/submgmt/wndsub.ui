@@ -1,0 +1,1138 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>WndSub</class>
+<author>DE</author>
+<widget class="QWidget">
+    <property name="name">
+        <cstring>WndSub</cstring>
+    </property>
+    <property name="enabled">
+        <bool>true</bool>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>574</width>
+            <height>399</height>
+        </rect>
+    </property>
+    <property name="palette">
+        <palette>
+            <active>
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                </color>
+                <color>
+                    <red>237</red>
+                    <green>237</green>
+                    <blue>237</blue>
+                </color>
+                <color>
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                </color>
+                <color>
+                    <red>246</red>
+                    <green>246</green>
+                    <blue>246</blue>
+                </color>
+                <color>
+                    <red>118</red>
+                    <green>118</green>
+                    <blue>118</blue>
+                </color>
+                <color>
+                    <red>158</red>
+                    <green>158</green>
+                    <blue>158</blue>
+                </color>
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                </color>
+                <color>
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                </color>
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                </color>
+                <color>
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                </color>
+                <color>
+                    <red>250</red>
+                    <green>235</green>
+                    <blue>215</blue>
+                </color>
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                </color>
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>128</blue>
+                </color>
+                <color>
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                </color>
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                </color>
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                </color>
+            </active>
+            <disabled>
+                <color>
+                    <red>128</red>
+                    <green>128</green>
+                    <blue>128</blue>
+                </color>
+                <color>
+                    <red>237</red>
+                    <green>237</green>
+                    <blue>237</blue>
+                </color>
+                <color>
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                </color>
+                <color>
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                </color>
+                <color>
+                    <red>118</red>
+                    <green>118</green>
+                    <blue>118</blue>
+                </color>
+                <color>
+                    <red>158</red>
+                    <green>158</green>
+                    <blue>158</blue>
+                </color>
+                <color>
+                    <red>128</red>
+                    <green>128</green>
+                    <blue>128</blue>
+                </color>
+                <color>
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                </color>
+                <color>
+                    <red>128</red>
+                    <green>128</green>
+                    <blue>128</blue>
+                </color>
+                <color>
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                </color>
+                <color>
+                    <red>250</red>
+                    <green>235</green>
+                    <blue>215</blue>
+                </color>
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                </color>
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>128</blue>
+                </color>
+                <color>
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                </color>
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>192</blue>
+                </color>
+                <color>
+                    <red>128</red>
+                    <green>0</green>
+                    <blue>128</blue>
+                </color>
+            </disabled>
+            <inactive>
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                </color>
+                <color>
+                    <red>237</red>
+                    <green>237</green>
+                    <blue>237</blue>
+                </color>
+                <color>
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                </color>
+                <color>
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                </color>
+                <color>
+                    <red>118</red>
+                    <green>118</green>
+                    <blue>118</blue>
+                </color>
+                <color>
+                    <red>158</red>
+                    <green>158</green>
+                    <blue>158</blue>
+                </color>
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                </color>
+                <color>
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                </color>
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                </color>
+                <color>
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                </color>
+                <color>
+                    <red>250</red>
+                    <green>235</green>
+                    <blue>215</blue>
+                </color>
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                </color>
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>128</blue>
+                </color>
+                <color>
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                </color>
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>192</blue>
+                </color>
+                <color>
+                    <red>128</red>
+                    <green>0</green>
+                    <blue>128</blue>
+                </color>
+            </inactive>
+        </palette>
+    </property>
+    <property name="backgroundOrigin">
+        <enum>ParentOrigin</enum>
+    </property>
+    <property name="caption">
+        <string>Subtitle manager</string>
+    </property>
+    <property name="icon">
+        <pixmap>image0</pixmap>
+    </property>
+    <hbox>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <widget class="QLayoutWidget">
+            <property name="name">
+                <cstring>layout95</cstring>
+            </property>
+            <vbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QLayoutWidget">
+                    <property name="name">
+                        <cstring>layout14</cstring>
+                    </property>
+                    <hbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>tlFileIn</cstring>
+                            </property>
+                            <property name="backgroundOrigin">
+                                <enum>WindowOrigin</enum>
+                            </property>
+                            <property name="text">
+                                <string>&amp;Input File</string>
+                            </property>
+                            <property name="buddy" stdset="0">
+                                <cstring>leInputFile</cstring>
+                            </property>
+                        </widget>
+                        <widget class="QLineEdit">
+                            <property name="name">
+                                <cstring>leInputFile</cstring>
+                            </property>
+                            <property name="backgroundOrigin">
+                                <enum>WindowOrigin</enum>
+                            </property>
+                        </widget>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>pbSelectInputFile</cstring>
+                            </property>
+                            <property name="text">
+                                <string></string>
+                            </property>
+                            <property name="pixmap">
+                                <pixmap>image1</pixmap>
+                            </property>
+                        </widget>
+                    </hbox>
+                </widget>
+                <widget class="QLayoutWidget">
+                    <property name="name">
+                        <cstring>layout15</cstring>
+                    </property>
+                    <hbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>tlType</cstring>
+                            </property>
+                            <property name="backgroundOrigin">
+                                <enum>WindowOrigin</enum>
+                            </property>
+                            <property name="text">
+                                <string>I&amp;nput File Type</string>
+                            </property>
+                            <property name="buddy" stdset="0">
+                                <cstring>cbType</cstring>
+                            </property>
+                        </widget>
+                        <widget class="QComboBox">
+                            <property name="name">
+                                <cstring>cbType</cstring>
+                            </property>
+                            <property name="backgroundOrigin">
+                                <enum>WindowOrigin</enum>
+                            </property>
+                        </widget>
+                        <spacer>
+                            <property name="name">
+                                <cstring>spacer4_2_3_2</cstring>
+                            </property>
+                            <property name="orientation">
+                                <enum>Horizontal</enum>
+                            </property>
+                            <property name="sizeType">
+                                <enum>MinimumExpanding</enum>
+                            </property>
+                            <property name="sizeHint">
+                                <size>
+                                    <width>0</width>
+                                    <height>20</height>
+                                </size>
+                            </property>
+                        </spacer>
+                    </hbox>
+                </widget>
+                <widget class="QGroupBox">
+                    <property name="name">
+                        <cstring>gbOptions</cstring>
+                    </property>
+                    <property name="enabled">
+                        <bool>true</bool>
+                    </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
+                    </property>
+                    <property name="title">
+                        <string>Options</string>
+                    </property>
+                    <vbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QLayoutWidget">
+                            <property name="name">
+                                <cstring>layout6</cstring>
+                            </property>
+                            <hbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <widget class="QCheckBox">
+                                    <property name="name">
+                                        <cstring>cbShift</cstring>
+                                    </property>
+                                    <property name="minimumSize">
+                                        <size>
+                                            <width>220</width>
+                                            <height>0</height>
+                                        </size>
+                                    </property>
+                                    <property name="text">
+                                        <string>Shift subtitles by (milli-seconds)</string>
+                                    </property>
+                                </widget>
+                                <widget class="QSpinBox">
+                                    <property name="name">
+                                        <cstring>sbShift</cstring>
+                                    </property>
+                                    <property name="enabled">
+                                        <bool>false</bool>
+                                    </property>
+                                    <property name="minimumSize">
+                                        <size>
+                                            <width>70</width>
+                                            <height>0</height>
+                                        </size>
+                                    </property>
+                                    <property name="maxValue">
+                                        <number>100000</number>
+                                    </property>
+                                    <property name="minValue">
+                                        <number>-100000</number>
+                                    </property>
+                                    <property name="value">
+                                        <number>1000</number>
+                                    </property>
+                                </widget>
+                                <spacer>
+                                    <property name="name">
+                                        <cstring>spacer4_2_3</cstring>
+                                    </property>
+                                    <property name="orientation">
+                                        <enum>Horizontal</enum>
+                                    </property>
+                                    <property name="sizeType">
+                                        <enum>MinimumExpanding</enum>
+                                    </property>
+                                    <property name="sizeHint">
+                                        <size>
+                                            <width>0</width>
+                                            <height>20</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                            </hbox>
+                        </widget>
+                        <widget class="QLayoutWidget">
+                            <property name="name">
+                                <cstring>layout7</cstring>
+                            </property>
+                            <hbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <widget class="QCheckBox">
+                                    <property name="name">
+                                        <cstring>cbExpand</cstring>
+                                    </property>
+                                    <property name="minimumSize">
+                                        <size>
+                                            <width>220</width>
+                                            <height>0</height>
+                                        </size>
+                                    </property>
+                                    <property name="text">
+                                        <string>Expand subtitles by (factor * 1000)</string>
+                                    </property>
+                                </widget>
+                                <widget class="QSpinBox">
+                                    <property name="name">
+                                        <cstring>sbExpand</cstring>
+                                    </property>
+                                    <property name="enabled">
+                                        <bool>false</bool>
+                                    </property>
+                                    <property name="minimumSize">
+                                        <size>
+                                            <width>70</width>
+                                            <height>0</height>
+                                        </size>
+                                    </property>
+                                    <property name="maxValue">
+                                        <number>100000</number>
+                                    </property>
+                                    <property name="minValue">
+                                        <number>0</number>
+                                    </property>
+                                    <property name="lineStep">
+                                        <number>1</number>
+                                    </property>
+                                    <property name="value">
+                                        <number>1000</number>
+                                    </property>
+                                </widget>
+                                <spacer>
+                                    <property name="name">
+                                        <cstring>spacer4_2</cstring>
+                                    </property>
+                                    <property name="orientation">
+                                        <enum>Horizontal</enum>
+                                    </property>
+                                    <property name="sizeType">
+                                        <enum>MinimumExpanding</enum>
+                                    </property>
+                                    <property name="sizeHint">
+                                        <size>
+                                            <width>0</width>
+                                            <height>20</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                            </hbox>
+                        </widget>
+                        <widget class="QLayoutWidget">
+                            <property name="name">
+                                <cstring>layout8</cstring>
+                            </property>
+                            <hbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <widget class="QCheckBox">
+                                    <property name="name">
+                                        <cstring>cbFps</cstring>
+                                    </property>
+                                    <property name="text">
+                                        <string>Change subtitles fps</string>
+                                    </property>
+                                </widget>
+                                <widget class="QComboBox">
+                                    <property name="name">
+                                        <cstring>comboFpsOrig</cstring>
+                                    </property>
+                                    <property name="enabled">
+                                        <bool>false</bool>
+                                    </property>
+                                </widget>
+                                <widget class="QLabel">
+                                    <property name="name">
+                                        <cstring>tlFps</cstring>
+                                    </property>
+                                    <property name="text">
+                                        <string>to</string>
+                                    </property>
+                                </widget>
+                                <widget class="QComboBox">
+                                    <property name="name">
+                                        <cstring>comboFpsDest</cstring>
+                                    </property>
+                                    <property name="enabled">
+                                        <bool>false</bool>
+                                    </property>
+                                </widget>
+                                <spacer>
+                                    <property name="name">
+                                        <cstring>spacer4_2_2</cstring>
+                                    </property>
+                                    <property name="orientation">
+                                        <enum>Horizontal</enum>
+                                    </property>
+                                    <property name="sizeType">
+                                        <enum>MinimumExpanding</enum>
+                                    </property>
+                                    <property name="sizeHint">
+                                        <size>
+                                            <width>0</width>
+                                            <height>20</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                            </hbox>
+                        </widget>
+                        <widget class="QCheckBox">
+                            <property name="name">
+                                <cstring>cbAuto</cstring>
+                            </property>
+                            <property name="text">
+                                <string>Synchonize subtitles</string>
+                            </property>
+                        </widget>
+                        <widget class="QLayoutWidget">
+                            <property name="name">
+                                <cstring>layout1</cstring>
+                            </property>
+                            <hbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <widget class="QLabel">
+                                    <property name="name">
+                                        <cstring>tlFirstSub</cstring>
+                                    </property>
+                                    <property name="enabled">
+                                        <bool>false</bool>
+                                    </property>
+                                    <property name="backgroundOrigin">
+                                        <enum>WindowOrigin</enum>
+                                    </property>
+                                    <property name="text">
+                                        <string>Fi&amp;rst subtitle</string>
+                                    </property>
+                                    <property name="buddy" stdset="0">
+                                        <cstring>timeFirstSub</cstring>
+                                    </property>
+                                </widget>
+                                <widget class="QTimeEdit">
+                                    <property name="name">
+                                        <cstring>timeFirstSub</cstring>
+                                    </property>
+                                    <property name="enabled">
+                                        <bool>false</bool>
+                                    </property>
+                                    <property name="minimumSize">
+                                        <size>
+                                            <width>80</width>
+                                            <height>0</height>
+                                        </size>
+                                    </property>
+                                    <property name="display">
+                                        <set>Seconds|Minutes|Hours</set>
+                                    </property>
+                                </widget>
+                                <widget class="QLabel">
+                                    <property name="name">
+                                        <cstring>tlFirstSpeak</cstring>
+                                    </property>
+                                    <property name="enabled">
+                                        <bool>false</bool>
+                                    </property>
+                                    <property name="text">
+                                        <string>synchonized with Firs&amp;t speak</string>
+                                    </property>
+                                    <property name="buddy" stdset="0">
+                                        <cstring>timeFirstSpeak</cstring>
+                                    </property>
+                                </widget>
+                                <widget class="QTimeEdit">
+                                    <property name="name">
+                                        <cstring>timeFirstSpeak</cstring>
+                                    </property>
+                                    <property name="enabled">
+                                        <bool>false</bool>
+                                    </property>
+                                    <property name="minimumSize">
+                                        <size>
+                                            <width>80</width>
+                                            <height>0</height>
+                                        </size>
+                                    </property>
+                                </widget>
+                            </hbox>
+                        </widget>
+                        <widget class="QLayoutWidget">
+                            <property name="name">
+                                <cstring>layout2</cstring>
+                            </property>
+                            <hbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <widget class="QLabel">
+                                    <property name="name">
+                                        <cstring>tlLastSub</cstring>
+                                    </property>
+                                    <property name="enabled">
+                                        <bool>false</bool>
+                                    </property>
+                                    <property name="text">
+                                        <string>Last &amp;subtitle</string>
+                                    </property>
+                                    <property name="buddy" stdset="0">
+                                        <cstring>timeLastSub</cstring>
+                                    </property>
+                                </widget>
+                                <widget class="QTimeEdit">
+                                    <property name="name">
+                                        <cstring>timeLastSub</cstring>
+                                    </property>
+                                    <property name="enabled">
+                                        <bool>false</bool>
+                                    </property>
+                                    <property name="minimumSize">
+                                        <size>
+                                            <width>80</width>
+                                            <height>0</height>
+                                        </size>
+                                    </property>
+                                </widget>
+                                <widget class="QLabel">
+                                    <property name="name">
+                                        <cstring>tlLastSpeak</cstring>
+                                    </property>
+                                    <property name="enabled">
+                                        <bool>false</bool>
+                                    </property>
+                                    <property name="text">
+                                        <string>synchonized with &amp;Last speak</string>
+                                    </property>
+                                    <property name="buddy" stdset="0">
+                                        <cstring>timeLastSpeak</cstring>
+                                    </property>
+                                </widget>
+                                <widget class="QTimeEdit">
+                                    <property name="name">
+                                        <cstring>timeLastSpeak</cstring>
+                                    </property>
+                                    <property name="enabled">
+                                        <bool>false</bool>
+                                    </property>
+                                    <property name="minimumSize">
+                                        <size>
+                                            <width>80</width>
+                                            <height>0</height>
+                                        </size>
+                                    </property>
+                                </widget>
+                            </hbox>
+                        </widget>
+                        <widget class="QLayoutWidget">
+                            <property name="name">
+                                <cstring>layout94</cstring>
+                            </property>
+                            <hbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <widget class="QCheckBox">
+                                    <property name="name">
+                                        <cstring>cbShiftPos</cstring>
+                                    </property>
+                                    <property name="minimumSize">
+                                        <size>
+                                            <width>220</width>
+                                            <height>0</height>
+                                        </size>
+                                    </property>
+                                    <property name="text">
+                                        <string>Shift position subtitles</string>
+                                    </property>
+                                </widget>
+                                <widget class="QSpinBox">
+                                    <property name="name">
+                                        <cstring>sbShiftPos</cstring>
+                                    </property>
+                                    <property name="enabled">
+                                        <bool>false</bool>
+                                    </property>
+                                    <property name="maxValue">
+                                        <number>1000</number>
+                                    </property>
+                                    <property name="minValue">
+                                        <number>-1000</number>
+                                    </property>
+                                    <property name="value">
+                                        <number>0</number>
+                                    </property>
+                                </widget>
+                                <spacer>
+                                    <property name="name">
+                                        <cstring>spacer4_2_3_3</cstring>
+                                    </property>
+                                    <property name="orientation">
+                                        <enum>Horizontal</enum>
+                                    </property>
+                                    <property name="sizeType">
+                                        <enum>MinimumExpanding</enum>
+                                    </property>
+                                    <property name="sizeHint">
+                                        <size>
+                                            <width>134</width>
+                                            <height>20</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                            </hbox>
+                        </widget>
+                    </vbox>
+                </widget>
+                <widget class="QLayoutWidget">
+                    <property name="name">
+                        <cstring>layout9</cstring>
+                    </property>
+                    <hbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>pbGo</cstring>
+                            </property>
+                            <property name="text">
+                                <string>&amp;Proceed</string>
+                            </property>
+                            <property name="accel">
+                                <string>Alt+P</string>
+                            </property>
+                        </widget>
+                        <spacer>
+                            <property name="name">
+                                <cstring>spacer4</cstring>
+                            </property>
+                            <property name="orientation">
+                                <enum>Horizontal</enum>
+                            </property>
+                            <property name="sizeType">
+                                <enum>Expanding</enum>
+                            </property>
+                            <property name="sizeHint">
+                                <size>
+                                    <width>325</width>
+                                    <height>20</height>
+                                </size>
+                            </property>
+                        </spacer>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>pbQuit</cstring>
+                            </property>
+                            <property name="text">
+                                <string>&amp;Quitter</string>
+                            </property>
+                            <property name="accel">
+                                <string>Alt+Q</string>
+                            </property>
+                        </widget>
+                    </hbox>
+                </widget>
+                <widget class="QLabel">
+                    <property name="name">
+                        <cstring>tlOutputFile</cstring>
+                    </property>
+                    <property name="text">
+                        <string>&amp;Output File</string>
+                    </property>
+                    <property name="buddy" stdset="0">
+                        <cstring>leOutputFile</cstring>
+                    </property>
+                </widget>
+                <widget class="QLayoutWidget">
+                    <property name="name">
+                        <cstring>layout46</cstring>
+                    </property>
+                    <hbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>tlType_2</cstring>
+                            </property>
+                            <property name="text">
+                                <string>Output File Type</string>
+                            </property>
+                            <property name="buddy" stdset="0">
+                                <cstring>cbType</cstring>
+                            </property>
+                        </widget>
+                        <widget class="QComboBox">
+                            <property name="name">
+                                <cstring>cbTypeO</cstring>
+                            </property>
+                        </widget>
+                        <widget class="QLineEdit">
+                            <property name="name">
+                                <cstring>leOutputFile</cstring>
+                            </property>
+                        </widget>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>pbSelectOutputFile</cstring>
+                            </property>
+                            <property name="text">
+                                <string></string>
+                            </property>
+                            <property name="pixmap">
+                                <pixmap>image1</pixmap>
+                            </property>
+                        </widget>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>pbSave</cstring>
+                            </property>
+                            <property name="enabled">
+                                <bool>false</bool>
+                            </property>
+                            <property name="text">
+                                <string>Save</string>
+                            </property>
+                            <property name="accel">
+                                <string></string>
+                            </property>
+                        </widget>
+                    </hbox>
+                </widget>
+                <spacer>
+                    <property name="name">
+                        <cstring>spacer36</cstring>
+                    </property>
+                    <property name="orientation">
+                        <enum>Vertical</enum>
+                    </property>
+                    <property name="sizeType">
+                        <enum>Expanding</enum>
+                    </property>
+                    <property name="sizeHint">
+                        <size>
+                            <width>20</width>
+                            <height>73</height>
+                        </size>
+                    </property>
+                </spacer>
+            </vbox>
+        </widget>
+        <widget class="QLayoutWidget">
+            <property name="name">
+                <cstring>layout47</cstring>
+            </property>
+            <vbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QLabel">
+                    <property name="name">
+                        <cstring>tlInputSubs</cstring>
+                    </property>
+                    <property name="backgroundOrigin">
+                        <enum>WindowOrigin</enum>
+                    </property>
+                    <property name="text">
+                        <string>Input subs</string>
+                    </property>
+                </widget>
+                <widget class="QListBox">
+                    <item>
+                        <property name="text">
+                            <string>New Item</string>
+                        </property>
+                    </item>
+                    <property name="name">
+                        <cstring>lbInputSubs</cstring>
+                    </property>
+                </widget>
+                <widget class="QLabel">
+                    <property name="name">
+                        <cstring>tlOutputSubs</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Output subs</string>
+                    </property>
+                </widget>
+                <widget class="QListBox">
+                    <item>
+                        <property name="text">
+                            <string>New Item</string>
+                        </property>
+                    </item>
+                    <property name="name">
+                        <cstring>lbOutputSubs</cstring>
+                    </property>
+                </widget>
+            </vbox>
+        </widget>
+    </hbox>
+</widget>
+<images>
+    <image name="image0">
+        <data format="PNG" length="1573">89504e470d0a1a0a0000000d4948445200000024000000240806000000e1009898000005ec494441545885b597ed6f5bd51dc73fc7be71fcdc1657095d9b923669e8a06d8ad250f2a2454ac8d2d1b28c4a69c9064883a66a356d14b63f004d884e5413824d6ae00d09da109bd637295a1f5e9421adf246fa002550e30cda24d471d2388993f83ab6ef3d971776b2b8f173bb9f7474aece39f7fe3ef77b7ebff3200cc3004008a174777727745d474a49a63a579f9492356bd62084f8ead4a9534f7bbdde20300f2480a493024c59f26cd6759df6f676000cc3600136d7f3d236afd7cbe8e8e843cdcdcda7a7a6a60efa7cbe2120520c541a909492b56bd77269cb96ac2fec1818c8dad7dfdfcfba75eb181c1cac6b6969f99bcfe77b32051201e4330fb3f1c32f19490d978096aa17cdb4e459e8ba5ec84f64b5783c8ec7e3a1b3b3138bc5b2a9a3a3e32de03ec0f5dc360e1f7aceedfff48d8ab1dea3ced7b756b01eb0036580c804849469b025011986415555155d5d5db8ddee27dbdadadedebd9e5d2fbe227edf7250a7b1dee57efe272b5e7ef3b0f3a3da556c041c4ba1d280ee8542524a2c160bd5d5d51c3b760cb7c3bab763bffdcf8fefc58dae42780244192d4dce074ffcc2f677920ada007346a04862faae80344dc36c3663b158a8a9a9a173b7c60b2f459d24804bc0d40c726c0275de4a53bd73d3e30fd04a522505d2831a29258eb295399d5ebe7c39637b4343c3221080d96ce6cab96e763cf60fec4ee0df02c2c9440b455730a73ab878351a199d630ab0905448a4011532652e972b6bdf5220ffe57f628afe96aa1ae05b05c64c203466e42ae68c950c8f4678effc588f3fc42d92996640068572a53cc0ccfefdcbda169682783c4e4f4f0fef9efc232f3e7195ce233698d0e14b0b089db828276454129e4df06edf77672fdce434300344492e0146d10ae5b203070ed0dadacac5de67e93cba02d4385c1160d291d24c20713f08f8ebb991e10f3ed34e0253a9124901dddbb4dfba752b33d7fb78e9551b082b5cb582ae80496148ad20ae9be8fb648cb363ebfb8139601a9805e2a416c87b9af6ded33dd46d3e83dde5800105e6ca402804e65c44e266bef04f73d3d18c2e2c3aa0a64a8c943a9021864a31bfdf4f68c40ff3ef50b7bb026ecd41c00442614255189d2d637a661e77e3afa99e2c47f4fb8c1444823bb68e6531b463602067608bdede656da1b100a1c13fb1ef6795301b01bf0626854854706342104be88cdb76b1675f175fbdff3e24336aa1a459d10a3534342c6bfbe8e4219a7fba0a7409d76e8334a319e00b48e635189cf4b0e737afa69d14b2d95dc790b7af9bfa2615bbcb0dd767202e40943130a433ad1a7c3d1c67e7cf8f536e7715045452da2f7cd8d7ff31b6f20b546daa869bb7201407a170231863745263725a6573fb6bdcbff1e18260a084bd2c168b118d4699bc1de49b4b6fb27dd736086b303405268589b0e4da37116623094cd57bf961d38f17618a062a642f0b04020483412efce5044fbdd00631135c1f0193424237f1afcf42683a7c375fc923edbf627c7c3ce329339b153d65c1601000a7b31cf080ef73d0937173de3b4c3426b9119865e7913f303e3e0e80c7e32908a624a00d1b3630191cc6f6c00650ab93cb9a49e13f574799988c31311966cf2bbd78aaeab29ebd7359d15b87c3e120387885edbbf782b502ea8f1032d7e2bba9323317a3f647bfa4eac1edd86c36ec763b369b0dc330905222a52c7ecaf2a96418066621932717a180e2c456d7cada47225867cd34b5772d53a498a05eb63086d5db79813ebde6a7b155c36e51f09eeb23343d4ffd134729b7bbd3c6652b0503699a86d5ecce3616805b37bee6bf23e3bcf6bbe334d6dec7c686367ed058856e18a8aa9a519d85692b49a17c2ff57f7286ca950eb66dd98ca7a69ef0bc243c34b40891a9aeadad2d4d215dd7f3beb0b3ed208f665853ee74584afc2c032a44a1d5ab57e7749c0ba66485365dbc98d75136c7d95429298616808a71906fec5d65593ea06254cad75730d0c2fdbc1807778ec93536df6eb014c89052d2d1d171d7b78f7c26a59ce67f378d34c9c4c21f0921ca81154065aab6fe9f78349257a050aa4480c5fd6a2990029493bcf85bb9633aefa14992eaa8246fac69378fef015643a93e355f62690000000049454e44ae426082</data>
+    </image>
+    <image name="image1">
+        <data format="PNG" length="201">89504e470d0a1a0a0000000d49484452000000100000000d0806000000a0bbee24000000904944415428919d92410ac4200c457f4ab65de4429e6c6018989365e1755cf40076a18106621503f2157d21ff23e59c31ab9452b5bdaad2f3ee588155956c5933535a99603491aa12cf461cc156c4ccb55c00500008e41cc351736ed260a0a05ce2cea6724ad8b48718435ee3ea16fce3371b030b1efe7ce7e0ffd732e916f660e091c10e0cf40c803dd83558a9e81fdc37d14cdb656b27f80000000049454e44ae426082</data>
+    </image>
+</images>
+<connections>
+    <connection>
+        <sender>pbSelectInputFile</sender>
+        <signal>clicked()</signal>
+        <receiver>WndSub</receiver>
+        <slot>clicSelectInputFile()</slot>
+    </connection>
+    <connection>
+        <sender>pbQuit</sender>
+        <signal>clicked()</signal>
+        <receiver>WndSub</receiver>
+        <slot>close()</slot>
+    </connection>
+    <connection>
+        <sender>pbGo</sender>
+        <signal>clicked()</signal>
+        <receiver>WndSub</receiver>
+        <slot>clicProceed()</slot>
+    </connection>
+    <connection>
+        <sender>pbSave</sender>
+        <signal>clicked()</signal>
+        <receiver>WndSub</receiver>
+        <slot>clickedSave()</slot>
+    </connection>
+    <connection>
+        <sender>pbSelectOutputFile</sender>
+        <signal>clicked()</signal>
+        <receiver>WndSub</receiver>
+        <slot>clicSelectOutputFile()</slot>
+    </connection>
+    <connection>
+        <sender>leOutputFile</sender>
+        <signal>textChanged(const QString&amp;)</signal>
+        <receiver>WndSub</receiver>
+        <slot>filenameChanged()</slot>
+    </connection>
+    <connection>
+        <sender>cbShift</sender>
+        <signal>clicked()</signal>
+        <receiver>WndSub</receiver>
+        <slot>checkShift()</slot>
+    </connection>
+    <connection>
+        <sender>cbExpand</sender>
+        <signal>clicked()</signal>
+        <receiver>WndSub</receiver>
+        <slot>checkExpand()</slot>
+    </connection>
+    <connection>
+        <sender>cbFps</sender>
+        <signal>clicked()</signal>
+        <receiver>WndSub</receiver>
+        <slot>checkFps()</slot>
+    </connection>
+    <connection>
+        <sender>cbAuto</sender>
+        <signal>clicked()</signal>
+        <receiver>WndSub</receiver>
+        <slot>checkAuto()</slot>
+    </connection>
+    <connection>
+        <sender>cbAuto</sender>
+        <signal>stateChanged(int)</signal>
+        <receiver>WndSub</receiver>
+        <slot>checkAuto()</slot>
+    </connection>
+    <connection>
+        <sender>cbShiftPos</sender>
+        <signal>clicked()</signal>
+        <receiver>WndSub</receiver>
+        <slot>checkShiftPos()</slot>
+    </connection>
+</connections>
+<tabstops>
+    <tabstop>leInputFile</tabstop>
+    <tabstop>pbSelectInputFile</tabstop>
+    <tabstop>cbType</tabstop>
+    <tabstop>cbShift</tabstop>
+    <tabstop>sbShift</tabstop>
+    <tabstop>cbExpand</tabstop>
+    <tabstop>sbExpand</tabstop>
+    <tabstop>cbFps</tabstop>
+    <tabstop>comboFpsOrig</tabstop>
+    <tabstop>comboFpsDest</tabstop>
+    <tabstop>cbAuto</tabstop>
+    <tabstop>timeFirstSub</tabstop>
+    <tabstop>timeFirstSpeak</tabstop>
+    <tabstop>timeLastSub</tabstop>
+    <tabstop>timeLastSpeak</tabstop>
+    <tabstop>pbGo</tabstop>
+    <tabstop>cbTypeO</tabstop>
+    <tabstop>leOutputFile</tabstop>
+    <tabstop>pbSelectOutputFile</tabstop>
+    <tabstop>pbSave</tabstop>
+    <tabstop>pbQuit</tabstop>
+    <tabstop>lbInputSubs</tabstop>
+    <tabstop>lbOutputSubs</tabstop>
+</tabstops>
+<includes>
+    <include location="local" impldecl="in declaration">qfiledialog.h</include>
+    <include location="local" impldecl="in declaration">qmessagebox.h</include>
+    <include location="local" impldecl="in declaration">qregexp.h</include>
+    <include location="local" impldecl="in declaration">subtitle.h</include>
+    <include location="global" impldecl="in declaration">vector</include>
+    <include location="local" impldecl="in declaration">qstatusbar.h</include>
+    <include location="global" impldecl="in declaration">krootpixmap.h</include>
+    <include location="local" impldecl="in implementation">wndsub.ui.h</include>
+</includes>
+<forwards>
+    <forward>class subtitle;</forward>
+</forwards>
+<variables>
+    <variable>std::vector&lt;subtitle&gt; subvec;</variable>
+    <variable access="private">KRootPixmap *root;</variable>
+    <variable>std::vector&lt;subtitle&gt; v_subs;</variable>
+</variables>
+<slots>
+    <slot>filenameChanged()</slot>
+    <slot>init()</slot>
+    <slot>clickedSave()</slot>
+    <slot>clicSelectInputFile()</slot>
+    <slot>clicSelectOutputFile()</slot>
+    <slot>checkFps()</slot>
+    <slot>checkExpand()</slot>
+    <slot>checkShift()</slot>
+    <slot>checkAuto()</slot>
+    <slot>timeBasedProceed( subtitle &amp; s )</slot>
+    <slot>frameBasedProceed( subtitle &amp; s )</slot>
+    <slot>clicProceed()</slot>
+    <slot>saveSami()</slot>
+    <slot>loadSami()</slot>
+    <slot access="">checkShiftPos()</slot>
+</slots>
+<functions>
+    <function access="protected">autoDetectFormat()</function>
+    <function access="protected">loadSubFile()</function>
+    <function access="protected">showOutputSubs()</function>
+    <function access="protected">showInputSubs()</function>
+    <function access="protected">saveMicrodvd()</function>
+    <function>saveSubrip()</function>
+    <function access="protected">saveSubviewer()</function>
+    <function access="protected">saveSpumux()</function>
+    <function access="protected">loadSubviewer()</function>
+    <function access="protected">loadMicrodvd()</function>
+    <function access="protected">loadSubrip()</function>
+    <function>loadSpumux()</function>
+</functions>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>
