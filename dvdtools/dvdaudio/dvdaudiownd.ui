@@ -238,6 +238,8 @@
         <action name="aPreview"/>
         <separator/>
         <action name="aMEncoder"/>
+        <action name="aDirectPlay"/>
+        <separator/>
         <action name="aEncode"/>
     </toolbar>
 </toolbars>
@@ -361,6 +363,23 @@
             <string>Mencoder</string>
         </property>
     </action>
+    <action>
+        <property name="name">
+            <cstring>aDirectPlay</cstring>
+        </property>
+        <property name="toggleAction">
+            <bool>true</bool>
+        </property>
+        <property name="on">
+            <bool>true</bool>
+        </property>
+        <property name="iconSet">
+            <iconset>ic_directplay.png</iconset>
+        </property>
+        <property name="text">
+            <string>Direct Play</string>
+        </property>
+    </action>
 </actions>
 <includes>
     <include location="global" impldecl="in declaration">qlistview.h</include>
@@ -399,7 +418,8 @@
     <slot>selectBgColor()</slot>
     <slot>selectFont()</slot>
     <slot>encode()</slot>
-    <slot>readProc()</slot>
+    <slot>readProcMpginfo()</slot>
+    <slot>readProcMplayer()</slot>
     <slot>preview()</slot>
     <slot>removeItem()</slot>
     <slot>makeMenu( QStringList albums )</slot>

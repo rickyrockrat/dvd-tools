@@ -103,9 +103,24 @@ void dvdaudioWnd::newAlbum()
 			filename = d.absPath() + "/" + l[i];
 			mpginfoProc = new QProcess(this );
 			connect( mpginfoProc, SIGNAL(readyReadStdout()),
-						this, SLOT(readProc()));
+						this, SLOT(readProcMplayer()));
+			mpginfoProc->addArgument( "mplayer" );
+			mpginfoProc->addArgument( "-vo" );
+			mpginfoProc->addArgument( "null" );
+			mpginfoProc->addArgument( "-ao" );
+			mpginfoProc->addArgument( "null" );
+			mpginfoProc->addArgument( "-frames" );
+			mpginfoProc->addArgument( "0" );
+			mpginfoProc->addArgument( "-identify" );
+			mpginfoProc->addArgument( filename );
+			mpginfoProc->start();
+
+			/*
+			connect( mpginfoProc, SIGNAL(readyReadStdout()),
+						this, SLOT(readProcMpginfo()));
 			mpginfoProc->addArgument( "mpginfo" );
 			mpginfoProc->addArgument( filename );
+			*/
 			mpginfoProc->start();
 
 			while ( mpginfoProc->isRunning() )
@@ -170,10 +185,24 @@ void dvdaudioWnd::addTracks()
 		{
 			mpginfoProc = new QProcess(this );
 			connect( mpginfoProc, SIGNAL(readyReadStdout()),
-						this, SLOT(readProc()));
-			mpginfoProc->addArgument( "mpginfo" );
+						this, SLOT(readProcMplayer()));
+			mpginfoProc->addArgument( "mplayer" );
+			mpginfoProc->addArgument( "-vo" );
+			mpginfoProc->addArgument( "null" );
+			mpginfoProc->addArgument( "-ao" );
+			mpginfoProc->addArgument( "null" );
+			mpginfoProc->addArgument( "-frames" );
+			mpginfoProc->addArgument( "0" );
+			mpginfoProc->addArgument( "-identify" );
 			mpginfoProc->addArgument( *it );
 			mpginfoProc->start();
+
+			/*
+			connect( mpginfoProc, SIGNAL(readyReadStdout()),
+						this, SLOT(readProcMpginfo()));
+			mpginfoProc->addArgument( "mpginfo" );
+			mpginfoProc->addArgument( *it );
+			*/
 
 			while ( mpginfoProc->isRunning() )
 			{
@@ -181,7 +210,7 @@ void dvdaudioWnd::addTracks()
 			if ( !mpginfoProc->normalExit() )
 			{
 				QMessageBox::information( this, "Problem",
-					"mpginfo error for file " + *it );
+					"mplayer identify error for file " + *it );
 			}
 			else
 			{
@@ -261,24 +290,33 @@ void dvdaudioWnd::encode()
 			delete tpw;
 
 			shName.sprintf( "enc%04d.sh", ctr );
-			outputName.sprintf( "vob%04d.vob", ctr++ );
+			outputName.sprintf( "vob%04d.vob", ctr );
 			QFile fEnc( shName );
-			QTime t = QTime::fromString( item->text( ID_DURATION ) );
-			int duration = t.hour() * 3600 + t.minute() * 60 + t.second();
 
 			if ( fEnc.open( IO_WriteOnly ) );
 			{
-				duration *= npal.toInt();
 				QTextStream stream( &fEnc );
 				
-				outputMp2.sprintf( "mp2%04d.mp2", ctr++ );
+				outputMp2.sprintf( "mp2%04d.mp2", ctr );
 				stream << "#!/bin/bash" << endl;
 				stream << "lame --decode \"" << item->text( ID_FILENAME );
 				stream << "\" - | toolame -b " << item->text( ID_BITRATE );
 				stream << " -s 48 /dev/stdin " << outputMp2 << endl;
+				stream << "set `mpginfo " << outputMp2;
+				stream << "| grep \"Estimated Duration:\" | cut -f2- -d\":\" | cut -f1 -d\".\" | tr \":\" \" \"`" << endl;
+				stream << "if [ -n \"$3\" ]" << endl;
+				stream << "then" << endl;
+        		stream << "  dur=$(($1*3600+$2*60+$3))" << endl;
+				stream << "elif [ -n \"$2\" ]" << endl;
+				stream << "then" << endl;
+        		stream << "  dur=$(($1*60+$2))" << endl;
+				stream << "else" << endl;
+        		stream << "  dur=$1" << endl;
+				stream << "fi" << endl;
+				stream << "nb=$(($dur*25))" << endl;
 				if ( aMEncoder->isOn() )
 				{
-					stream << "ppmtoy4m -n " << duration << pal;
+					stream << "ppmtoy4m -n $nb" << pal;
 					stream << " -r -S 420mpeg2 " << name;
 					stream << " | mencoder -audiofile " << outputMp2;
 					stream << " -oac copy -ovc lavc -lavcopts";
@@ -290,7 +328,7 @@ void dvdaudioWnd::encode()
 				else
 				{
 					// encoding with mpeg2enc
-					stream << "ppmtoy4m -n " << duration;
+					stream << "ppmtoy4m -n $nb";
 					stream << " -r " << pal << " -S 420mpeg2 ";
 					stream << name;
 					stream << " | mpeg2enc -a 2 -F 3 -b 500 -n p -f 8 ";
@@ -313,6 +351,8 @@ void dvdaudioWnd::encode()
 				QMessageBox::information( this, "Encode",
 						"Problem starting encode" );
 			}
+			QTime t = QTime::fromString( item->text( ID_DURATION ) );
+			int duration = t.hour() * 3600 + t.minute() * 60 + t.second();
 			encoding->demarrer( item->text(ID_FILENAME), duration );
 			if ( !procEncode->normalExit() )
 			{
@@ -323,6 +363,7 @@ void dvdaudioWnd::encode()
 			//fEnc.remove();
 			files[ctAlbum].append( outputName );
 
+			ctr++;
 		}
 		it++;
 	}
@@ -331,7 +372,51 @@ void dvdaudioWnd::encode()
 }
 
 
-void dvdaudioWnd::readProc()
+void dvdaudioWnd::readProcMplayer()
+{
+	QStringList abit, arate, ed, kb, ti, ar, al, tr, ye, ge;
+	QStringList list = QStringList::split( "\n",
+										mpginfoProc->readStdout() );
+
+	ed = QStringList::split( "=", list.grep( "ID_LENGTH").join("") );
+	abit = QStringList::split( "=", list.grep( "ID_AUDIO_BITRATE").join("=") );
+	arate = QStringList::split( "=", list.grep( "ID_AUDIO_RATE").join("=") );
+	ti = QStringList::split( "=", list.grep( "ID_CLIP_INFO_VALUE0").join("") );
+	ar = QStringList::split( "=", list.grep( "ID_CLIP_INFO_VALUE1").join("") );
+	al = QStringList::split( "=", list.grep( "ID_CLIP_INFO_VALUE2").join("") );
+	tr = QStringList::split( "=", list.grep( "ID_CLIP_INFO_VALUE5").join("") );
+	ye = QStringList::split( "=", list.grep( "ID_CLIP_INFO_VALUE3").join("") );
+	ge = QStringList::split( "=", list.grep( "ID_CLIP_INFO_VALUE6").join("") );
+
+	int x = strtol( ed[1].ascii(), NULL, 10 );
+	QTime t = QTime().addSecs( x );
+
+	if ( trackItem )
+		trackItem = new QListViewItem( albumItem, trackItem, ti[1] );
+	else
+		trackItem = new QListViewItem( albumItem, ti[1] );
+	trackItem->setText( ID_IDENT, CC_TRACK ); 
+	trackItem->setText( ID_DURATION, t.toString() );
+	trackItem->setText( ID_ARTIST, ar[1] );
+	trackItem->setText( ID_ALBUM, al[1] );
+	trackItem->setText( ID_TRACK, tr[1] );
+	trackItem->setText( ID_BITRATE, abit[3] );
+	trackItem->setText( ID_SAMPLE, arate[3] );
+	trackItem->setText( ID_YEAR, ye[1] );
+	trackItem->setText( ID_GENRE, ge[1] );
+
+	trackItem->setRenameEnabled( ID_NAME, true );
+	trackItem->setRenameEnabled( ID_ARTIST, true );
+	trackItem->setRenameEnabled( ID_ALBUM, true );
+	trackItem->setRenameEnabled( ID_TRACK, true );
+	trackItem->setRenameEnabled( ID_BITRATE, true );
+	trackItem->setRenameEnabled( ID_YEAR, true );
+	trackItem->setRenameEnabled( ID_GENRE, true );
+
+	albumItem->setOpen( true );
+}
+
+void dvdaudioWnd::readProcMpginfo()
 {
 	QStringList list = QStringList::split( "\n",
 	mpginfoProc->readStdout() );
@@ -463,6 +548,10 @@ void dvdaudioWnd::makeMenu( QStringList albums )
 			stXml << "<dvdauthor dest=\"DVD\">" << endl;
 			stXml << "<vmgm>" << endl;
 			stXml << "<menus>" << endl;
+			stXml << "<pgc entry=\"title\" pause=\"0\" >" << endl;
+			stXml << "<pre>g0 = " << aDirectPlay->isOn();
+			stXml << "; jump titleset 1 menu; </pre>" << endl;
+			stXml << "</pgc>" << endl;
 			stXml << "</menus>" << endl;
 			stXml << "</vmgm>" << endl;
 			stXml << "<titleset>" << endl;
@@ -530,8 +619,9 @@ void dvdaudioWnd::makeMenu( QStringList albums )
 				stream << "rm -f " << outputsName << endl;
 				stream << "rm -f " << outputXml << endl;
 
-				stXml << "<pgc>" << endl;
-				stXml << "<vob file=\"" << outputMenu << "\"></vob>" << endl;
+				stXml << "<pgc entry=\"root\" pause=\"0\">" << endl;
+				stXml << "<pre>if ( g0 gt 0 ) { g0 = 0; jump title 1 chapter 1; }</pre>" << endl;
+				stXml << "<vob file=\"" << outputMenu << "\" pause=\"inf\"></vob>" << endl;
 				for ( int ctr = 0; (ctr < 8) && ( ((pg*8)+ctr) < albums.count()); ctr++ )
 				{
 					stXml << "<button>jump title " << ctr+1;
@@ -561,6 +651,14 @@ void dvdaudioWnd::makeMenu( QStringList albums )
 				for ( int i = 0; i < files[ti].count(); i++ )
 				{
 					stXml << "<vob file=\"" << files[ti][i] << "\"></vob>" << endl;
+				}
+				if ( ti == (albums.count()-1) )
+				{
+					stXml << "<post>call menu entry root;</post>" << endl;
+				}
+				else
+				{
+					stXml << "<post>jump title " << ti+2 << ";</post>" << endl;
 				}
 				stXml << "</pgc>" << endl;
 			}

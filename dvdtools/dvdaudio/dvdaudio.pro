@@ -21,7 +21,8 @@ IMAGES	= pix/ic_album.png \
 	pix/ic_track.png \
 	pix/ic_exit.png \
 	pix/ic_run.png \
-	pix/ic_mencoder.png
+	pix/ic_mencoder.png \
+	pix/ic_directplay.png
 
 dvdaudio.path = /usr/bin
 dvdaudio.files = dvdaudio
