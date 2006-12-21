@@ -29,6 +29,10 @@ void dvdaudioWnd::init()
 	trackDir = QDir::currentDirPath();
 	font = QFont( "Bitstream Vera Sans Mono", 28 );
 
+	connect( aNew, SIGNAL(activated()), this, SLOT(newProject()) );
+	connect( aOpen, SIGNAL(activated()), this, SLOT(openProject()) );
+	connect( aSave, SIGNAL(activated()), this, SLOT(saveProject()) );
+
 	connect( aAddAlbum, SIGNAL(activated()), this, SLOT(newAlbum()) );
 	connect( aAddTracks, SIGNAL(activated()), this, SLOT(addTracks()) );
 	connect( aBgColor, SIGNAL(activated()), this, SLOT(selectBgColor()) );
@@ -234,6 +238,122 @@ void dvdaudioWnd::selectFont()
 {
 	bool ok;
 	font = QFontDialog::getFont(&ok, font );
+}
+
+void dvdaudioWnd::newProject()
+{
+}
+
+void dvdaudioWnd::openProject()
+{
+
+	QString s = QFileDialog::getOpenFileName(
+                    workingDir,
+                    "Xml (*.xml)",
+                    this,
+                    "open file dialog",
+                    "Choose a file to open" );
+ 	if ( !s.isNull() )
+	{
+		QFile f( s );
+		if ( !f.open( IO_ReadOnly ) )
+		{
+			QMessageBox::information( this, "error", "Can't open file");
+			return;
+		}
+		QDomDocument doc;
+		QString errs;
+		int errnl, errnc;
+		if ( doc.setContent( &f, false, &errs, &errnl, &errnc ) )
+		{
+			f.close();
+			lvDVD->clear();
+			QDomElement docElem = doc.documentElement();
+			QDomAttr albumname = docElem.attributeNode( "ID_NAME" );
+			std::cout << "album=" << albumname.value();
+
+			QDomNode n = docElem.firstChild();
+			while( !n.isNull() )
+			{
+				QDomElement e = n.toElement(); 
+				if( !e.isNull() )
+				{
+					std::cout << e.tagName() << std::endl; 
+				}
+				n = n.nextSibling();
+			}
+		}
+		else
+		{
+			QString s;
+			s.sprintf( "(l=%d,c=%d)", errnl, errnc );
+			QMessageBox::information( this, "error", errs+s);
+		}
+		// erreur ?
+	}
+}
+
+void dvdaudioWnd::saveProject()
+{
+	if ( dvdItem )
+	{
+		QDomDocument doc( "DvDAudio" );
+		QDomElement rootElem = doc.createElement( "DVDAUDIO" );
+		rootElem.setAttribute( "NAME", dvdItem->text(ID_NAME) );
+
+		QListViewItemIterator it( lvDVD );
+		QListViewItem *item;
+		QDomElement el;
+		QDomElement albumEl;
+		int ctr = 0;
+
+		while ( it.current() )
+		{
+			item = it.current();
+			if ( item->text( ID_IDENT ) == CC_ALBUM )
+			{
+				if ( ctr > 0 )
+					doc.appendChild( albumEl );
+
+				ctr++;
+				albumEl = doc.createElement( "ALBUM" );
+				albumEl.setAttribute( "ID_NAME=", item->text( ID_NAME ) );
+			}
+			else if ( item->text( ID_IDENT ) == CC_TRACK )
+			{
+				el = doc.createElement( "TRACK" );
+				el.setAttribute( "ID_NAME=", item->text( ID_NAME ) );
+				el.setAttribute( "ID_DURATION", item->text( ID_DURATION ) );
+				el.setAttribute( "ID_ARTIST", item->text( ID_ARTIST ) );
+				el.setAttribute( "ID_ALBUM", item->text( ID_ALBUM ) );
+				el.setAttribute( "ID_TRACK", item->text( ID_TRACK ) );
+				el.setAttribute( "ID_BITRATE", item->text( ID_BITRATE ) );
+				el.setAttribute( "ID_SAMPLE", item->text( ID_SAMPLE ) );
+				el.setAttribute( "ID_YEAR", item->text( ID_YEAR ) );
+				el.setAttribute( "ID_GENRE", item->text( ID_GENRE ) );
+				el.setAttribute( "ID_FILENAME", item->text(ID_FILENAME) );
+				doc.appendChild( el );
+			}
+			it++;
+		}
+		if ( ctr>0 )
+			doc.appendChild( albumEl );
+		doc.appendChild( rootElem );
+		QString s = QFileDialog::getSaveFileName(
+				workingDir,
+				"Xml (*.xml)",
+				this,
+				"save file dialog",
+				"Choose a filename to save under" );
+		QFile f( s );
+		if ( !f.open(IO_WriteOnly) )
+		{
+			QMessageBox::information( this, "error", "Cannot open file" );
+		}
+		QTextStream st( &f );
+		st << doc.toString().utf8();
+		f.close();
+	}
 }
 
 void dvdaudioWnd::encode()
