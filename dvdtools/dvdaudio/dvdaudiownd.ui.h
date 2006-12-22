@@ -188,6 +188,7 @@ void dvdaudioWnd::addTracks()
 		for ( it = l.begin(); it != l.end(); it++ )
 		{
 			mpginfoProc = new QProcess(this );
+			/* ID_LENGTH reported by mplayer is also wrong...
 			connect( mpginfoProc, SIGNAL(readyReadStdout()),
 						this, SLOT(readProcMplayer()));
 			mpginfoProc->addArgument( "mplayer" );
@@ -199,22 +200,22 @@ void dvdaudioWnd::addTracks()
 			mpginfoProc->addArgument( "0" );
 			mpginfoProc->addArgument( "-identify" );
 			mpginfoProc->addArgument( *it );
-			mpginfoProc->start();
+			*/
 
-			/*
 			connect( mpginfoProc, SIGNAL(readyReadStdout()),
 						this, SLOT(readProcMpginfo()));
 			mpginfoProc->addArgument( "mpginfo" );
 			mpginfoProc->addArgument( *it );
-			*/
 
+			mpginfoProc->start();
 			while ( mpginfoProc->isRunning() )
 			{
 			}
 			if ( !mpginfoProc->normalExit() )
 			{
 				QMessageBox::information( this, "Problem",
-					"mplayer identify error for file " + *it );
+					/*"mplayer identify error for file " + *it );*/
+					"mpginfo error for file " + *it );
 			}
 			else
 			{
@@ -269,8 +270,22 @@ void dvdaudioWnd::openProject()
 			f.close();
 			lvDVD->clear();
 			QDomElement docElem = doc.documentElement();
-			QDomAttr albumname = docElem.attributeNode( "ID_NAME" );
-			std::cout << "album=" << albumname.value();
+			QDomAttr dvdname = docElem.attributeNode( "NAME" );
+			//std::cout << "dvd=" << dvdname.value() << std::endl;
+			lvDVD->addColumn( "ident", 0 );
+			lvDVD->addColumn( "duration" );
+			lvDVD->addColumn( "artist" );
+			lvDVD->addColumn( "album" );
+			lvDVD->addColumn( "track" );
+			lvDVD->addColumn( "bitrate" );
+			lvDVD->addColumn( "sample" );
+			lvDVD->addColumn( "year" );
+			lvDVD->addColumn( "genre" );
+			lvDVD->addColumn( "filename", 0 );
+
+			lvDVD->setRootIsDecorated( true );
+			dvdItem = new QListViewItem( lvDVD, "New DVD Audio", CC_DVD );
+			dvdItem->setOpen(true);
 
 			QDomNode n = docElem.firstChild();
 			while( !n.isNull() )
@@ -278,7 +293,62 @@ void dvdaudioWnd::openProject()
 				QDomElement e = n.toElement(); 
 				if( !e.isNull() )
 				{
-					std::cout << e.tagName() << std::endl; 
+					if ( e.tagName() == "ALBUM" )
+					{
+						QDomAttr albumname = e.attributeNode( "NAME" );
+						std::cout << "album=" << albumname.value() << std::endl; 
+						if ( albumItem )
+							albumItem = new QListViewItem( dvdItem, albumItem, albumname.value(), CC_ALBUM );
+						else
+							albumItem = new QListViewItem( dvdItem, albumname.value(), CC_ALBUM );
+						QDomNode n1 = e.firstChild();
+						while( !n1.isNull() )
+						{
+							QDomElement e1 = n1.toElement(); 
+							if( !e1.isNull() )
+							{
+								if ( e1.tagName() == "TRACK" )
+								{
+									QDomAttr att = e1.attributeNode( "ID_NAME" );
+									std::cout << "track=" << att.value() << std::endl; 
+									if ( trackItem )
+										trackItem = new QListViewItem( albumItem, trackItem, att.value() );
+									else
+										trackItem = new QListViewItem( albumItem, att.value() );
+									trackItem->setText( ID_IDENT, CC_TRACK ); 
+									att = e1.attributeNode( "ID_DURATION" );
+									trackItem->setText( ID_DURATION, att.value() );
+									att = e1.attributeNode( "ID_ARTIST" );
+									trackItem->setText( ID_ARTIST, att.value() );
+									att = e1.attributeNode( "ID_ALBUM" );
+									trackItem->setText( ID_ALBUM, att.value());
+									att = e1.attributeNode( "ID_TRACK" );
+									trackItem->setText( ID_TRACK, att.value());
+									att = e1.attributeNode( "ID_BITRATE" );
+									trackItem->setText( ID_BITRATE, att.value() );
+									att = e1.attributeNode( "ID_SAMPLE" );
+									trackItem->setText( ID_SAMPLE, att.value() );
+									att = e1.attributeNode( "ID_YEAR" );
+									trackItem->setText( ID_YEAR, att.value());
+									att = e1.attributeNode( "ID_GENRE" );
+									trackItem->setText( ID_GENRE, att.value());
+									att = e1.attributeNode( "ID_FILENAME" );
+									trackItem->setText( ID_FILENAME, att.value());
+
+									trackItem->setRenameEnabled( ID_NAME, true );
+									trackItem->setRenameEnabled( ID_ARTIST, true );
+									trackItem->setRenameEnabled( ID_ALBUM, true );
+									trackItem->setRenameEnabled( ID_TRACK, true );
+									trackItem->setRenameEnabled( ID_BITRATE, true );
+									trackItem->setRenameEnabled( ID_YEAR, true );
+									trackItem->setRenameEnabled( ID_GENRE, true );
+
+									albumItem->setOpen( true );
+								}
+							}
+							n1 = n1.nextSibling();
+						}
+					}
 				}
 				n = n.nextSibling();
 			}
@@ -300,6 +370,7 @@ void dvdaudioWnd::saveProject()
 		QDomDocument doc( "DvDAudio" );
 		QDomElement rootElem = doc.createElement( "DVDAUDIO" );
 		rootElem.setAttribute( "NAME", dvdItem->text(ID_NAME) );
+		doc.appendChild( rootElem );
 
 		QListViewItemIterator it( lvDVD );
 		QListViewItem *item;
@@ -312,17 +383,15 @@ void dvdaudioWnd::saveProject()
 			item = it.current();
 			if ( item->text( ID_IDENT ) == CC_ALBUM )
 			{
-				if ( ctr > 0 )
-					doc.appendChild( albumEl );
 
-				ctr++;
 				albumEl = doc.createElement( "ALBUM" );
-				albumEl.setAttribute( "ID_NAME=", item->text( ID_NAME ) );
+				albumEl.setAttribute( "NAME", item->text( ID_NAME ) );
+				rootElem.appendChild( albumEl );
 			}
 			else if ( item->text( ID_IDENT ) == CC_TRACK )
 			{
 				el = doc.createElement( "TRACK" );
-				el.setAttribute( "ID_NAME=", item->text( ID_NAME ) );
+				el.setAttribute( "ID_NAME", item->text( ID_NAME ) );
 				el.setAttribute( "ID_DURATION", item->text( ID_DURATION ) );
 				el.setAttribute( "ID_ARTIST", item->text( ID_ARTIST ) );
 				el.setAttribute( "ID_ALBUM", item->text( ID_ALBUM ) );
@@ -332,13 +401,10 @@ void dvdaudioWnd::saveProject()
 				el.setAttribute( "ID_YEAR", item->text( ID_YEAR ) );
 				el.setAttribute( "ID_GENRE", item->text( ID_GENRE ) );
 				el.setAttribute( "ID_FILENAME", item->text(ID_FILENAME) );
-				doc.appendChild( el );
+				albumEl.appendChild( el );
 			}
 			it++;
 		}
-		if ( ctr>0 )
-			doc.appendChild( albumEl );
-		doc.appendChild( rootElem );
 		QString s = QFileDialog::getSaveFileName(
 				workingDir,
 				"Xml (*.xml)",
@@ -419,44 +485,48 @@ void dvdaudioWnd::encode()
 				
 				outputMp2.sprintf( "mp2%04d.mp2", ctr );
 				stream << "#!/bin/bash" << endl;
-				stream << "lame --decode \"" << item->text( ID_FILENAME );
-				stream << "\" - | toolame -b " << item->text( ID_BITRATE );
-				stream << " -s 48 /dev/stdin " << outputMp2 << endl;
-				stream << "set `mpginfo " << outputMp2;
-				stream << "| grep \"Estimated Duration:\" | cut -f2- -d\":\" | cut -f1 -d\".\" | tr \":\" \" \"`" << endl;
-				stream << "if [ -n \"$3\" ]" << endl;
-				stream << "then" << endl;
-        		stream << "  dur=$(($1*3600+$2*60+$3))" << endl;
-				stream << "elif [ -n \"$2\" ]" << endl;
-				stream << "then" << endl;
-        		stream << "  dur=$(($1*60+$2))" << endl;
-				stream << "else" << endl;
-        		stream << "  dur=$1" << endl;
-				stream << "fi" << endl;
-				stream << "nb=$(($dur*25))" << endl;
+				QTime t = QTime::fromString( item->text( ID_DURATION ) );
+				int duration = t.hour() * 3600 + t.minute() * 60 + t.second();
+				duration *= 25;		// pal
 				if ( aMEncoder->isOn() )
 				{
-					stream << "ppmtoy4m -n $nb" << pal;
+					stream << "ppmtoy4m -n " << duration << pal;
 					stream << " -r -S 420mpeg2 " << name;
-					stream << " | mencoder -audiofile " << outputMp2;
-					stream << " -oac copy -ovc lavc -lavcopts";
-					stream << " vcodec=mpeg2video:keyint=300:vbitrate=500";
-					stream << " -of mpeg -mpegopts format=dvd:vframerate=";
+					stream << " | mencoder -audiofile \"" << item->text( ID_FILENAME );
+					stream << "\" -srate 48000 -oac lavc -ovc lavc -lavcopts";
+					stream << " acodec=mp2:abitrate=" << item->text( ID_BITRATE );
+					stream << ":vcodec=mpeg2video:keyint=300:vbitrate=500";
+					stream << " -of mpeg -mpegopts format=dvd:vbitrate=600:vframerate=";
 					stream << npal << ":tsaf:vaspect=4/3 -o ";
 					stream << outputName << " -" << endl;
 				}
 				else
 				{
 					// encoding with mpeg2enc
+					stream << "lame --decode \"" << item->text( ID_FILENAME );
+					stream << "\" - | toolame -b " << item->text( ID_BITRATE );
+					stream << " -s 48 /dev/stdin " << outputMp2 << endl;
+					stream << "set `mpginfo " << outputMp2;
+					stream << "| grep \"Estimated Duration:\" | cut -f2- -d\":\" | cut -f1 -d\".\" | tr \":\" \" \"`" << endl;
+					stream << "if [ -n \"$3\" ]" << endl;
+					stream << "then" << endl;
+					stream << "  dur=$(($1*3600+$2*60+$3))" << endl;
+					stream << "elif [ -n \"$2\" ]" << endl;
+					stream << "then" << endl;
+					stream << "  dur=$(($1*60+$2))" << endl;
+					stream << "else" << endl;
+					stream << "  dur=$1" << endl;
+					stream << "fi" << endl;
+					stream << "nb=`expr $dur \\* 25`" << endl;
 					stream << "ppmtoy4m -n $nb";
 					stream << " -r " << pal << " -S 420mpeg2 ";
 					stream << name;
 					stream << " | mpeg2enc -a 2 -F 3 -b 500 -n p -f 8 ";
 					stream << " -o /dev/stdout | mplex -f 8 -o ";
 					stream << outputName << " /dev/stdin " << outputMp2 << endl;
+					stream << "rm -f " << outputMp2;
 				}
 				stream << "rm -f " << name << endl;
-				stream << "rm -f " << outputMp2;
 			}
 			fEnc.close();
 			procEncode = new QProcess(this );
@@ -473,7 +543,7 @@ void dvdaudioWnd::encode()
 			}
 			QTime t = QTime::fromString( item->text( ID_DURATION ) );
 			int duration = t.hour() * 3600 + t.minute() * 60 + t.second();
-			encoding->demarrer( item->text(ID_FILENAME), duration );
+			encoding->demarrer( item->text(ID_FILENAME), duration*25 );
 			if ( !procEncode->normalExit() )
 			{
 				QMessageBox::information( this, "Problem",
@@ -520,7 +590,7 @@ void dvdaudioWnd::readProcMplayer()
 	trackItem->setText( ID_ARTIST, ar[1] );
 	trackItem->setText( ID_ALBUM, al[1] );
 	trackItem->setText( ID_TRACK, tr[1] );
-	trackItem->setText( ID_BITRATE, abit[3] );
+	trackItem->setText( ID_BITRATE, QString::number( abit[3].toInt()/1000) );
 	trackItem->setText( ID_SAMPLE, arate[3] );
 	trackItem->setText( ID_YEAR, ye[1] );
 	trackItem->setText( ID_GENRE, ge[1] );
@@ -683,15 +753,27 @@ void dvdaudioWnd::makeMenu( QStringList albums )
 			stream << "-s 48 /dev/stdin silence.mp2" << endl;
 				
 			// converting background to ppm
+			QFont tf = font;
+			tf.setPointSize( sbFontSize->value()+2);
+			QFontMetrics fm( tf );
+			QRect r = fm.boundingRect( dvdItem->text( ID_NAME ) );
+			int x = ( 720 - r.width() ) / 2;
 			if ( bgPic.isNull( ) )
 			{
-				stream << "convert -size 720x576 -depth 8 xc:black bg.ppm";
+				stream << "convert -size 720x576 -depth 8 xc:black ";
+				stream << "-fill blue -pointsize " << sbFontSize->value()+2;
+				stream << " -draw \"text " << x;
+				stream << ",40 '" << dvdItem->text( ID_NAME );
+				stream << "'\" bg.ppm";
 				stream << endl;
 			}
 			else
 			{
 				stream << "convert " << bgPic;
-				stream << " -depth 8 -resize 720x576 bg.ppm" << endl;
+				stream << "-fill blue -pointsize " << sbFontSize->value()+2;
+				stream << " -draw \"text " << x;
+				stream << ",40 '" << dvdItem->text( ID_NAME );
+				stream << "'\" -depth 8 -resize 720x576 bg.ppm" << endl;
 			}
 			// encoding bg to mpeg2
 			outputMpeg.sprintf( "menu_base.m2v" );
