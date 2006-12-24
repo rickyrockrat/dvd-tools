@@ -3,9 +3,9 @@ LANGUAGE	= C++
 
 CONFIG	+= qt warn_off debug
 
-LIBS	+= -lkdeui -lfreetype
+TARGET = submgmt
 
-DEFINES	+= KDE_SUBMGMT
+LIBS	+= -lkdeui -lfreetype
 
 HEADERS	+= subtitle.h
 
@@ -15,6 +15,11 @@ FORMS	= wndsub.ui
 
 IMAGES	= fileopen.xpm \
 	submgmt_icon.png
+
+submgmt.path = /usr/bin
+submgmt.files = submgmt
+
+INSTALLS += submgmt
 
 unix {
   UI_DIR = .ui

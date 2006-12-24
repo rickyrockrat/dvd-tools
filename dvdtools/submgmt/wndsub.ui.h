@@ -11,11 +11,6 @@
 *****************************************************************************/
 #include <iostream>
 
-#ifdef KDE_SUBMGMT
-#include <krootpixmap.h>
-#include <vector>
-#endif
-
 #define TIME_FMT	"hh:mm:ss,zzz"
 #define SPU_TIME_FMT	"hh:mm:ss.zzz"
 #define NUM_LINES	10
@@ -36,7 +31,7 @@ QRegExp pjs = QRegExp( "[0-9]+,[0-9]+,\"." );
 QRegExp mpsub = QRegExp( "FORMAT=[0-9]+" );
 QRegExp mpsub2 = QRegExp( "FORMAT=TIM." );
 QRegExp aqtitle = QRegExp( "-->>" );
-QRegExp subrip9 = QRegExp( "\[[0-9]+:[0-9]+:[0-9]+]" );
+QRegExp subrip9 = QRegExp( "\\[[0-9]+:[0-9]+:[0-9]+]" );
 QRegExp spumux = QRegExp( "<spu " );
 
 void WndSub::filenameChanged()
@@ -100,10 +95,6 @@ void WndSub::init()
 	sbExpand->setEnabled( false );
 	comboFpsDest->setEnabled( false );
 	tlFps->setEnabled( false );
-
-    root = new KRootPixmap( this );
-
-	root->start();
 }
 
 void WndSub::clickedSave()
@@ -156,10 +147,12 @@ void WndSub::checkFps()
 {
 	if ( cbFps->isChecked() )
 	{
+		comboFpsOrig->setEnabled( true );
 		comboFpsDest->setEnabled( true );
 	}
 	else
 	{
+		comboFpsOrig->setEnabled( false );
 		comboFpsDest->setEnabled( false );
 	}
 }

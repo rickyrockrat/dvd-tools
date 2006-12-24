@@ -1092,7 +1092,6 @@
     <include location="local" impldecl="in declaration">subtitle.h</include>
     <include location="global" impldecl="in declaration">vector</include>
     <include location="local" impldecl="in declaration">qstatusbar.h</include>
-    <include location="global" impldecl="in declaration">krootpixmap.h</include>
     <include location="local" impldecl="in implementation">wndsub.ui.h</include>
 </includes>
 <forwards>
@@ -1100,7 +1099,6 @@
 </forwards>
 <variables>
     <variable>std::vector&lt;subtitle&gt; subvec;</variable>
-    <variable access="private">KRootPixmap *root;</variable>
     <variable>std::vector&lt;subtitle&gt; v_subs;</variable>
 </variables>
 <slots>
