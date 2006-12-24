@@ -284,7 +284,7 @@ void dvdaudioWnd::openProject()
 			lvDVD->addColumn( "filename", 0 );
 
 			lvDVD->setRootIsDecorated( true );
-			dvdItem = new QListViewItem( lvDVD, "New DVD Audio", CC_DVD );
+			dvdItem = new QListViewItem( lvDVD, dvdname.value(), CC_DVD );
 			dvdItem->setOpen(true);
 
 			QDomNode n = docElem.firstChild();
@@ -296,7 +296,7 @@ void dvdaudioWnd::openProject()
 					if ( e.tagName() == "ALBUM" )
 					{
 						QDomAttr albumname = e.attributeNode( "NAME" );
-						std::cout << "album=" << albumname.value() << std::endl; 
+						//std::cout << "album=" << albumname.value() << std::endl; 
 						if ( albumItem )
 							albumItem = new QListViewItem( dvdItem, albumItem, albumname.value(), CC_ALBUM );
 						else
@@ -310,7 +310,7 @@ void dvdaudioWnd::openProject()
 								if ( e1.tagName() == "TRACK" )
 								{
 									QDomAttr att = e1.attributeNode( "ID_NAME" );
-									std::cout << "track=" << att.value() << std::endl; 
+									//std::cout << "track=" << att.value() << std::endl; 
 									if ( trackItem )
 										trackItem = new QListViewItem( albumItem, trackItem, att.value() );
 									else
@@ -731,7 +731,11 @@ void dvdaudioWnd::makeMenu( QStringList albums )
 		{
 			QTextStream stream( &fEnc );
 			QTextStream stXml( &fXml );
-			int npages = albums.count() / 8 + 1;
+			int npages = albums.count() / 8;
+			if ( ( albums.count() % 8 ) != 0 )
+			{
+				npages++;
+			}
 			QString outputName, outputsName, outputhName, outputXml, outputMenu;
 			QString outputMpeg;
 
@@ -785,6 +789,7 @@ void dvdaudioWnd::makeMenu( QStringList albums )
 			cleanAlbumNames( albums );
 			for ( int pg = 0; pg < npages; pg++ )
 			{
+				stream << "echo Generating menu " << pg << " of " << npages << endl;
 				outputName.sprintf( "menu_%04d.png", pg );
 				genMenuCommand( albums, stream, "white", outputName, pg, npages );
 
@@ -815,18 +820,18 @@ void dvdaudioWnd::makeMenu( QStringList albums )
 				stream << " silence.mp2 | ";
 				stream << "spumux " << outputXml;
 				stream << " > " << outputMenu << endl;
-				stream << "rm -f " << outputMpeg << endl;
 				stream << "rm -f " << outputName << endl;
 				stream << "rm -f " << outputhName << endl;
 				stream << "rm -f " << outputsName << endl;
 				stream << "rm -f " << outputXml << endl;
 
-				stXml << "<pgc entry=\"root\" pause=\"0\">" << endl;
+				//stXml << "<pgc entry=\"root\" pause=\"0\">" << endl;
+				stXml << "<pgc pause=\"0\">" << endl;
 				stXml << "<pre>if ( g0 gt 0 ) { g0 = 0; jump title 1 chapter 1; }</pre>" << endl;
 				stXml << "<vob file=\"" << outputMenu << "\" pause=\"inf\"></vob>" << endl;
 				for ( int ctr = 0; (ctr < 8) && ( ((pg*8)+ctr) < albums.count()); ctr++ )
 				{
-					stXml << "<button>jump title " << ctr+1;
+					stXml << "<button>jump title " << (pg*8)+ctr+1;
 					stXml << " chapter 1;</button>" << endl;
 				}
 				// prev menu
@@ -843,6 +848,7 @@ void dvdaudioWnd::makeMenu( QStringList albums )
 				}
 				stXml << "</pgc>" << endl;
 			}
+			stream << "rm -f " << outputMpeg << endl;
 			stream << "rm -f silence.mp2" << endl;
 
 			stXml << "</menus>" << endl;
@@ -856,7 +862,7 @@ void dvdaudioWnd::makeMenu( QStringList albums )
 				}
 				if ( ti == (albums.count()-1) )
 				{
-					stXml << "<post>call menu entry root;</post>" << endl;
+					stXml << "<post>call menu;</post>" << endl;
 				}
 				else
 				{
