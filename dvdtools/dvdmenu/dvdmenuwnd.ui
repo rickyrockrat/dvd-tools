@@ -1,0 +1,405 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>dvdmenuWnd</class>
+<widget class="QMainWindow">
+    <property name="name">
+        <cstring>dvdmenuWnd</cstring>
+    </property>
+    <property name="enabled">
+        <bool>true</bool>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>471</width>
+            <height>469</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>DvD Menu</string>
+    </property>
+    <hbox>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <widget class="QLayoutWidget">
+            <property name="name">
+                <cstring>layout4</cstring>
+            </property>
+            <vbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QListView">
+                    <column>
+                        <property name="text">
+                            <string>Name</string>
+                        </property>
+                        <property name="clickable">
+                            <bool>true</bool>
+                        </property>
+                        <property name="resizable">
+                            <bool>true</bool>
+                        </property>
+                    </column>
+                    <property name="name">
+                        <cstring>lvDVD</cstring>
+                    </property>
+                    <property name="frameShape">
+                        <enum>StyledPanel</enum>
+                    </property>
+                    <property name="frameShadow">
+                        <enum>Sunken</enum>
+                    </property>
+                    <property name="defaultRenameAction">
+                        <enum>Accept</enum>
+                    </property>
+                </widget>
+                <widget class="QProgressBar">
+                    <property name="name">
+                        <cstring>pbOccup</cstring>
+                    </property>
+                </widget>
+            </vbox>
+        </widget>
+        <widget class="QLayoutWidget">
+            <property name="name">
+                <cstring>layout5</cstring>
+            </property>
+            <vbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QGroupBox">
+                    <property name="name">
+                        <cstring>groupBox1_2</cstring>
+                    </property>
+                    <property name="title">
+                        <string>Menu</string>
+                    </property>
+                    <vbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QToolButton">
+                            <property name="name">
+                                <cstring>pbMenuSound</cstring>
+                            </property>
+                            <property name="minimumSize">
+                                <size>
+                                    <width>0</width>
+                                    <height>40</height>
+                                </size>
+                            </property>
+                            <property name="text">
+                                <string>Menu
+Music</string>
+                            </property>
+                        </widget>
+                        <widget class="QToolButton">
+                            <property name="name">
+                                <cstring>pbMenuBg</cstring>
+                            </property>
+                            <property name="minimumSize">
+                                <size>
+                                    <width>0</width>
+                                    <height>40</height>
+                                </size>
+                            </property>
+                            <property name="text">
+                                <string>Background
+Picture</string>
+                            </property>
+                        </widget>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>textLabel1</cstring>
+                            </property>
+                            <property name="text">
+                                <string>Font size</string>
+                            </property>
+                        </widget>
+                        <widget class="QSpinBox">
+                            <property name="name">
+                                <cstring>sbFontSize</cstring>
+                            </property>
+                            <property name="maxValue">
+                                <number>70</number>
+                            </property>
+                            <property name="minValue">
+                                <number>28</number>
+                            </property>
+                            <property name="value">
+                                <number>28</number>
+                            </property>
+                        </widget>
+                    </vbox>
+                </widget>
+            </vbox>
+        </widget>
+    </hbox>
+</widget>
+<menubar>
+    <property name="name">
+        <cstring>MenuBarEditor</cstring>
+    </property>
+    <item text="&amp;File" name="File">
+        <action name="aExit"/>
+    </item>
+</menubar>
+<toolbars>
+    <toolbar dock="2">
+        <property name="name">
+            <cstring>Toolbar</cstring>
+        </property>
+        <property name="label">
+            <string>Toolbar</string>
+        </property>
+        <action name="aOpen"/>
+        <action name="aSave"/>
+        <separator/>
+        <action name="aNewDVD"/>
+        <action name="aAddTitle"/>
+        <action name="aAddVideo"/>
+        <action name="aRemove"/>
+        <separator/>
+        <action name="aFont"/>
+        <action name="aBgColor"/>
+        <action name="aPreview"/>
+        <separator/>
+        <action name="aMEncoder"/>
+        <action name="aDirectPlay"/>
+        <separator/>
+        <action name="aEncode"/>
+    </toolbar>
+</toolbars>
+<actions>
+    <action>
+        <property name="name">
+            <cstring>aNewDVD</cstring>
+        </property>
+        <property name="iconSet">
+            <iconset>ic_newdvd.png</iconset>
+        </property>
+        <property name="text">
+            <string>New DVD</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>aAddTitle</cstring>
+        </property>
+        <property name="toggleAction">
+            <bool>false</bool>
+        </property>
+        <property name="iconSet">
+            <iconset>ic_title.png</iconset>
+        </property>
+        <property name="text">
+            <string>Add Title</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>aAddVideo</cstring>
+        </property>
+        <property name="iconSet">
+            <iconset>ic_video.png</iconset>
+        </property>
+        <property name="text">
+            <string>Add Video</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>aFont</cstring>
+        </property>
+        <property name="iconSet">
+            <iconset>ic_font.png</iconset>
+        </property>
+        <property name="text">
+            <string>Font</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>aBgColor</cstring>
+        </property>
+        <property name="iconSet">
+            <iconset>ic_bgcolor.png</iconset>
+        </property>
+        <property name="text">
+            <string>Background Color</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>aPreview</cstring>
+        </property>
+        <property name="iconSet">
+            <iconset>ic_preview.png</iconset>
+        </property>
+        <property name="text">
+            <string>Preview</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>aRemove</cstring>
+        </property>
+        <property name="iconSet">
+            <iconset>ic_remove.png</iconset>
+        </property>
+        <property name="text">
+            <string>Remove</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>aEncode</cstring>
+        </property>
+        <property name="iconSet">
+            <iconset>ic_run.png</iconset>
+        </property>
+        <property name="text">
+            <string>Encode</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>aExit</cstring>
+        </property>
+        <property name="iconSet">
+            <iconset>ic_exit.png</iconset>
+        </property>
+        <property name="text">
+            <string>Exit</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>aMEncoder</cstring>
+        </property>
+        <property name="toggleAction">
+            <bool>true</bool>
+        </property>
+        <property name="on">
+            <bool>true</bool>
+        </property>
+        <property name="iconSet">
+            <iconset>ic_mencoder.png</iconset>
+        </property>
+        <property name="text">
+            <string>Mencoder</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>aDirectPlay</cstring>
+        </property>
+        <property name="toggleAction">
+            <bool>true</bool>
+        </property>
+        <property name="on">
+            <bool>true</bool>
+        </property>
+        <property name="iconSet">
+            <iconset>ic_directplay.png</iconset>
+        </property>
+        <property name="text">
+            <string>Direct Play</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>aNew</cstring>
+        </property>
+        <property name="iconSet">
+            <iconset>ic_new.png</iconset>
+        </property>
+        <property name="text">
+            <string>New project</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>aOpen</cstring>
+        </property>
+        <property name="iconSet">
+            <iconset>ic_open.png</iconset>
+        </property>
+        <property name="text">
+            <string>Open project</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>aSave</cstring>
+        </property>
+        <property name="iconSet">
+            <iconset>ic_save.png</iconset>
+        </property>
+        <property name="text">
+            <string>Save project</string>
+        </property>
+    </action>
+</actions>
+<includes>
+    <include location="global" impldecl="in declaration">qlistview.h</include>
+    <include location="global" impldecl="in declaration">qdir.h</include>
+    <include location="global" impldecl="in declaration">qfiledialog.h</include>
+    <include location="global" impldecl="in declaration">qprocess.h</include>
+    <include location="global" impldecl="in declaration">qmessagebox.h</include>
+    <include location="local" impldecl="in declaration">videopreview.h</include>
+    <include location="global" impldecl="in declaration">qpixmap.h</include>
+    <include location="global" impldecl="in declaration">qimage.h</include>
+    <include location="global" impldecl="in declaration">qfile.h</include>
+    <include location="local" impldecl="in declaration">encodewnd.h</include>
+    <include location="global" impldecl="in declaration">qfontdialog.h</include>
+    <include location="global" impldecl="in declaration">qcolordialog.h</include>
+    <include location="global" impldecl="in declaration">qdom.h</include>
+    <include location="local" impldecl="in implementation">dvdmenuwnd.ui.h</include>
+</includes>
+<variables>
+    <variable access="private">QStringList *files;</variable>
+    <variable access="private">QString videoDir;</variable>
+    <variable access="private">int titleCtr;</variable>
+    <variable access="private">QColor bgcolor;</variable>
+    <variable access="private">QFont font;</variable>
+    <variable access="private">QProcess *procEncode;</variable>
+    <variable access="private">QString workingDir;</variable>
+    <variable access="public">QListViewItem *videoItem;</variable>
+    <variable access="private">QProcess *mpginfoProc;</variable>
+    <variable access="public">QListViewItem *titleItem;</variable>
+    <variable access="public">QListViewItem * dvdItem;</variable>
+    <variable access="private">QString bgPic;</variable>
+    <variable access="private">QString menuSound;</variable>
+</variables>
+<slots>
+    <slot>newDVD()</slot>
+    <slot>newTitle()</slot>
+    <slot>lvClicked( QListViewItem * item )</slot>
+    <slot>addVideo()</slot>
+    <slot>selectBgColor()</slot>
+    <slot>selectFont()</slot>
+    <slot>newProject()</slot>
+    <slot>openProject()</slot>
+    <slot>saveProject()</slot>
+    <slot>encode()</slot>
+    <slot>preview()</slot>
+    <slot>removeItem()</slot>
+    <slot>makeMenu( QStringList titles )</slot>
+    <slot>makeDvd()</slot>
+    <slot>setOptions( videoPreviewWnd * t )</slot>
+    <slot>cleanAlbumNames( QStringList &amp; titles )</slot>
+    <slot>genMenuCommand( QStringList titles, QTextStream &amp; stream, QString color, QString outputName, int pg, int npages )</slot>
+    <slot>selectBgPic()</slot>
+    <slot>selectSound()</slot>
+</slots>
+<functions>
+    <function access="private" specifier="non virtual">init()</function>
+    <function returnType="QString">stringListeEnd( QStringList &amp; liste, int depart )</function>
+</functions>
+<pixmapinproject/>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>
