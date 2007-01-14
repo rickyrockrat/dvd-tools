@@ -89,7 +89,7 @@ void dvdaudioWnd::newAlbum()
 	}
 	else
 	{
-		a = s;
+		a = s.section( '/', -2 );
 	}
 	if ( albumItem )
 		albumItem = new QListViewItem( dvdItem, albumItem, a, CC_ALBUM );
@@ -774,7 +774,7 @@ void dvdaudioWnd::makeMenu( QStringList albums )
 			else
 			{
 				stream << "convert " << bgPic;
-				stream << "-fill blue -pointsize " << sbFontSize->value()+2;
+				stream << " -fill blue -pointsize " << sbFontSize->value()+2;
 				stream << " -draw \"text " << x;
 				stream << ",40 '" << dvdItem->text( ID_NAME );
 				stream << "'\" -depth 8 -resize 720x576 bg.ppm" << endl;
@@ -811,7 +811,7 @@ void dvdaudioWnd::makeMenu( QStringList albums )
 				stream << "select=\"" << outputsName << "\"" << endl;
 				stream << "highlight=\"" << outputhName << "\"" << endl;
 				stream << "autooutline=\"infer\"" << endl;
-				stream << "outlinewidth=\"12\"" << endl;
+				stream << "outlinewidth=\"20\"" << endl;
 				stream << "autoorder=\"rows\">" << endl;
 				stream << "</spu>" << endl;
 				stream << "</stream>" << endl;
