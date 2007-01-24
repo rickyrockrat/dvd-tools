@@ -33,7 +33,7 @@ void dvdmenuWnd::init()
 	connect( aOpen, SIGNAL(activated()), this, SLOT(openProject()) );
 	connect( aSave, SIGNAL(activated()), this, SLOT(saveProject()) );
 
-	connect( aAddTitle, SIGNAL(activated()), this, SLOT(newTitle()) );
+	connect( aAddTitle, SIGNAL(activated()), this, SLOT(addTitle()) );
 	connect( aAddVideo, SIGNAL(activated()), this, SLOT(addVideo()) );
 	connect( aBgColor, SIGNAL(activated()), this, SLOT(selectBgColor()) );
 	connect( aEncode, SIGNAL(activated()), this, SLOT(encode()) );
@@ -54,7 +54,8 @@ void dvdmenuWnd::newDVD()
 {
 	lvDVD->clear();
 	lvDVD->addColumn( "ident", 0 );
-	lvDVD->addColumn( "picture" );
+	lvDVD->addColumn( "picture/chapters" );
+	lvDVD->addColumn( "aspect" );
 	lvDVD->addColumn( "audio1" );
 	lvDVD->addColumn( "audio2" );
 	lvDVD->addColumn( "sub1" );
@@ -74,33 +75,38 @@ void dvdmenuWnd::newDVD()
 			"Choose the temporary directory" );
 }
 
-void dvdmenuWnd::newTitle()
+void dvdmenuWnd::addTitle()
 {
-	QString a;
-	QString s = QFileDialog::getOpenFileName(
-                    workingDir,
-                    "Picture (*.png;*.jpg)",
-                    this,
-                    "open file dialog",
-                    "Choose a picture for the title" );
-	a.sprintf( "Title %d", ++titleCtr );
-	if ( titleItem )
-		titleItem = new QListViewItem( dvdItem, titleItem, a, CC_TITLE);
-	else
-		titleItem = new QListViewItem( dvdItem, a, CC_TITLE );
-	titleItem->setRenameEnabled( ID_NAME, true );
-	titleItem->setRenameEnabled( ID_PICTURE, true );
-	titleItem->setRenameEnabled( ID_AUDIO1, true );
-	titleItem->setRenameEnabled( ID_AUDIO2, true );
-	titleItem->setRenameEnabled( ID_SUB1, true );
-	titleItem->setRenameEnabled( ID_SUB2, true );
-	titleItem->setRenameEnabled( ID_SUB3, true );
-	titleItem->setRenameEnabled( ID_SUB4, true );
- 	if ( !s.isNull() )
+	newTitle *nt = new newTitle(this, "add", true);
+
+	if ( nt->exec() == QDialog::Accepted )
 	{
-		titleItem->setText( ID_PICTURE, s );
+		QString a = nt->title;
+		if ( titleItem )
+			titleItem = new QListViewItem( dvdItem, titleItem, a, CC_TITLE);
+		else
+			titleItem = new QListViewItem( dvdItem, a, CC_TITLE );
+		titleItem->setRenameEnabled( ID_NAME, true );
+		titleItem->setRenameEnabled( ID_PICTURE, true );
+		titleItem->setRenameEnabled( ID_ASPECT, true );
+		titleItem->setRenameEnabled( ID_AUDIO1, true );
+		titleItem->setRenameEnabled( ID_AUDIO2, true );
+		titleItem->setRenameEnabled( ID_SUB1, true );
+		titleItem->setRenameEnabled( ID_SUB2, true );
+		titleItem->setRenameEnabled( ID_SUB3, true );
+		titleItem->setRenameEnabled( ID_SUB4, true );
+
+		titleItem->setText( ID_PICTURE, nt->snapshot );
+		titleItem->setText( ID_ASPECT, nt->aspect );
+		titleItem->setText( ID_AUDIO1, nt->audio1 );
+		titleItem->setText( ID_AUDIO2, nt->audio2 );
+		titleItem->setText( ID_SUB1, nt->sub1 );
+		titleItem->setText( ID_SUB2, nt->sub2 );
+		titleItem->setText( ID_SUB3, nt->sub3 );
+		titleItem->setText( ID_SUB4, nt->sub4 );
+
+		titleItem->setOpen( true );
 	}
-	titleItem->setOpen( true );
 }
 
 void dvdmenuWnd::lvClicked( QListViewItem *item )
@@ -145,6 +151,7 @@ void dvdmenuWnd::addVideo()
 			videoItem->setText( ID_IDENT, CC_VIDEO ); 
 			videoItem->setText( ID_FILENAME, *it );
 			videoItem->setRenameEnabled( ID_NAME, true );
+			videoItem->setRenameEnabled( ID_PICTURE, true );
 
 			QFileInfo fi( *it );
 			pbOccup->setProgress( pbOccup->progress()+int(fi.size()*1.2/1024) );
@@ -176,7 +183,7 @@ void dvdmenuWnd::openProject()
                     this,
                     "open file dialog",
                     "Choose a file to open" );
- 	if ( !s.isNull() )
+ 	if ( !s.isEmpty() )
 	{
 		QFile f( s );
 		if ( !f.open( IO_ReadOnly ) )
@@ -192,10 +199,18 @@ void dvdmenuWnd::openProject()
 			f.close();
 			lvDVD->clear();
 			QDomElement docElem = doc.documentElement();
-			QDomAttr dvdname = docElem.attributeNode( "NAME" );
+			QDomAttr dvdname = docElem.attributeNode( "TMPDIR" );
+			workingDir = dvdname.value();
+			dvdname = docElem.attributeNode( "MENUMUSIC" );
+			menuSound = dvdname.value();
+			dvdname = docElem.attributeNode( "MENUBG" );
+			bgPic = dvdname.value();
+
+			dvdname = docElem.attributeNode( "NAME" );
 			//std::cout << "dvd=" << dvdname.value() << std::endl;
 			lvDVD->addColumn( "ident", 0 );
-			lvDVD->addColumn( "picture" );
+			lvDVD->addColumn( "picture/chapters" );
+			lvDVD->addColumn( "aspect" );
 			lvDVD->addColumn( "audio1" );
 			lvDVD->addColumn( "audio2" );
 			lvDVD->addColumn( "sub1" );
@@ -219,18 +234,36 @@ void dvdmenuWnd::openProject()
 						QDomAttr titlename = e.attributeNode( "NAME" );
 						QDomAttr att;
 						//std::cout << "title=" << titlename.value() << std::endl; 
-						att = e.attributeNode( "ID_PICTURE" );
-						titleItem->setText( ID_PICTURE, att.value() );
 						if ( titleItem )
 							titleItem = new QListViewItem( dvdItem, titleItem, titlename.value(), CC_TITLE );
 						else
 							titleItem = new QListViewItem( dvdItem, titlename.value(), CC_TITLE );
+						titleItem->setRenameEnabled( ID_PICTURE, true );
+						titleItem->setRenameEnabled( ID_ASPECT, true );
 						titleItem->setRenameEnabled( ID_AUDIO1, true );
 						titleItem->setRenameEnabled( ID_AUDIO2, true );
 						titleItem->setRenameEnabled( ID_SUB1, true );
 						titleItem->setRenameEnabled( ID_SUB2, true );
 						titleItem->setRenameEnabled( ID_SUB3, true );
 						titleItem->setRenameEnabled( ID_SUB4, true );
+
+						att = e.attributeNode( "ID_PICTURE" );
+						titleItem->setText( ID_PICTURE, att.value() );
+						att = e.attributeNode( "ID_ASPECT" );
+						titleItem->setText( ID_ASPECT, att.value() );
+						att = e.attributeNode( "ID_AUDIO1" );
+						titleItem->setText( ID_AUDIO1, att.value() );
+						att = e.attributeNode( "ID_AUDIO2" );
+						titleItem->setText( ID_AUDIO2, att.value());
+						att = e.attributeNode( "ID_SUB1" );
+						titleItem->setText( ID_SUB1, att.value());
+						att = e.attributeNode( "ID_SUB2" );
+						titleItem->setText( ID_SUB2, att.value() );
+						att = e.attributeNode( "ID_SUB3" );
+						titleItem->setText( ID_SUB3, att.value() );
+						att = e.attributeNode( "ID_SUB4" );
+						titleItem->setText( ID_SUB4, att.value());
+
 						QDomNode n1 = e.firstChild();
 						while( !n1.isNull() )
 						{
@@ -246,22 +279,12 @@ void dvdmenuWnd::openProject()
 									else
 										videoItem = new QListViewItem( titleItem, att.value() );
 									videoItem->setText( ID_IDENT, CC_VIDEO ); 
-									att = e1.attributeNode( "ID_AUDIO1" );
-									videoItem->setText( ID_AUDIO1, att.value() );
-									att = e1.attributeNode( "ID_AUDIO2" );
-									videoItem->setText( ID_AUDIO2, att.value());
-									att = e1.attributeNode( "ID_SUB1" );
-									videoItem->setText( ID_SUB1, att.value());
-									att = e1.attributeNode( "ID_SUB2" );
-									videoItem->setText( ID_SUB2, att.value() );
-									att = e1.attributeNode( "ID_SUB3" );
-									videoItem->setText( ID_SUB3, att.value() );
-									att = e1.attributeNode( "ID_SUB4" );
-									videoItem->setText( ID_SUB4, att.value());
-									att = e1.attributeNode( "ID_FILENAME" );
-									videoItem->setText( ID_FILENAME, att.value());
 
 									videoItem->setRenameEnabled( ID_NAME, true );
+									att = e1.attributeNode( "ID_CHAPTERS" );
+									videoItem->setText( ID_PICTURE, att.value());
+									att = e1.attributeNode( "ID_FILENAME" );
+									videoItem->setText( ID_FILENAME, att.value());
 									titleItem->setOpen( true );
 								}
 							}
@@ -289,6 +312,9 @@ void dvdmenuWnd::saveProject()
 		QDomDocument doc( "DvD" );
 		QDomElement rootElem = doc.createElement( "DVD" );
 		rootElem.setAttribute( "NAME", dvdItem->text(ID_NAME) );
+		rootElem.setAttribute( "TMPDIR", workingDir );
+		rootElem.setAttribute( "MENUMUSIC", menuSound );
+		rootElem.setAttribute( "MENUBG", bgPic );
 		doc.appendChild( rootElem );
 
 		QListViewItemIterator it( lvDVD );
@@ -306,18 +332,20 @@ void dvdmenuWnd::saveProject()
 				titleEl = doc.createElement( "TITLE" );
 				titleEl.setAttribute( "NAME", item->text( ID_NAME ) );
 				titleEl.setAttribute( "ID_PICTURE", item->text( ID_PICTURE ) );
+				titleEl.setAttribute( "ID_ASPECT", item->text( ID_ASPECT ) );
+				titleEl.setAttribute( "ID_AUDIO1", item->text( ID_AUDIO1 ) );
+				titleEl.setAttribute( "ID_AUDIO2", item->text( ID_AUDIO2 ) );
+				titleEl.setAttribute( "ID_SUB1", item->text( ID_SUB1 ) );
+				titleEl.setAttribute( "ID_SUB2", item->text( ID_SUB2 ) );
+				titleEl.setAttribute( "ID_SUB3", item->text( ID_SUB3 ) );
+				titleEl.setAttribute( "ID_SUB4", item->text( ID_SUB4 ) );
 				rootElem.appendChild( titleEl );
 			}
 			else if ( item->text( ID_IDENT ) == CC_VIDEO )
 			{
 				el = doc.createElement( "VIDEO" );
 				el.setAttribute( "ID_NAME", item->text( ID_NAME ) );
-				el.setAttribute( "ID_AUDIO1", item->text( ID_AUDIO1 ) );
-				el.setAttribute( "ID_AUDIO2", item->text( ID_AUDIO2 ) );
-				el.setAttribute( "ID_SUB1", item->text( ID_SUB1 ) );
-				el.setAttribute( "ID_SUB2", item->text( ID_SUB2 ) );
-				el.setAttribute( "ID_SUB3", item->text( ID_SUB3 ) );
-				el.setAttribute( "ID_SUB4", item->text( ID_SUB4 ) );
+				el.setAttribute( "ID_CHAPTERS", item->text( ID_PICTURE ) );
 				el.setAttribute( "ID_FILENAME", item->text(ID_FILENAME) );
 				titleEl.appendChild( el );
 			}
@@ -399,9 +427,16 @@ void dvdmenuWnd::encode()
 				ctTitle++;
 
 				stream << "#!/bin/bash" << endl;
-				// create a silence mp2 file
-				stream << "dd if=/dev/zero bs=4 count=1602 | toolame -b 128 ";
-				stream << "-s 48 /dev/stdin silence.mp2" << endl;
+				if ( menuSound.isEmpty() )
+				{
+					// create a silent mp2 file
+					stream << "dd if=/dev/zero bs=4 count=1602 | ";
+				}
+				else
+				{
+					stream << "lame --decode \"" << menuSound << "\" - | ";
+				}
+				stream << "toolame -b 128 -s 48 /dev/stdin menusnd.mp2" << endl;
 
 				QString outputMpeg;
 				for ( int pg = 0; pg < npages; pg++ )
@@ -488,7 +523,7 @@ void dvdmenuWnd::encode()
 					stream << "</stream>" << endl;
 					stream << "</subpictures>' >" << outputXml << endl;
 					stream << "mplex -f 8 -o /dev/stdout " << outputMpeg;
-					stream << " silence.mp2 | ";
+					stream << " menusnd.mp2 | ";
 					stream << "spumux " << outputXml;
 					stream << " > " << outputMenu << endl;
 					stream << "# rm -f " << outputName << endl;
@@ -516,8 +551,8 @@ void dvdmenuWnd::encode()
 					}
 					stXml << "</pgc>" << endl;
 				}
-				stream << "rm -f " << outputMpeg << endl;
-				stream << "rm -f silence.mp2" << endl;
+				stream << "# rm -f " << outputMpeg << endl;
+				stream << "# rm -f menusnd.mp2" << endl;
 
 				stXml << "</menus>" << endl;
 				stXml << "</vmgm>" << endl;
@@ -547,7 +582,13 @@ void dvdmenuWnd::encode()
 					stXml << "</menus>" << endl;
 					stXml << "<titles>" << endl;
 				}
-				if ( !it.current()->text(ID_AUDIO1).isNull() )
+				if ( !it.current()->text(ID_ASPECT).isEmpty() )
+				{
+					stXml << "<video aspect=\"";
+					stXml << it.current()->text(ID_ASPECT);
+					stXml << "\"/>" << endl;
+				}
+				if ( !it.current()->text(ID_AUDIO1).isEmpty() )
 				{
 					stXml << "<audio lang=\"";
 					stXml << it.current()->text(ID_AUDIO1);
@@ -557,31 +598,31 @@ void dvdmenuWnd::encode()
 				{
 					stXml << "<audio lang=\"en\"/>" << endl;
 				}
-				if ( !it.current()->text(ID_AUDIO2).isNull() )
+				if ( !it.current()->text(ID_AUDIO2).isEmpty() )
 				{
 					stXml << "<audio lang=\"";
 					stXml << it.current()->text(ID_AUDIO2);
 					stXml << "\"/>" << endl;
 				}
-				if ( !it.current()->text(ID_SUB1).isNull() )
+				if ( !it.current()->text(ID_SUB1).isEmpty() )
 				{
 					stXml << "<subpicture lang=\"";
 					stXml << it.current()->text(ID_SUB1);
 					stXml << "\"/>" << endl;
 				}
-				if ( !it.current()->text(ID_SUB2).isNull() )
+				if ( !it.current()->text(ID_SUB2).isEmpty() )
 				{
 					stXml << "<subpicture lang=\"";
 					stXml << it.current()->text(ID_SUB2);
 					stXml << "\"/>" << endl;
 				}
-				if ( !it.current()->text(ID_SUB3).isNull() )
+				if ( !it.current()->text(ID_SUB3).isEmpty() )
 				{
 					stXml << "<subpicture lang=\"";
 					stXml << it.current()->text(ID_SUB3);
 					stXml << "\"/>" << endl;
 				}
-				if ( !it.current()->text(ID_SUB4).isNull() )
+				if ( !it.current()->text(ID_SUB4).isEmpty() )
 				{
 					stXml << "<subpicture lang=\"";
 					stXml << it.current()->text(ID_SUB4);
@@ -593,7 +634,12 @@ void dvdmenuWnd::encode()
 				while ( ( it1.current() ) &&
 						( it1.current()->text(ID_IDENT) == CC_VIDEO ) )
 				{
-					stXml << "<vob file=\"" << it1.current()->text(ID_FILENAME );
+					stXml << "<vob file=\"" << it1.current()->text(ID_FILENAME);
+					if ( !(it1.current()->text(ID_PICTURE).isEmpty()) )
+					{
+						stXml << "\" chapters=\"";
+						stXml << it1.current()->text(ID_PICTURE).isEmpty();
+					}
 					stXml << "\"></vob>" << endl;
 					it1++;
 				}
@@ -789,7 +835,7 @@ void dvdmenuWnd::selectBgPic( )
 
 void dvdmenuWnd::selectSound( )
 {
-	menuSound = QFileDialog::getOpenFileName( currentDir, "*.mp3",
+	menuSound = QFileDialog::getOpenFileName( workingDir, "*.mp3",
 		this,
 		"open file dialog",
 		"Choose a sound for the menu" );

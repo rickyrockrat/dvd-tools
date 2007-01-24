@@ -10,7 +10,8 @@ SOURCES	+= main.cpp \
 	videopreview.cpp
 
 FORMS	= encodewnd.ui \
-	dvdmenuwnd.ui
+	dvdmenuwnd.ui \
+	newtitlewnd.ui
 
 IMAGES	= pix/ic_title.png \
 	pix/ic_bgcolor.png \

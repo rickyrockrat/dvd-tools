@@ -358,6 +358,7 @@ Picture</string>
     <include location="global" impldecl="in declaration">qfontdialog.h</include>
     <include location="global" impldecl="in declaration">qcolordialog.h</include>
     <include location="global" impldecl="in declaration">qdom.h</include>
+    <include location="local" impldecl="in declaration">newtitlewnd.h</include>
     <include location="local" impldecl="in implementation">dvdmenuwnd.ui.h</include>
 </includes>
 <variables>
@@ -377,7 +378,6 @@ Picture</string>
 </variables>
 <slots>
     <slot>newDVD()</slot>
-    <slot>newTitle()</slot>
     <slot>lvClicked( QListViewItem * item )</slot>
     <slot>addVideo()</slot>
     <slot>selectBgColor()</slot>
@@ -395,6 +395,7 @@ Picture</string>
     <slot>genMenuCommand( QStringList titles, QTextStream &amp; stream, QString color, QString outputName, int pg, int npages )</slot>
     <slot>selectBgPic()</slot>
     <slot>selectSound()</slot>
+    <slot access="">addTitle()</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>
