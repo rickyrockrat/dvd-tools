@@ -221,6 +221,7 @@ void dvdmenuWnd::openProject()
 
 			lvDVD->setRootIsDecorated( true );
 			dvdItem = new QListViewItem( lvDVD, dvdname.value(), CC_DVD );
+			dvdItem->setRenameEnabled( ID_NAME, true );
 			dvdItem->setOpen(true);
 
 			QDomNode n = docElem.firstChild();
@@ -238,6 +239,7 @@ void dvdmenuWnd::openProject()
 							titleItem = new QListViewItem( dvdItem, titleItem, titlename.value(), CC_TITLE );
 						else
 							titleItem = new QListViewItem( dvdItem, titlename.value(), CC_TITLE );
+						titleItem->setRenameEnabled( ID_NAME, true );
 						titleItem->setRenameEnabled( ID_PICTURE, true );
 						titleItem->setRenameEnabled( ID_ASPECT, true );
 						titleItem->setRenameEnabled( ID_AUDIO1, true );

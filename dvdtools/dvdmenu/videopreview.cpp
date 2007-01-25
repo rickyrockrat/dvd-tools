@@ -82,10 +82,10 @@ void videoPreviewWnd::drawContents( QPainter *p )
 
 		QListViewItemIterator it( m_dvd );
 		QListViewItem *item;
-		QRect r1( 20, 70, 240, 180 );
-		QRect r2( 300, 70, 240, 180 );
-		QRect r3( 20, 290, 240, 180 );
-		QRect r4( 300, 290, 240, 180 );
+		QRect r1( 80, 70, 240, 180 );
+		QRect r2( 400, 70, 240, 180 );
+		QRect r3( 80, 320, 240, 180 );
+		QRect r4( 400, 320, 240, 180 );
 		QRect tr[ 4 ];
 		tr[0] = r1;
 		tr[1] = r2;
@@ -115,6 +115,7 @@ void videoPreviewWnd::drawContents( QPainter *p )
 			it++;
 		}
 		ct = 0;
+		int origFontSize = m_font.pointSize();
 		while ( it.current() )
 		{
 			item = it.current();
@@ -128,7 +129,20 @@ void videoPreviewWnd::drawContents( QPainter *p )
 				if ( !m_bgonly || m_preview )
 				{
 					p->setPen( m_fgcolor );
-					p->drawText( tr[ct].x(), tr[ct].y()+tr[ct].height() + 30,
+					m_font.setPointSize(origFontSize);
+					p->setFont( m_font );
+					QFontMetrics fm( m_font );
+					QRect titleRect = fm.boundingRect( item->text( ID_NAME ) );
+					while( titleRect.width() > 300 )
+					{
+						m_font.setPointSize( m_font.pointSize() - 1 );
+						p->setFont( m_font );
+						fm = QFontMetrics( m_font );
+						titleRect = fm.boundingRect( item->text( ID_NAME ) );
+					}
+
+					int x = ( tr[ct].x() + tr[ct].width()/2 ) - titleRect.width()/2;
+					p->drawText( x, tr[ct].y()+tr[ct].height() + 40,
 						item->text( ID_NAME ) );
 				}
 				ct++;
