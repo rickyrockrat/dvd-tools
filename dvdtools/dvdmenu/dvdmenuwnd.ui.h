@@ -285,6 +285,7 @@ void dvdmenuWnd::openProject()
 									videoItem->setRenameEnabled( ID_NAME, true );
 									att = e1.attributeNode( "ID_CHAPTERS" );
 									videoItem->setText( ID_PICTURE, att.value());
+									videoItem->setRenameEnabled( ID_PICTURE, true );
 									att = e1.attributeNode( "ID_FILENAME" );
 									videoItem->setText( ID_FILENAME, att.value());
 									titleItem->setOpen( true );
