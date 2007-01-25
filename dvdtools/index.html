@@ -1,110 +1,35 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
+
+  
   <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+
+  
   <title>DVD Tools Homepage</title>
 </head>
+
+
 <body>
+
 <div style="text-align: center;">
 <h1>DVD Tools</h1>
-<div style="text-align: left;"></div>
+
+<div style="text-align: left;">The DVD Tools project is a collection of useful tools to help you create you own dvd.<br>
+</div>
+
 <div style="text-align: left;">
-<h2>dvdaudio&nbsp;<a href="https://sourceforge.net/project/showfiles.php?group_id=184940&amp;package_id=215696&amp;release_id=473652">Download</a></h2>
-I created this tool when I had a bunch of mp3 files that would have taken 5 cds.<br>
-I thought, well a DVD can store the whole thing, but how can I listen to the music afterward ?<br>
-<br>
-I finally thought of creating a king of slide show where the "show" is only the music.<br>
-That way, I can listen those mp3 files on my standalone dvd player.<br>
-<br>
-So how does it works.<br>
-<br>
-Well it has a nice (hopefully) graphical interface written in Qt.<br>
-You create a new DVD, in which you add albums, in which you add tracks.<br>
-<br>
-Here is what it looks like :<br>
-<br>
-<img style="width: 800px; height: 400px;" alt="dvdaudio 1" src="dvdaudio1.jpg"><br>
-<br>
-Most information is gathered from the mp3 file, thanks to the ID3 tags. However you can edit nearly each field.<br>
-When you have finished inserting albums and tracks, just click
-"Encode". When encoding is finished, the dvd structure is ready to be
-burn in the DVD directory of the temporary folder.<br>
-<br>
-dvdaudio will produce&nbsp;menus with 8 albums titles at most and buttons to navigate the menus.<br>
-An album will be transformed into a dvd title, each track as a chapter,
-and on the screen information about the track is displayed.<br>
-<br>
-Here's what a menu looks like :<br>
-<br>
-<img style="width: 767px; height: 576px;" alt="dvdaudio 2" src="xine_snapshot-1.png"><br>
-<br>
-Additionnal buttons "Next" and "Prev" are added if necessary.<br>
-And here is what a track looks like :<br>
-<br>
-<img style="width: 728px; height: 609px;" alt="dvdaudio 3" src="dvdaudio3.jpg"><br>
-<br>
-Fonts, background images and other king of things are customizable.<br>
-<br>
-dvdaudio is written under linux, and is heavily dependent on softwares that are at best rare on windows.<br>
-Dependencies :<br>
-- Qt<br>
-- mplayer/mencoder<br>
-- lame<br>
-- toolame<br>
-- dvdauthor<br>
-- ImageMagick<br>
-- bash<br>
-- mjpegtools<br>
-<br>
-The GUI in itself is as portable as a Qt project can be, so if you have all these tools available under windows, it may work...<br>
-<br>
-Installation :<br>
-$ tar zxvf dvdaudio-&lt;version&gt;.tar.gz<br>
-$ cd dvdaudio-&lt;version&gt;<br>
-$ qmake dvdaudio.pro<br>
-$ make<br>
-$ make install<br>
-<br>
-Notes :<br>
-- At the moment, only PAL dvds are supported.<br>
-- Global overhead is of about 20%. If you know how to reduce it, let me know.<br>
-- Don't forget to put an Arial.ttf file in your ~/.spumux directory if you want dvdaudio to work.<br>
-<br>
-<h2>submgmt&nbsp;<a href="https://sourceforge.net/project/showfiles.php?group_id=184940&amp;package_id=215834&amp;release_id=473653">Download</a></h2>
-Handling subtitles files may be frustrating. More often than not, the
-subtitle file is not really synchonized with the movie. &nbsp;Submgmt
-is my answer to this problem.<br>
-Is has many neat features :<br>
-- shift subtitles <br>
-- expand subtitles<br>
-- change subtitle fps<br>
-- synchronize with a movie<br>
-- shift position subtitles<br>
-<br>
-It knows the following formats :<br>
-- subviewer (.srt)<br>
-- microdvd<br>
-- subrip<br>
-- sami<br>
-- spumux<br>
-<br>
-As a side effect, it can convert a subtitle file to any of the above format.<br>
-Here is a sscreenshot showing how a subtitle is shifted by one position :<br>
-<br>
-<img style="width: 783px; height: 485px;" alt="submgmt" src="submgmt.jpg"><br>
-<br>
-Dependencies :<br>
-- Qt<br>
-<br>
-Installation :<br>
-$ tar zxvf submgmt-&lt;version&gt;.tar.gz<br>
-$ cd submgmt-&lt;version&gt;<br>
-$ qmake submgmt.pro<br>
-$ make<br>
-$ make install<br>
-<br>
+<h2>dvdaudio</h2>
+<a href="dvdaudio.html">dvdaudio</a> is a tool to create an audio oriented slide-show.
+<h2>dvdmenu</h2>
+<a href="dvdmenu.html">dvdmenu</a> is an attempt to generate easily nice dvd menus.
+<h2>submgmt</h2>
+<a href="submgmt.html">submgmt</a> is a subtitle manager.
 <h2>qcreatevob</h2>
+<a href="qcreatevob.html">qcreatevob</a> let's you convert video file to vob format.
 </div>
+
 </div>
+
 </body>
 </html>
