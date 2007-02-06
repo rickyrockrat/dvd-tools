@@ -1,0 +1,51 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>previewWnd</class>
+<widget class="QWidget">
+    <property name="name">
+        <cstring>previewWnd</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>600</width>
+            <height>480</height>
+        </rect>
+    </property>
+    <property name="sizePolicy">
+        <sizepolicy>
+            <hsizetype>3</hsizetype>
+            <vsizetype>3</vsizetype>
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+        </sizepolicy>
+    </property>
+    <property name="maximumSize">
+        <size>
+            <width>720</width>
+            <height>576</height>
+        </size>
+    </property>
+    <property name="caption">
+        <string>Menu Preview</string>
+    </property>
+    <property name="icon">
+        <pixmap>ic_preview.png</pixmap>
+    </property>
+    <vbox>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>tlPixmap</cstring>
+            </property>
+            <property name="scaledContents">
+                <bool>true</bool>
+            </property>
+        </widget>
+    </vbox>
+</widget>
+<pixmapinproject/>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>
