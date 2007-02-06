@@ -3,15 +3,14 @@ LANGUAGE	= C++
 
 CONFIG	+= qt warn_off
 
-HEADERS	+= videopreview.h \
-	common.h
+HEADERS	+= common.h
 
-SOURCES	+= main.cpp \
-	videopreview.cpp
+SOURCES	+= main.cpp
 
 FORMS	= encodewnd.ui \
 	dvdmenuwnd.ui \
-	newtitlewnd.ui
+	newtitlewnd.ui \
+	previewwnd.ui
 
 IMAGES	= pix/ic_title.png \
 	pix/ic_bgcolor.png \
@@ -26,7 +25,8 @@ IMAGES	= pix/ic_title.png \
 	pix/ic_directplay.png \
 	pix/ic_new.png \
 	pix/ic_open.png \
-	pix/ic_save.png
+	pix/ic_save.png \
+	pix/black.jpg
 
 dvdmenu.path = /usr/bin
 dvdmenu.files = dvdmenu

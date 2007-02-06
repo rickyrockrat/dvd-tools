@@ -359,9 +359,15 @@ Picture</string>
     <include location="global" impldecl="in declaration">qcolordialog.h</include>
     <include location="global" impldecl="in declaration">qdom.h</include>
     <include location="local" impldecl="in declaration">newtitlewnd.h</include>
+    <include location="local" impldecl="in declaration">previewwnd.h</include>
+    <include location="global" impldecl="in declaration">vector</include>
     <include location="local" impldecl="in implementation">dvdmenuwnd.ui.h</include>
 </includes>
 <variables>
+    <variable>QRect tabr[4];</variable>
+    <variable>QRect r4;</variable>
+    <variable>QRect r3;</variable>
+    <variable>QRect r2;</variable>
     <variable access="private">QStringList *files;</variable>
     <variable access="private">QString videoDir;</variable>
     <variable access="private">int titleCtr;</variable>
@@ -375,9 +381,11 @@ Picture</string>
     <variable access="public">QListViewItem * dvdItem;</variable>
     <variable access="private">QString bgPic;</variable>
     <variable access="private">QString menuSound;</variable>
+    <variable access="private">QRect r1;</variable>
 </variables>
 <slots>
     <slot>newDVD()</slot>
+    <slot>addTitle()</slot>
     <slot>lvClicked( QListViewItem * item )</slot>
     <slot>addVideo()</slot>
     <slot>selectBgColor()</slot>
@@ -395,11 +403,12 @@ Picture</string>
     <slot>genMenuCommand( QStringList titles, QTextStream &amp; stream, QString color, QString outputName, int pg, int npages )</slot>
     <slot>selectBgPic()</slot>
     <slot>selectSound()</slot>
-    <slot access="">addTitle()</slot>
+    <slot returnType="QPixmap &amp;">drawButtons(QPixmap &amp; fond, QColor, int, int, std::vector&lt;QRect&gt;*)</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>
     <function returnType="QString">stringListeEnd( QStringList &amp; liste, int depart )</function>
+    <function returnType="QPixmap">drawMenu(QPixmap &amp; fond, int currentpage, int totalpages)</function>
 </functions>
 <pixmapinproject/>
 <layoutdefaults spacing="6" margin="11"/>

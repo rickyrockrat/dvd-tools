@@ -27,6 +27,7 @@ void dvdmenuWnd::init()
 	bgcolor = Qt::black;
 	titleCtr = 0;
 	videoDir = QDir::currentDirPath();
+	font.setStyleStrategy( QFont::PreferAntialias );
 	font = QFont( "Bitstream Vera Sans Mono", 28 );
 
 	connect( aNew, SIGNAL(activated()), this, SLOT(newProject()) );
@@ -48,6 +49,14 @@ void dvdmenuWnd::init()
 	this, SLOT(lvClicked(QListViewItem*)));
 
 	pbOccup->setTotalSteps( 4400000 );
+	r1 = QRect( 50, 70, 230, 180 );
+	r2 = QRect( 350, 70, 230, 180 );
+	r3 = QRect( 50, 320, 230, 180 );
+	r4 = QRect( 350, 320, 230, 180 );
+	tabr[0] = r1;
+	tabr[1] = r2;
+	tabr[2] = r3;
+	tabr[3] = r4;
 }
 
 void dvdmenuWnd::newDVD()
@@ -200,11 +209,11 @@ void dvdmenuWnd::openProject()
 			lvDVD->clear();
 			QDomElement docElem = doc.documentElement();
 			QDomAttr dvdname = docElem.attributeNode( "TMPDIR" );
-			workingDir = dvdname.value();
+			workingDir = QString::fromUtf8( dvdname.value() );
 			dvdname = docElem.attributeNode( "MENUMUSIC" );
-			menuSound = dvdname.value();
+			menuSound = QString::fromUtf8( dvdname.value() );
 			dvdname = docElem.attributeNode( "MENUBG" );
-			bgPic = dvdname.value();
+			bgPic = QString::fromUtf8( dvdname.value() );
 
 			dvdname = docElem.attributeNode( "NAME" );
 			//std::cout << "dvd=" << dvdname.value() << std::endl;
@@ -235,10 +244,11 @@ void dvdmenuWnd::openProject()
 						QDomAttr titlename = e.attributeNode( "NAME" );
 						QDomAttr att;
 						//std::cout << "title=" << titlename.value() << std::endl; 
+						QString t = QString::fromUtf8( titlename.value() );
 						if ( titleItem )
-							titleItem = new QListViewItem( dvdItem, titleItem, titlename.value(), CC_TITLE );
+							titleItem = new QListViewItem( dvdItem, titleItem, t, CC_TITLE );
 						else
-							titleItem = new QListViewItem( dvdItem, titlename.value(), CC_TITLE );
+							titleItem = new QListViewItem( dvdItem, t, CC_TITLE );
 						titleItem->setRenameEnabled( ID_NAME, true );
 						titleItem->setRenameEnabled( ID_PICTURE, true );
 						titleItem->setRenameEnabled( ID_ASPECT, true );
@@ -250,21 +260,21 @@ void dvdmenuWnd::openProject()
 						titleItem->setRenameEnabled( ID_SUB4, true );
 
 						att = e.attributeNode( "ID_PICTURE" );
-						titleItem->setText( ID_PICTURE, att.value() );
+						titleItem->setText( ID_PICTURE, QString::fromUtf8( att.value()) );
 						att = e.attributeNode( "ID_ASPECT" );
-						titleItem->setText( ID_ASPECT, att.value() );
+						titleItem->setText( ID_ASPECT, QString::fromUtf8( att.value()) );
 						att = e.attributeNode( "ID_AUDIO1" );
-						titleItem->setText( ID_AUDIO1, att.value() );
+						titleItem->setText( ID_AUDIO1, QString::fromUtf8( att.value()) );
 						att = e.attributeNode( "ID_AUDIO2" );
-						titleItem->setText( ID_AUDIO2, att.value());
+						titleItem->setText( ID_AUDIO2, QString::fromUtf8( att.value()));
 						att = e.attributeNode( "ID_SUB1" );
-						titleItem->setText( ID_SUB1, att.value());
+						titleItem->setText( ID_SUB1, QString::fromUtf8( att.value()));
 						att = e.attributeNode( "ID_SUB2" );
-						titleItem->setText( ID_SUB2, att.value() );
+						titleItem->setText( ID_SUB2, QString::fromUtf8( att.value() ));
 						att = e.attributeNode( "ID_SUB3" );
-						titleItem->setText( ID_SUB3, att.value() );
+						titleItem->setText( ID_SUB3, QString::fromUtf8( att.value() ));
 						att = e.attributeNode( "ID_SUB4" );
-						titleItem->setText( ID_SUB4, att.value());
+						titleItem->setText( ID_SUB4, QString::fromUtf8( att.value()));
 
 						QDomNode n1 = e.firstChild();
 						while( !n1.isNull() )
@@ -277,17 +287,17 @@ void dvdmenuWnd::openProject()
 									att = e1.attributeNode( "ID_NAME" );
 									//std::cout << "track=" << att.value() << std::endl; 
 									if ( videoItem )
-										videoItem = new QListViewItem( titleItem, videoItem, att.value() );
+										videoItem = new QListViewItem( titleItem, videoItem, QString::fromUtf8( att.value() ) );
 									else
-										videoItem = new QListViewItem( titleItem, att.value() );
+										videoItem = new QListViewItem( titleItem, QString::fromUtf8( att.value() ) );
 									videoItem->setText( ID_IDENT, CC_VIDEO ); 
 
 									videoItem->setRenameEnabled( ID_NAME, true );
 									att = e1.attributeNode( "ID_CHAPTERS" );
-									videoItem->setText( ID_PICTURE, att.value());
+									videoItem->setText( ID_PICTURE, QString::fromUtf8( att.value()));
 									videoItem->setRenameEnabled( ID_PICTURE, true );
 									att = e1.attributeNode( "ID_FILENAME" );
-									videoItem->setText( ID_FILENAME, att.value());
+									videoItem->setText( ID_FILENAME, QString::fromUtf8( att.value()) );
 									titleItem->setOpen( true );
 								}
 							}
@@ -314,10 +324,10 @@ void dvdmenuWnd::saveProject()
 	{
 		QDomDocument doc( "DvD" );
 		QDomElement rootElem = doc.createElement( "DVD" );
-		rootElem.setAttribute( "NAME", dvdItem->text(ID_NAME) );
-		rootElem.setAttribute( "TMPDIR", workingDir );
-		rootElem.setAttribute( "MENUMUSIC", menuSound );
-		rootElem.setAttribute( "MENUBG", bgPic );
+		rootElem.setAttribute( "NAME", dvdItem->text(ID_NAME).utf8() );
+		rootElem.setAttribute( "TMPDIR", workingDir.utf8() );
+		rootElem.setAttribute( "MENUMUSIC", menuSound.utf8() );
+		rootElem.setAttribute( "MENUBG", bgPic.utf8() );
 		doc.appendChild( rootElem );
 
 		QListViewItemIterator it( lvDVD );
@@ -333,23 +343,23 @@ void dvdmenuWnd::saveProject()
 			{
 
 				titleEl = doc.createElement( "TITLE" );
-				titleEl.setAttribute( "NAME", item->text( ID_NAME ) );
-				titleEl.setAttribute( "ID_PICTURE", item->text( ID_PICTURE ) );
-				titleEl.setAttribute( "ID_ASPECT", item->text( ID_ASPECT ) );
-				titleEl.setAttribute( "ID_AUDIO1", item->text( ID_AUDIO1 ) );
-				titleEl.setAttribute( "ID_AUDIO2", item->text( ID_AUDIO2 ) );
-				titleEl.setAttribute( "ID_SUB1", item->text( ID_SUB1 ) );
-				titleEl.setAttribute( "ID_SUB2", item->text( ID_SUB2 ) );
-				titleEl.setAttribute( "ID_SUB3", item->text( ID_SUB3 ) );
-				titleEl.setAttribute( "ID_SUB4", item->text( ID_SUB4 ) );
+				titleEl.setAttribute( "NAME", item->text( ID_NAME ).utf8() );
+				titleEl.setAttribute( "ID_PICTURE", item->text( ID_PICTURE ).utf8() );
+				titleEl.setAttribute( "ID_ASPECT", item->text( ID_ASPECT ).utf8() );
+				titleEl.setAttribute( "ID_AUDIO1", item->text( ID_AUDIO1 ).utf8() );
+				titleEl.setAttribute( "ID_AUDIO2", item->text( ID_AUDIO2 ).utf8() );
+				titleEl.setAttribute( "ID_SUB1", item->text( ID_SUB1 ).utf8() );
+				titleEl.setAttribute( "ID_SUB2", item->text( ID_SUB2 ).utf8() );
+				titleEl.setAttribute( "ID_SUB3", item->text( ID_SUB3 ).utf8() );
+				titleEl.setAttribute( "ID_SUB4", item->text( ID_SUB4 ).utf8() );
 				rootElem.appendChild( titleEl );
 			}
 			else if ( item->text( ID_IDENT ) == CC_VIDEO )
 			{
 				el = doc.createElement( "VIDEO" );
-				el.setAttribute( "ID_NAME", item->text( ID_NAME ) );
-				el.setAttribute( "ID_CHAPTERS", item->text( ID_PICTURE ) );
-				el.setAttribute( "ID_FILENAME", item->text(ID_FILENAME) );
+				el.setAttribute( "ID_NAME", item->text( ID_NAME ).utf8() );
+				el.setAttribute( "ID_CHAPTERS", item->text( ID_PICTURE ).utf8() );
+				el.setAttribute( "ID_FILENAME", item->text(ID_FILENAME).utf8() );
 				titleEl.appendChild( el );
 			}
 			it++;
@@ -430,6 +440,7 @@ void dvdmenuWnd::encode()
 				ctTitle++;
 
 				stream << "#!/bin/bash" << endl;
+				//stream << "exec | tee dvdmenu.log" << endl;
 				if ( menuSound.isEmpty() )
 				{
 					// create a silent mp2 file
@@ -444,56 +455,74 @@ void dvdmenuWnd::encode()
 				QString outputMpeg;
 				for ( int pg = 0; pg < npages; pg++ )
 				{
-					tpw = new videoPreviewWnd( lvDVD, this, "preview", Qt::WType_Dialog );
-					tpw->setTotalPages( npages );
-					tpw->setCurrentPage( pg );
-					tpw->setBgPic( bgPic );
-					tpw->setFont( font );
-					tpw->setBgColor( bgcolor );
-					setOptions( tpw );
-					tpw->setBgOnly( true );
-
+					QPixmap bg;
+		if ( !bgPic.isEmpty() )
+		{
+			bg = QPixmap( bgPic );
+			bg.resize( 720, 576 );
+		}
+		else if ( bgcolor.isValid() )
+		{
+			bg = QPixmap( 720, 576 );
+			bg.fill( bgcolor );
+		}
+		else
+		{
+			bg = QPixmap::fromMimeSource( "black.jpg" );
+		}
 					name.sprintf( "bg%04d.ppm", pg );
-					QPixmap pic0 = QPixmap::grabWidget( tpw );
+					QPixmap pic0 = drawMenu( bg, pg, npages );
 					QImage img0 = pic0.convertToImage();
 					img0.convertDepth( 8 );
 					img0.save( name, "PPM" );
 
-					tpw->setBgOnly( false );
+					QString outputName, outputsName, outputhName, outputXml, outputMenu;
+					outputName.sprintf( "picN%04d.png", pg );
+					outputhName.sprintf( "picH%04d.png", pg );
+					outputsName.sprintf( "picS%04d.png", pg );
+		
+					QPixmap bp = QPixmap::fromMimeSource( "black.jpg" );
+					std::vector<QRect> vr;
 
-					name.sprintf( "picN%04d.png", pg );
-					tpw->setFgColor( Qt::white );
-					QPixmap pic1 = QPixmap::grabWidget( tpw );
+					name.sprintf( "picn%04d.png", pg );
+					QPixmap pic1 = drawButtons( bp, Qt::white, pg, npages,&vr );
 					QImage img1 = pic1.convertToImage();
+/*
+QStringList sl = img1.outputFormatList();
+QStringList::Iterator it = sl.begin();
+    while( it != sl.end() ) {
+        stream << "F=" <<  *it << endl;;
+        ++it;
+    }
+	*/
+
 					img1.convertDepth( 8 );
 					img1.save( name, "PNG" );
 					// convert buttons to 3 colors
-					stream << "convert " << name << " -colors 3 " << name << endl;
+					int nc = 2;
+					stream << "convert " << name << " -colors " << nc << " " << outputName << endl;
+					stream << "#rm " << name << endl;
 
-					name.sprintf( "picH%04d.png", pg );
-					tpw->setFgColor( Qt::yellow );
-					QPixmap pic2 = QPixmap::grabWidget( tpw );
+					name.sprintf( "pich%04d.png", pg );
+					QPixmap pic2 = drawButtons( bp, Qt::yellow, pg, npages,&vr );
 					QImage img2 = pic2.convertToImage();
 					img2.convertDepth( 8 );
 					img2.save( name, "PNG" );
-					stream << "convert " << name << " -colors 3 " << name << endl;
+					stream << "convert " << name << " -colors " << nc << " " << outputhName << endl;
+					stream << "#rm " << name << endl;
 
-					name.sprintf( "picS%04d.png", pg );
-					tpw->setFgColor( Qt::red );
-					QPixmap pic3 = QPixmap::grabWidget( tpw );
+					name.sprintf( "pics%04d.png", pg );
+					QPixmap pic3 = drawButtons( bp, Qt::red, pg, npages,&vr );
 					QImage img3 = pic3.convertToImage();
 					img3.convertDepth( 8 );
 					img3.save( name, "PNG" );
-					stream << "convert " << name << " -colors 3 " << name << endl;
+					stream << "convert " << name << " -colors " << nc << " " << outputsName << endl;
+					stream << "#rm " << name << endl;
 
-					delete tpw;
-					QString outputName, outputsName, outputhName, outputXml, outputMenu;
-
-							
 					// encoding bg to mpeg2
 					outputMpeg.sprintf( "menu_base.m2v" );
 					bgName.sprintf( "bg%04d.ppm", pg );
-					stream << "ppmtoy4m -n 1 -F25:1 -A 59:54 ";
+					stream << "ppmtoy4m -n 2 -r -I t -L -F 25:1 -A 59:54 ";
 					stream << bgName << " -S 420mpeg2 ";
 					stream << " | mpeg2enc -f 8 -o " << outputMpeg << endl;
 					stream << "# rm -f " << bgName << endl;
@@ -503,10 +532,6 @@ void dvdmenuWnd::encode()
 						stXml << "<pgc pause=\"0\" >" << endl;
 					}
 					stream << "echo Generating menu " << pg << " of " << npages << endl;
-					outputName.sprintf( "picN%04d.png", pg );
-					outputhName.sprintf( "picH%04d.png", pg );
-					outputsName.sprintf( "picS%04d.png", pg );
-		
 					outputXml.sprintf( "menus_%04d.xml", pg );
 					outputMenu.sprintf( "menus_%04d.mpg", pg );
 					// spumux control file
@@ -518,10 +543,36 @@ void dvdmenuWnd::encode()
 					stream << "image=\"" << outputName << "\"" << endl;
 					stream << "select=\"" << outputsName << "\"" << endl;
 					stream << "highlight=\"" << outputhName << "\"" << endl;
-					stream << "transparent=\"000000\"" << endl;
+					stream << "transparent=\"000000\" >" << endl;
+					/*
 					stream << "autooutline=\"infer\"" << endl;
 					stream << "outlinewidth=\"30\"" << endl;
 					stream << "autoorder=\"rows\">" << endl;
+					*/
+					int x0 = 0, x1 = 0, y0 = 0, y1 = 0;
+					for (int i = 0; i < vr.size(); i++ )
+					{
+						QRect r = vr[i];
+						// turn values to even
+						x0 = ((r.x()-1)/2)*2;
+						y0 = ((r.y()-1)/2)*2;
+						x1 = ((r.x()+r.width())/2)*2;
+						y1 = ((r.y()+r.height())/2)*2;
+
+						/*
+						x0 = r.x();
+						y0 = r.y();
+						x1 = r.x()+r.width();
+						y1 = r.y()+r.height();
+						*/
+						stream << "<button name=\"" << i+1 << "\" x0=\"";
+						stream << x0 << "\" y0=\"" << y0;
+						stream << "\" x1=\"" << x1;
+						stream << "\" y1=\"" << y1<< "\" />";
+						stream << endl;
+                //<action [ name="name" ] />
+					}
+
 					stream << "</spu>" << endl;
 					stream << "</stream>" << endl;
 					stream << "</subpictures>' >" << outputXml << endl;
@@ -529,6 +580,7 @@ void dvdmenuWnd::encode()
 					stream << " menusnd.mp2 | ";
 					stream << "spumux " << outputXml;
 					stream << " > " << outputMenu << endl;
+					stream << "[ -s " << outputMenu << " ] || exit 1" << endl;
 					stream << "# rm -f " << outputName << endl;
 					stream << "# rm -f " << outputhName << endl;
 					stream << "# rm -f " << outputsName << endl;
@@ -692,10 +744,149 @@ QString dvdmenuWnd::stringListeEnd( QStringList &liste, int depart )
 	return resultat;
 }
 
+QPixmap dvdmenuWnd::drawMenu( QPixmap &fond, int currentpage, int totalpages )
+{
+	QPainter p;
+
+	p.begin( &fond );
+	p.setPen( QPen( white, 5 ) );
+	p.setFont( font );
+
+	QListViewItemIterator it( lvDVD );
+	QListViewItem *item;
+	int ct = 0;
+	while ( it.current() )
+	{
+		item = it.current();
+		if ( item->text( ID_IDENT ) == CC_DVD )
+		{
+			p.setPen( Qt::white );
+			QFontMetrics fm( font );
+			QRect titleRect = fm.boundingRect( item->text( ID_NAME ) );
+			int x = ( 720-titleRect.width() ) / 2;
+			p.drawText( x, 30, item->text( ID_NAME ) );
+		}
+		if ( ( ct / 4 ) == currentpage )
+			break;
+		if ( item->text( ID_IDENT ) == CC_TITLE )
+		{
+			ct++;
+		}
+		it++;
+	}
+	ct = 0;
+	int origFontSize = font.pointSize();
+	while ( it.current() )
+	{
+		item = it.current();
+		if ( item->text( ID_IDENT ) == CC_TITLE )
+		{
+			QPixmap pmt( item->text( ID_PICTURE ) );
+			p.drawPixmap( tabr[ ct ], pmt );
+			ct++;
+		}
+		if ( ct == 4 ) break;
+		it++;
+	}
+
+
+	p.end();
+	return fond;
+}
+
+QPixmap &dvdmenuWnd::drawButtons( QPixmap &fond, QColor c, int currentpage, int totalpages, std::vector<QRect> *vrects )
+{
+	QPainter p;
+
+	p.begin( &fond );
+	p.setPen( c );
+	p.setFont( font );
+	vrects->clear();
+
+	QListViewItemIterator it( lvDVD );
+	QListViewItem *item;
+	int ct = 0;
+	int origFontSize = font.pointSize();
+	// move to the right page
+	while ( it.current() )
+	{
+		item = it.current();
+		if ( item->text( ID_IDENT ) == CC_DVD )
+		{
+		}
+		if ( ( ct / 4 ) == currentpage )
+			break;
+		if ( item->text( ID_IDENT ) == CC_TITLE )
+		{
+			ct++;
+		}
+		it++;
+	}
+	ct = 0;
+	while ( it.current() )
+	{
+		item = it.current();
+		if ( item->text( ID_IDENT ) == CC_TITLE )
+		{
+			p.setPen( c );
+			font.setPointSize(origFontSize);
+			p.setFont( font );
+			QFontMetrics fm( font );
+			QRect titleRect = fm.boundingRect( item->text( ID_NAME ) );
+			while( titleRect.width() > 280 )
+			{
+				font.setPointSize( font.pointSize() - 1 );
+				p.setFont( font );
+				fm = QFontMetrics( font );
+				titleRect = fm.boundingRect( item->text( ID_NAME ) );
+			}
+
+			int x = ( tabr[ct].x() + tabr[ct].width()/2 ) - titleRect.width()/2;
+			int y = tabr[ct].y()+tabr[ct].height() + font.pointSize() + 10;
+			p.drawText( x, y, item->text( ID_NAME ) );
+			QRect endrect( x, y-titleRect.height(), titleRect.width()+3, titleRect.height() );
+			vrects->push_back( endrect );
+			ct++;
+			if ( ct == 4 ) break;
+		}
+		it++;
+	}
+	
+	// prev menu
+	int ps = font.pointSize();
+	font.setPointSize( ps - 8 );
+	p.setFont( font );
+	QFontMetrics fm( font );
+	if ( currentpage > 0 )
+	{
+		QString prev( "<<Prev" );
+		QRect prevRect = fm.boundingRect( prev );
+		p.drawText( 30, 550, prev );
+
+		QRect endrect( 30, 550-prevRect.height(), 
+				prevRect.width(), prevRect.height() );
+		vrects->push_back( endrect );
+	}
+	// next menu
+	if ( currentpage != totalpages - 1 )
+	{
+		QString next( "Next>>" );
+		QRect nextRect = fm.boundingRect( next );
+		p.drawText( 600, 550, next );
+		QRect endrect( 600, 550-nextRect.height(), 
+				nextRect.width(), nextRect.height() );
+		vrects->push_back( endrect );
+	}
+	font.setPointSize( ps );
+	p.end();
+	return fond;
+}
+
 void dvdmenuWnd::preview()
 {
 	if ( videoItem )
 	{
+		/*
 		videoPreviewWnd *tpw = new videoPreviewWnd( lvDVD, this, "preview", Qt::WType_Dialog );
 		tpw->setBgOnly( false );
 		tpw->setPreview( true );
@@ -724,6 +915,45 @@ void dvdmenuWnd::preview()
 		tpw->setBgPic( bgPic );
 		setOptions( tpw );
 		tpw->show();
+		*/
+		QListViewItemIterator it( lvDVD );
+		int ct = 0;
+		while ( it.current() )
+		{
+			if ( it.current()->text( ID_IDENT ) == CC_TITLE )
+			{
+				ct++;
+			}
+			it++;
+		}
+		// we show the first page
+		int n = ct / 4;
+		if ( ( ct % 4 ) != 0 )
+		{
+			n++;
+		}
+		QPixmap bg;
+		if ( !bgPic.isEmpty() )
+		{
+			bg = QPixmap( bgPic );
+			bg.resize( 720, 576 );
+		}
+		else if ( bgcolor.isValid() )
+		{
+			bg = QPixmap( 720, 576 );
+			bg.fill( bgcolor );
+		}
+		else
+		{
+			bg = QPixmap::fromMimeSource( "black.jpg" );
+		}
+		std::vector<QRect> vr;
+		bg = drawMenu( bg, 0, n );
+		bg = drawButtons( bg, Qt::white, 0, n, &vr );
+
+		previewWnd *pw = new previewWnd();
+		pw->tlPixmap->setPixmap( bg );
+		pw->show();
 	}
 }
 
