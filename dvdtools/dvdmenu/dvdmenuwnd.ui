@@ -346,11 +346,11 @@ Picture</string>
 </actions>
 <includes>
     <include location="global" impldecl="in declaration">qlistview.h</include>
+    <include location="global" impldecl="in declaration">qpainter.h</include>
     <include location="global" impldecl="in declaration">qdir.h</include>
     <include location="global" impldecl="in declaration">qfiledialog.h</include>
     <include location="global" impldecl="in declaration">qprocess.h</include>
     <include location="global" impldecl="in declaration">qmessagebox.h</include>
-    <include location="local" impldecl="in declaration">videopreview.h</include>
     <include location="global" impldecl="in declaration">qpixmap.h</include>
     <include location="global" impldecl="in declaration">qimage.h</include>
     <include location="global" impldecl="in declaration">qfile.h</include>
@@ -398,7 +398,6 @@ Picture</string>
     <slot>removeItem()</slot>
     <slot>makeMenu( QStringList titles )</slot>
     <slot>makeDvd()</slot>
-    <slot>setOptions( videoPreviewWnd * t )</slot>
     <slot>cleanAlbumNames( QStringList &amp; titles )</slot>
     <slot>genMenuCommand( QStringList titles, QTextStream &amp; stream, QString color, QString outputName, int pg, int npages )</slot>
     <slot>selectBgPic()</slot>

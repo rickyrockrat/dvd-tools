@@ -401,7 +401,7 @@ void dvdmenuWnd::encode()
 	QString outputMp2;
 	QString pal( " -F 25:1 -A 59:54 " );
 	QString npal( "25" );
-	videoPreviewWnd *tpw;
+	//videoPreviewWnd *tpw;
 	QStringList titles;
 	while ( it1.current() )
 	{
@@ -1004,9 +1004,9 @@ void dvdmenuWnd::makeDvd( )
 	delete dvdauthorProc;
 }
 
+	/*
 void dvdmenuWnd::setOptions( videoPreviewWnd *t )
 {
-	/*
 	t->setDrawGenre( cbGenre->isChecked() );
 	t->setDrawArtist( cbArtist->isChecked() );
 	t->setDrawAlbum( cbAlbum->isChecked() );
@@ -1015,8 +1015,8 @@ void dvdmenuWnd::setOptions( videoPreviewWnd *t )
 	t->setDrawTrack( cbTrack->isChecked() );
 	t->setDrawDuration( cbDuration->isChecked() );
 	t->setDrawBitrate( cbBitrate->isChecked() );
-	*/
 }
+	*/
 
 void dvdmenuWnd::cleanAlbumNames(QStringList &titles)
 {
