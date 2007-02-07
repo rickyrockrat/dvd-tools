@@ -456,20 +456,20 @@ void dvdmenuWnd::encode()
 				for ( int pg = 0; pg < npages; pg++ )
 				{
 					QPixmap bg;
-		if ( !bgPic.isEmpty() )
-		{
-			bg = QPixmap( bgPic );
-			bg.resize( 720, 576 );
-		}
-		else if ( bgcolor.isValid() )
-		{
-			bg = QPixmap( 720, 576 );
-			bg.fill( bgcolor );
-		}
-		else
-		{
-			bg = QPixmap::fromMimeSource( "black.jpg" );
-		}
+					if ( !bgPic.isEmpty() )
+					{
+						bg = QPixmap( bgPic );
+						bg.resize( 720, 576 );
+					}
+					else if ( bgcolor.isValid() )
+					{
+						bg = QPixmap( 720, 576 );
+						bg.fill( bgcolor );
+					}
+					else
+					{
+						bg = QPixmap::fromMimeSource( "black.jpg" );
+					}
 					name.sprintf( "bg%04d.ppm", pg );
 					QPixmap pic0 = drawMenu( bg, pg, npages );
 					QImage img0 = pic0.convertToImage();
@@ -500,7 +500,7 @@ QStringList::Iterator it = sl.begin();
 					img1.save( name, "PNG" );
 					// convert buttons to 3 colors
 					int nc = 2;
-					stream << "convert " << name << " -colors " << nc << " " << outputName << endl;
+					stream << "convert " << name << " -transparent black -colors " << nc << " " << outputName << endl;
 					stream << "#rm " << name << endl;
 
 					name.sprintf( "pich%04d.png", pg );
@@ -508,7 +508,7 @@ QStringList::Iterator it = sl.begin();
 					QImage img2 = pic2.convertToImage();
 					img2.convertDepth( 8 );
 					img2.save( name, "PNG" );
-					stream << "convert " << name << " -colors " << nc << " " << outputhName << endl;
+					stream << "convert " << name << " -transparent black -colors " << nc << " " << outputhName << endl;
 					stream << "#rm " << name << endl;
 
 					name.sprintf( "pics%04d.png", pg );
@@ -516,7 +516,7 @@ QStringList::Iterator it = sl.begin();
 					QImage img3 = pic3.convertToImage();
 					img3.convertDepth( 8 );
 					img3.save( name, "PNG" );
-					stream << "convert " << name << " -colors " << nc << " " << outputsName << endl;
+					stream << "convert " << name << " -transparent black -colors " << nc << " " << outputsName << endl;
 					stream << "#rm " << name << endl;
 
 					// encoding bg to mpeg2
@@ -531,7 +531,7 @@ QStringList::Iterator it = sl.begin();
 					{
 						stXml << "<pgc pause=\"0\" >" << endl;
 					}
-					stream << "echo Generating menu " << pg << " of " << npages << endl;
+					stream << "echo Generating menu " << pg+1 << " of " << npages << endl;
 					outputXml.sprintf( "menus_%04d.xml", pg );
 					outputMenu.sprintf( "menus_%04d.mpg", pg );
 					// spumux control file
@@ -543,12 +543,13 @@ QStringList::Iterator it = sl.begin();
 					stream << "image=\"" << outputName << "\"" << endl;
 					stream << "select=\"" << outputsName << "\"" << endl;
 					stream << "highlight=\"" << outputhName << "\"" << endl;
-					stream << "transparent=\"000000\" >" << endl;
 					/*
+					stream << "transparent=\"000000\" >" << endl;
 					stream << "autooutline=\"infer\"" << endl;
 					stream << "outlinewidth=\"30\"" << endl;
 					stream << "autoorder=\"rows\">" << endl;
 					*/
+					stream << " >" << endl;
 					int x0 = 0, x1 = 0, y0 = 0, y1 = 0;
 					for (int i = 0; i < vr.size(); i++ )
 					{
