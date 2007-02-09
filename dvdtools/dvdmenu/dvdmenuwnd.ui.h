@@ -440,7 +440,6 @@ void dvdmenuWnd::encode()
 				ctTitle++;
 
 				stream << "#!/bin/bash" << endl;
-				//stream << "exec | tee dvdmenu.log" << endl;
 				if ( menuSound.isEmpty() )
 				{
 					// create a silent mp2 file
@@ -473,8 +472,7 @@ void dvdmenuWnd::encode()
 					name.sprintf( "bg%04d.ppm", pg );
 					QPixmap pic0 = drawMenu( bg, pg, npages );
 					QImage img0 = pic0.convertToImage();
-					img0.convertDepth( 8 );
-					img0.save( name, "PPM" );
+					img0.convertDepth( 8 ).save( name, "PPM" );
 
 					QString outputName, outputsName, outputhName, outputXml, outputMenu;
 					outputName.sprintf( "picN%04d.png", pg );
@@ -484,40 +482,12 @@ void dvdmenuWnd::encode()
 					QPixmap bp = QPixmap::fromMimeSource( "black.jpg" );
 					std::vector<QRect> vr;
 
-					name.sprintf( "picn%04d.png", pg );
-					QPixmap pic1 = drawButtons( bp, Qt::white, pg, npages,&vr );
-					QImage img1 = pic1.convertToImage();
-/*
-QStringList sl = img1.outputFormatList();
-QStringList::Iterator it = sl.begin();
-    while( it != sl.end() ) {
-        stream << "F=" <<  *it << endl;;
-        ++it;
-    }
-	*/
-
-					img1.convertDepth( 8 );
-					img1.save( name, "PNG" );
-					// convert buttons to 3 colors
+					QPixmap pic1 = drawButtons( bp, Qt::white, "white", outputName, &stream, pg, npages,&vr );
 					int nc = 2;
-					stream << "convert " << name << " -transparent black -colors " << nc << " " << outputName << endl;
-					stream << "#rm " << name << endl;
 
-					name.sprintf( "pich%04d.png", pg );
-					QPixmap pic2 = drawButtons( bp, Qt::yellow, pg, npages,&vr );
-					QImage img2 = pic2.convertToImage();
-					img2.convertDepth( 8 );
-					img2.save( name, "PNG" );
-					stream << "convert " << name << " -transparent black -colors " << nc << " " << outputhName << endl;
-					stream << "#rm " << name << endl;
+					QPixmap pic2 = drawButtons( bp, Qt::yellow, "yellow", outputhName, &stream, pg, npages,&vr );
 
-					name.sprintf( "pics%04d.png", pg );
-					QPixmap pic3 = drawButtons( bp, Qt::red, pg, npages,&vr );
-					QImage img3 = pic3.convertToImage();
-					img3.convertDepth( 8 );
-					img3.save( name, "PNG" );
-					stream << "convert " << name << " -transparent black -colors " << nc << " " << outputsName << endl;
-					stream << "#rm " << name << endl;
+					QPixmap pic3 = drawButtons( bp, Qt::red, "red", outputsName, &stream, pg, npages,&vr );
 
 					// encoding bg to mpeg2
 					outputMpeg.sprintf( "menu_base.m2v" );
@@ -544,7 +514,7 @@ QStringList::Iterator it = sl.begin();
 					stream << "select=\"" << outputsName << "\"" << endl;
 					stream << "highlight=\"" << outputhName << "\"" << endl;
 					/*
-					stream << "transparent=\"000000\" >" << endl;
+					stream << "transparent=\"000000\" " << endl;
 					stream << "autooutline=\"infer\"" << endl;
 					stream << "outlinewidth=\"30\"" << endl;
 					stream << "autoorder=\"rows\">" << endl;
@@ -795,12 +765,13 @@ QPixmap dvdmenuWnd::drawMenu( QPixmap &fond, int currentpage, int totalpages )
 	return fond;
 }
 
-QPixmap &dvdmenuWnd::drawButtons( QPixmap &fond, QColor c, int currentpage, int totalpages, std::vector<QRect> *vrects )
+QPixmap &dvdmenuWnd::drawButtons( QPixmap &fond, QColor c, QString cname,
+	QString fname, QTextStream *stream, int currentpage, int totalpages, std::vector<QRect> *vrects )
 {
 	QPainter p;
 
 	p.begin( &fond );
-	p.setPen( c );
+	p.setPen( QPen( c, 8 ) );
 	p.setFont( font );
 	vrects->clear();
 
@@ -824,6 +795,14 @@ QPixmap &dvdmenuWnd::drawButtons( QPixmap &fond, QColor c, int currentpage, int 
 		it++;
 	}
 	ct = 0;
+	if ( stream )
+	{
+		*stream << "convert -size 720x576 xc:transparent ";
+		*stream << "-family \"" << font.family() << "\" ";
+		*stream << "-fill " << cname << " ";
+		*stream << "-stroke " << cname << " ";
+		*stream << "-strokewidth 2 -colors 3 +antialias ";
+	}
 	while ( it.current() )
 	{
 		item = it.current();
@@ -845,7 +824,16 @@ QPixmap &dvdmenuWnd::drawButtons( QPixmap &fond, QColor c, int currentpage, int 
 			int x = ( tabr[ct].x() + tabr[ct].width()/2 ) - titleRect.width()/2;
 			int y = tabr[ct].y()+tabr[ct].height() + font.pointSize() + 10;
 			p.drawText( x, y, item->text( ID_NAME ) );
-			QRect endrect( x, y-titleRect.height(), titleRect.width()+3, titleRect.height() );
+
+			if ( stream )
+			{
+				*stream << "-pointsize " << font.pointSize() << " ";
+				*stream << "-draw \"text " << x << "," << y << " \\\"";
+				*stream << item->text(ID_NAME) << "\\\"\" ";
+			}
+
+
+			QRect endrect( x, y-titleRect.height(), titleRect.width()+3, titleRect.height()+3 );
 			vrects->push_back( endrect );
 			ct++;
 			if ( ct == 4 ) break;
@@ -864,8 +852,15 @@ QPixmap &dvdmenuWnd::drawButtons( QPixmap &fond, QColor c, int currentpage, int 
 		QRect prevRect = fm.boundingRect( prev );
 		p.drawText( 30, 550, prev );
 
+		if ( stream )
+		{
+			*stream << "-pointsize " << font.pointSize() << " ";
+			*stream << "-draw \"text 30,550 " << " \\\"";
+			*stream << prev << "\\\"\" ";
+		}
+
 		QRect endrect( 30, 550-prevRect.height(), 
-				prevRect.width(), prevRect.height() );
+				prevRect.width()+3, prevRect.height()+3 );
 		vrects->push_back( endrect );
 	}
 	// next menu
@@ -874,12 +869,24 @@ QPixmap &dvdmenuWnd::drawButtons( QPixmap &fond, QColor c, int currentpage, int 
 		QString next( "Next>>" );
 		QRect nextRect = fm.boundingRect( next );
 		p.drawText( 600, 550, next );
+
+		if ( stream )
+		{
+			*stream << "-pointsize " << font.pointSize() << " ";
+			*stream << "-draw \"text 600,550 " << " \\\"";
+			*stream << next << "\\\"\" ";
+		}
+
 		QRect endrect( 600, 550-nextRect.height(), 
-				nextRect.width(), nextRect.height() );
+				nextRect.width()+3, nextRect.height()+3 );
 		vrects->push_back( endrect );
 	}
 	font.setPointSize( ps );
 	p.end();
+	if ( stream )
+	{
+		*stream << " -quality 100 " << fname << endl;
+	}
 	return fond;
 }
 
@@ -950,7 +957,7 @@ void dvdmenuWnd::preview()
 		}
 		std::vector<QRect> vr;
 		bg = drawMenu( bg, 0, n );
-		bg = drawButtons( bg, Qt::white, 0, n, &vr );
+		bg = drawButtons( bg, Qt::white, "white", "", 0, 0, n, &vr );
 
 		previewWnd *pw = new previewWnd();
 		pw->tlPixmap->setPixmap( bg );

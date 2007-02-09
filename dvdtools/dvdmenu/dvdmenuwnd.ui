@@ -402,7 +402,7 @@ Picture</string>
     <slot>genMenuCommand( QStringList titles, QTextStream &amp; stream, QString color, QString outputName, int pg, int npages )</slot>
     <slot>selectBgPic()</slot>
     <slot>selectSound()</slot>
-    <slot returnType="QPixmap &amp;">drawButtons(QPixmap &amp; fond, QColor, int, int, std::vector&lt;QRect&gt;*)</slot>
+    <slot returnType="QPixmap &amp;">drawButtons(QPixmap &amp; fond, QColor, QString, QString, QTextStream *, int, int, std::vector&lt;QRect&gt;*)</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>
