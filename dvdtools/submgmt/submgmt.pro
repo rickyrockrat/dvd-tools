@@ -3,8 +3,6 @@ LANGUAGE	= C++
 
 CONFIG	+= qt warn_off debug
 
-TARGET = submgmt
-
 LIBS	+= -lkdeui -lfreetype
 
 HEADERS	+= subtitle.h
@@ -15,6 +13,13 @@ FORMS	= wndsub.ui
 
 IMAGES	= fileopen.xpm \
 	submgmt_icon.png
+
+TARGET = submgmt
+
+
+
+
+
 
 submgmt.path = /usr/bin
 submgmt.files = submgmt

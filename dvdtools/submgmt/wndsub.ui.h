@@ -268,13 +268,21 @@ QTime operator *( const QTime &t1, const QTime &t2 )
 	return timeFromMilli( milli(t1) * milli(t2) );
 }
 
+double operator /( const QTime &t1, const QTime &t2 )
+{
+	return (double)milli(t1) / (double)milli(t2);
+}
+
+/*
 QTime operator /( const QTime &t1, const QTime &t2 )
 {
 	return timeFromMilli( int((double)milli(t1) / (double)milli(t2)) );
 }
+*/
 
 void WndSub::timeBasedProceed( subtitle &s )
 {
+	static int passage;
 	QTime length, lengths;
 	QString str;
 	QStringList subs;
@@ -313,8 +321,15 @@ void WndSub::timeBasedProceed( subtitle &s )
 		length = timeLastSpeak->time() - timeFirstSpeak->time();
 		lengths = timeLastSub->time() - timeFirstSub->time();
 
-		ts = ts * ( length / lengths ); 
-		te = te * ( length / lengths );
+		double factor;
+		factor = length / lengths;
+		if ( passage == 0 )
+		{
+			passage++;
+			std::cout << "factor=" << factor << std::endl;
+		}
+		ts = ts * factor; 
+		te = te * factor;
 
 		/* and we finish by aligning the first sub to the first speak */
 		ts = ts + timeFirstSpeak->time();
@@ -637,6 +652,7 @@ void WndSub::showInputSubs()
 void WndSub::saveMicrodvd()
 {
 	std::vector<subtitle>::iterator it;
+	QTextCodec *codec = QTextCodec::codecForName(cbOutputEncoding->currentText());
 
     QFile file( leOutputFile->text() );
     if ( file.open( IO_WriteOnly | IO_Truncate ) )
@@ -650,7 +666,7 @@ void WndSub::saveMicrodvd()
 			for ( its = it->subs.begin(); its != it->subs.end(); its++ )
 			{
 				if ( its != it->subs.begin() ) stream << "|";
-				stream << *its;;
+				stream << codec->fromUnicode( *its );
 			}
 			stream << endl;
 		}
@@ -664,6 +680,7 @@ void WndSub::saveSubrip()
 	QTime ts;
 	QTime te;
 	std::vector<subtitle>::iterator it;
+	QTextCodec *codec = QTextCodec::codecForName(cbOutputEncoding->currentText());
 
     QFile file( leOutputFile->text() );
 
@@ -680,7 +697,7 @@ void WndSub::saveSubrip()
 			for ( its = it->subs.begin(); its != it->subs.end(); its++ )
 			{
 				if ( its != it->subs.begin() ) stream << "[br]";
-				stream << *its;
+				stream << codec->fromUnicode( *its );
 			}
 			stream << endl << endl;
 		}
@@ -699,6 +716,7 @@ void WndSub::saveSami()
 	QTime te;
 	std::vector<subtitle>::iterator it;
 	int numero;
+	QTextCodec *codec = QTextCodec::codecForName(cbOutputEncoding->currentText());
 
     QFile file( leOutputFile->text() );
 
@@ -726,7 +744,7 @@ void WndSub::saveSami()
 			its++;
 			for ( ; its != it->subs.end(); its++ )
 			{
-				stream << "<br>" << *its;
+				stream << "<br>" << codec->fromUnicode( *its );
 			}
 			stream << endl;
 			stream << "<SYNC START=" << milli( te ) << ">" << endl;
@@ -747,6 +765,7 @@ void WndSub::saveSubviewer()
 	QTime te;
 	std::vector<subtitle>::iterator it;
 	int numero;
+	QTextCodec *codec = QTextCodec::codecForName(cbOutputEncoding->currentText());
 
     QFile file( leOutputFile->text() );
 
@@ -764,7 +783,7 @@ void WndSub::saveSubviewer()
 			QStringList::iterator its;
 			for ( its = it->subs.begin(); its != it->subs.end(); its++ )
 			{
-				stream << *its << endl;
+				stream << codec->fromUnicode( *its ) << endl;
 			}
 			stream << endl;
 			numero++;
@@ -783,6 +802,7 @@ void WndSub::saveSpumux()
 	QTime ts;
 	QTime te;
 	std::vector<subtitle>::iterator it;
+	QTextCodec *codec = QTextCodec::codecForName(cbOutputEncoding->currentText());
 
     QFile file( leOutputFile->text() );
 
@@ -803,7 +823,7 @@ void WndSub::saveSpumux()
 			for ( its = it->subs.begin(); its != it->subs.end(); its++ )
 			{
 				if ( its != it->subs.begin() ) stream << endl;
-				stream << *its;
+				stream << codec->fromUnicode( *its );
 			}
 			stream << " </spu>" << endl;
 		}
@@ -826,6 +846,7 @@ void WndSub::loadSami()
 	QRegExp sync( "SYNC START=" );
 	QRegExp br( "<br>" );
 	QRegExp spaces( "&nbsp;" );
+	QTextCodec *codec = QTextCodec::codecForName(cbInputEncoding->currentText());
 
     QFile file( leInputFile->text() );
 
@@ -836,7 +857,7 @@ void WndSub::loadSami()
         QString line;
         while ( !stream.atEnd() )
 		{
-            line = stream.readLine(); // line of text excluding '\n'
+            line = codec->toUnicode( stream.readLine()); // line of text excluding '\n'
 			if ( line.contains( sync ) )
 			{
 				Start = line.section( '=', 1, 1 ).section( '>', 0, 0 );
@@ -845,7 +866,7 @@ void WndSub::loadSami()
 				ts = timeFromMilli( Start.toInt() );
 				subs.clear();
 
-				line = stream.readLine();
+				line = codec->toUnicode( stream.readLine() );
 				QString str = line.section( 'CLASS=SUBTTL>', 1 );
 				if ( str.contains( spaces ) ) continue;
 				// handle <br>
@@ -858,7 +879,7 @@ void WndSub::loadSami()
 				}
 				
 				// get end
-				line = stream.readLine();
+				line = codec->toUnicode( stream.readLine() );
 				if ( line.contains( sync ) )
 				{
 					End = line.section( '=', 1, 1 ).section( '>', 0, 0 );
@@ -881,6 +902,7 @@ void WndSub::loadSubviewer()
 	QTime ts;
 	QTime te;
 	QStringList subs;
+	QTextCodec *codec = QTextCodec::codecForName(cbInputEncoding->currentText());
 
     QFile file( leInputFile->text() );
 
@@ -891,7 +913,7 @@ void WndSub::loadSubviewer()
         QString line;
         while ( !stream.atEnd() )
 		{
-            line = stream.readLine(); // line of text excluding '\n'
+            line = codec->toUnicode( stream.readLine() ); // line of text excluding '\n'
 			if ( line.contains( subviewer ) )
 			{
 				Start = line.section( ' ', 0, 0 );
@@ -901,7 +923,7 @@ void WndSub::loadSubviewer()
 				subs.clear();
 				while ( !stream.atEnd() )
 				{
-					line = stream.readLine();
+					line = codec->toUnicode( stream.readLine() );
 					if ( line.isEmpty() )
 						break;
 					/* text */
@@ -922,6 +944,7 @@ void WndSub::loadMicrodvd()
 	QString Text;
 	QStringList subs;
 	int start, end;
+	QTextCodec *codec = QTextCodec::codecForName(cbInputEncoding->currentText());
 
     QFile file( leInputFile->text() );
 
@@ -932,7 +955,7 @@ void WndSub::loadMicrodvd()
         QString line;
         while ( !stream.atEnd() )
 		{
-            line = stream.readLine(); // line of text excluding '\n'
+            line = codec->toUnicode( stream.readLine() ); // line of text excluding '\n'
 			if ( line.contains( microdvd ) )
 			{
 				/* {xxxx}{yyyy} text 1 | text 2 | ... */
@@ -961,6 +984,7 @@ void WndSub::loadSubrip()
 	QTime ts;
 	QTime te;
 	QStringList subs;
+	QTextCodec *codec = QTextCodec::codecForName(cbInputEncoding->currentText());
 
     QFile file( leInputFile->text() );
 
@@ -971,7 +995,7 @@ void WndSub::loadSubrip()
         QString line;
         while ( !stream.atEnd() )
 		{
-            line = stream.readLine(); // line of text excluding '\n'
+            line = codec->toUnicode( stream.readLine() ); // line of text excluding '\n'
 			if ( line.contains( subrip ) )
 			{
 				Start = line.section( ',', 0, 0 );
@@ -981,7 +1005,7 @@ void WndSub::loadSubrip()
 				subs.clear();
 				while ( !stream.atEnd() )
 				{
-					line = stream.readLine();
+					line = codec->toUnicode( stream.readLine() );
 					if ( line.isEmpty() )
 						break;
 					/* text */
@@ -1005,6 +1029,7 @@ void WndSub::loadSpumux()
 	QTime ts;
 	QTime te;
 	QStringList subs;
+	QTextCodec *codec = QTextCodec::codecForName(cbInputEncoding->currentText());
 
     QFile file( leInputFile->text() );
 
@@ -1015,7 +1040,7 @@ void WndSub::loadSpumux()
         QString line;
         while ( !stream.atEnd() )
 		{
-            line = stream.readLine(); // line of text excluding '\n'
+            line = codec->toUnicode( stream.readLine() ); // line of text excluding '\n'
 			if ( line.contains( spumux ) )
 			{
 				Debut = line.section( "<spu ", 1 ).section( "start=\"", 0, 0 );
@@ -1040,7 +1065,7 @@ void WndSub::loadSpumux()
 					subs.push_back( Reste );
 					while ( !stream.atEnd() )
 					{
-						line = stream.readLine();
+						line = codec->toUnicode( stream.readLine() );
 						if ( line.contains( "</spu>") )
 						{
 							QString text = line.section( "</spu>", 0, 0 );
