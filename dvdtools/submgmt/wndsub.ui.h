@@ -652,12 +652,20 @@ void WndSub::showInputSubs()
 void WndSub::saveMicrodvd()
 {
 	std::vector<subtitle>::iterator it;
-	QTextCodec *codec = QTextCodec::codecForName(cbOutputEncoding->currentText());
 
     QFile file( leOutputFile->text() );
     if ( file.open( IO_WriteOnly | IO_Truncate ) )
 	{
         QTextStream stream( &file );
+		if ( cbOutputEncoding->currentText() == "ISO 8859-1" )
+		{
+			stream.setEncoding( QTextStream::Latin1 );
+		}
+		else
+		{
+			stream.setEncoding( QTextStream::UnicodeUTF8 );
+		}
+		QTextCodec *codec = QTextCodec::codecForName(cbOutputEncoding->currentText());
 		for ( it = subvec.begin(); it != subvec.end(); it++ )
 		{
 			stream << "{" << it->fbegin << "}{" << it->fend << "}";
@@ -680,13 +688,21 @@ void WndSub::saveSubrip()
 	QTime ts;
 	QTime te;
 	std::vector<subtitle>::iterator it;
-	QTextCodec *codec = QTextCodec::codecForName(cbOutputEncoding->currentText());
 
     QFile file( leOutputFile->text() );
 
     if ( file.open( IO_WriteOnly | IO_Truncate ) )
 	{
         QTextStream stream( &file );
+		if ( cbOutputEncoding->currentText() == "ISO 8859-1" )
+		{
+			stream.setEncoding( QTextStream::Latin1 );
+		}
+		else
+		{
+			stream.setEncoding( QTextStream::UnicodeUTF8 );
+		}
+		QTextCodec *codec = QTextCodec::codecForName(cbOutputEncoding->currentText());
 		for ( it = subvec.begin(); it != subvec.end(); it++ )
 		{
 			ts = it->begin;
@@ -716,13 +732,21 @@ void WndSub::saveSami()
 	QTime te;
 	std::vector<subtitle>::iterator it;
 	int numero;
-	QTextCodec *codec = QTextCodec::codecForName(cbOutputEncoding->currentText());
 
     QFile file( leOutputFile->text() );
 
     if ( file.open( IO_WriteOnly | IO_Truncate ) )
 	{
         QTextStream stream( &file );
+		if ( cbOutputEncoding->currentText() == "ISO 8859-1" )
+		{
+			stream.setEncoding( QTextStream::Latin1 );
+		}
+		else
+		{
+			stream.setEncoding( QTextStream::UnicodeUTF8 );
+		}
+		QTextCodec *codec = QTextCodec::codecForName(cbOutputEncoding->currentText());
 		stream << "<SAMI>" << endl;
 		stream << "<HEAD>" << endl;
 		stream << "   <STYLE TYPE=\"Text/css\">" << endl;
@@ -765,13 +789,21 @@ void WndSub::saveSubviewer()
 	QTime te;
 	std::vector<subtitle>::iterator it;
 	int numero;
-	QTextCodec *codec = QTextCodec::codecForName(cbOutputEncoding->currentText());
 
     QFile file( leOutputFile->text() );
 
     if ( file.open( IO_WriteOnly | IO_Truncate ) )
 	{
         QTextStream stream( &file );
+		if ( cbOutputEncoding->currentText() == "ISO 8859-1" )
+		{
+			stream.setEncoding( QTextStream::Latin1 );
+		}
+		else
+		{
+			stream.setEncoding( QTextStream::UnicodeUTF8 );
+		}
+		QTextCodec *codec = QTextCodec::codecForName(cbOutputEncoding->currentText());
 		numero = 1;
 		for ( it = subvec.begin(); it != subvec.end(); it++ )
 		{
@@ -802,13 +834,21 @@ void WndSub::saveSpumux()
 	QTime ts;
 	QTime te;
 	std::vector<subtitle>::iterator it;
-	QTextCodec *codec = QTextCodec::codecForName(cbOutputEncoding->currentText());
 
     QFile file( leOutputFile->text() );
 
     if ( file.open( IO_WriteOnly | IO_Truncate ) )
 	{
         QTextStream stream( &file );
+		if ( cbOutputEncoding->currentText() == "ISO 8859-1" )
+		{
+			stream.setEncoding( QTextStream::Latin1 );
+		}
+		else
+		{
+			stream.setEncoding( QTextStream::UnicodeUTF8 );
+		}
+		QTextCodec *codec = QTextCodec::codecForName(cbOutputEncoding->currentText());
 		stream << "<subpictures>" << endl;
 		stream << "  <stream>" << endl;
 		for ( it = subvec.begin(); it != subvec.end(); it++ )
@@ -846,7 +886,6 @@ void WndSub::loadSami()
 	QRegExp sync( "SYNC START=" );
 	QRegExp br( "<br>" );
 	QRegExp spaces( "&nbsp;" );
-	QTextCodec *codec = QTextCodec::codecForName(cbInputEncoding->currentText());
 
     QFile file( leInputFile->text() );
 
@@ -854,6 +893,15 @@ void WndSub::loadSami()
 	{
 		subvec.clear();
         QTextStream stream( &file );
+		if ( cbInputEncoding->currentText() == "ISO 8859-1" )
+		{
+			stream.setEncoding( QTextStream::Latin1 );
+		}
+		else
+		{
+			stream.setEncoding( QTextStream::UnicodeUTF8 );
+		}
+		QTextCodec *codec = QTextCodec::codecForName(cbInputEncoding->currentText());
         QString line;
         while ( !stream.atEnd() )
 		{
@@ -902,7 +950,6 @@ void WndSub::loadSubviewer()
 	QTime ts;
 	QTime te;
 	QStringList subs;
-	QTextCodec *codec = QTextCodec::codecForName(cbInputEncoding->currentText());
 
     QFile file( leInputFile->text() );
 
@@ -910,6 +957,15 @@ void WndSub::loadSubviewer()
 	{
 		subvec.clear();
         QTextStream stream( &file );
+		if ( cbInputEncoding->currentText() == "ISO 8859-1" )
+		{
+			stream.setEncoding( QTextStream::Latin1 );
+		}
+		else
+		{
+			stream.setEncoding( QTextStream::UnicodeUTF8 );
+		}
+		QTextCodec *codec = QTextCodec::codecForName(cbInputEncoding->currentText());
         QString line;
         while ( !stream.atEnd() )
 		{
@@ -944,7 +1000,6 @@ void WndSub::loadMicrodvd()
 	QString Text;
 	QStringList subs;
 	int start, end;
-	QTextCodec *codec = QTextCodec::codecForName(cbInputEncoding->currentText());
 
     QFile file( leInputFile->text() );
 
@@ -952,6 +1007,15 @@ void WndSub::loadMicrodvd()
 	{
 		subvec.clear();
         QTextStream stream( &file );
+		if ( cbInputEncoding->currentText() == "ISO 8859-1" )
+		{
+			stream.setEncoding( QTextStream::Latin1 );
+		}
+		else
+		{
+			stream.setEncoding( QTextStream::UnicodeUTF8 );
+		}
+		QTextCodec *codec = QTextCodec::codecForName(cbInputEncoding->currentText());
         QString line;
         while ( !stream.atEnd() )
 		{
@@ -984,7 +1048,6 @@ void WndSub::loadSubrip()
 	QTime ts;
 	QTime te;
 	QStringList subs;
-	QTextCodec *codec = QTextCodec::codecForName(cbInputEncoding->currentText());
 
     QFile file( leInputFile->text() );
 
@@ -992,6 +1055,15 @@ void WndSub::loadSubrip()
 	{
 		subvec.clear();
         QTextStream stream( &file );
+		if ( cbInputEncoding->currentText() == "ISO 8859-1" )
+		{
+			stream.setEncoding( QTextStream::Latin1 );
+		}
+		else
+		{
+			stream.setEncoding( QTextStream::UnicodeUTF8 );
+		}
+		QTextCodec *codec = QTextCodec::codecForName(cbInputEncoding->currentText());
         QString line;
         while ( !stream.atEnd() )
 		{
@@ -1029,7 +1101,6 @@ void WndSub::loadSpumux()
 	QTime ts;
 	QTime te;
 	QStringList subs;
-	QTextCodec *codec = QTextCodec::codecForName(cbInputEncoding->currentText());
 
     QFile file( leInputFile->text() );
 
@@ -1037,6 +1108,15 @@ void WndSub::loadSpumux()
 	{
 		subvec.clear();
         QTextStream stream( &file );
+		if ( cbInputEncoding->currentText() == "ISO 8859-1" )
+		{
+			stream.setEncoding( QTextStream::Latin1 );
+		}
+		else
+		{
+			stream.setEncoding( QTextStream::UnicodeUTF8 );
+		}
+		QTextCodec *codec = QTextCodec::codecForName(cbInputEncoding->currentText());
         QString line;
         while ( !stream.atEnd() )
 		{
