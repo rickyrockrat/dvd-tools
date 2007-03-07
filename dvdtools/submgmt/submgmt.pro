@@ -3,7 +3,7 @@ LANGUAGE	= C++
 
 CONFIG	+= qt warn_off debug
 
-LIBS	+= -lkdeui -lfreetype
+LIBS	+= -lfreetype
 
 HEADERS	+= subtitle.h
 
