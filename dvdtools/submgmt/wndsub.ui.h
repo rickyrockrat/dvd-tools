@@ -10,6 +10,11 @@
 ** destructor.
 *****************************************************************************/
 #include <iostream>
+#include <qpainter.h>
+#include <qradiobutton.h>
+#include <qdeepcopy.h>
+#include <qprocess.h>
+#include "genpngwnd.h"
 
 #define TIME_FMT	"hh:mm:ss,zzz"
 #define SPU_TIME_FMT	"hh:mm:ss.zzz"
@@ -95,6 +100,9 @@ void WndSub::init()
 	sbExpand->setEnabled( false );
 	comboFpsDest->setEnabled( false );
 	tlFps->setEnabled( false );
+
+	connect( pbGenPng, SIGNAL(clicked()),
+		this, SLOT(genPngForSpumux()));
 }
 
 void WndSub::clickedSave()
@@ -1164,4 +1172,197 @@ void WndSub::loadSpumux()
 		}
         file.close();
     }
+}
+
+
+void WndSub::genPngForSpumux()
+{
+	genpngWnd *gw = new genpngWnd( this, 0 , 0 );
+	if ( gw->exec() == QDialog::Rejected )
+		return;
+	setCursor( Qt::WaitCursor );
+	QString Start;
+	QString End;
+	QTime ts;
+	QTime te;
+	std::vector<subtitle>::iterator it;
+
+	QString xmlname;
+	QString name;
+	xmlname.sprintf( "%s.xml", gw->leBaseName->text().ascii() );
+    QFile file( xmlname );
+
+    if ( file.open( IO_WriteOnly | IO_Truncate ) )
+	{
+        QTextStream stream( &file );
+		if ( cbOutputEncoding->currentText() == "ISO 8859-1" )
+		{
+			stream.setEncoding( QTextStream::Latin1 );
+		}
+		else
+		{
+			stream.setEncoding( QTextStream::UnicodeUTF8 );
+		}
+		QTextCodec *codec = QTextCodec::codecForName(cbOutputEncoding->currentText());
+		stream << "<subpictures>" << endl;
+		stream << "  <stream>" << endl;
+		int ctr = 0;
+		for ( it = subvec.begin(); it != subvec.end(); it++ )
+		{
+			ts = it->begin;
+			te = it->end;
+			stream << "    <spu";
+			stream << " start=\"" << ts.toString( SPU_TIME_FMT ) << "\"";;
+			stream << " end=\"" << te.toString( SPU_TIME_FMT ) << "\"";;
+
+			int maxw = 0, maxh = 0, interligne = 10;
+			QStringList::iterator its;
+			QFontMetrics fm( gw->pbNormalFont->font() );
+			QRect r;
+			// computing metrics
+			for ( its = it->subs.begin(); its != it->subs.end(); its++ )
+			{
+				if ( (*its).contains( "<i>" ) )
+				{
+					// we assume that the whole sub is italic...it's lot simpler
+					fm = QFontMetrics( gw->pbItalicFont->font() );
+					QString s = QDeepCopy<QString>( *its );
+					s.remove( "<i>" ).remove( "</i>" );
+					r = fm.boundingRect( s );
+				}
+				else if ( (*its).contains( "<b>" ) )
+				{
+					// we assume that the whole sub is bold...it's lot simpler
+					fm = QFontMetrics( gw->pbBoldFont->font() );
+					QString s = QDeepCopy<QString>( *its );
+					s.remove( "<b>" ).remove( "</b>" );
+					r = fm.boundingRect( s );
+				}
+				else
+				{
+					fm = QFontMetrics( gw->pbNormalFont->font() );
+					r = fm.boundingRect( *its );
+				}
+				if ( r.width() > maxw ) maxw = r.width();
+				maxh += r.height() + fm.leading();
+			}
+			maxw += gw->sbLeftMargin->value() + gw->sbRightMargin->value();	
+			maxh += gw->sbTopMargin->value() + gw->sbBottomMargin->value();	
+			if ( maxw > 720 ) maxw = 720;
+			if ( gw->rbPAL->isChecked() )
+			{
+				if ( maxh > 576 ) maxh = 576;
+			}
+			else
+			{
+				if ( maxh > 480 ) maxh = 480;
+			}
+
+			// drawing the text
+			QPixmap gensub( maxw, maxh );
+			gensub.fill( black );
+			QPainter p( &gensub );
+			QString s;
+			int x = 0, y = 0;
+			for ( its = it->subs.begin(); its != it->subs.end(); its++ )
+			{
+				s = QDeepCopy<QString>( *its );
+				if ( (*its).contains( "<i>" ) )
+				{
+					fm = QFontMetrics( gw->pbItalicFont->font() );
+					p.setFont( gw->pbItalicFont->font() );
+					s.remove( "<i>" ).remove( "</i>" );
+					r = fm.boundingRect( s );
+				}
+				else if ( (*its).contains( "<b>" ) )
+				{
+					fm = QFontMetrics( gw->pbBoldFont->font() );
+					p.setFont( gw->pbBoldFont->font() );
+					s.remove( "<b>" ).remove( "</b>" );
+					r = fm.boundingRect( s );
+				}
+				else
+				{
+					fm = QFontMetrics( gw->pbNormalFont->font() );
+					p.setFont( gw->pbNormalFont->font() );
+					r = fm.boundingRect( *its );
+				}
+				switch ( gw->cbHoriz->currentItem() )
+				{
+				case 1 : // Left alignment
+				x = 0;
+				break;
+				case 2 : // Right alignment
+				x = maxw - r.width();
+				break;
+				default : // center
+				x = ( maxw - r.width() ) / 2;
+				break;
+				}
+				p.setPen( QPen( gw->pbSubColor->paletteBackgroundColor() ) );
+				p.drawText( x, y+r.height(), s );
+				y += r.height() + fm.leading();
+			}
+
+			// computing offset
+			int xoff = 0, yoff = 0;
+			if ( gw->cbVert->currentItem() == 1 )
+			{	// top align
+				yoff = gw->sbTopMargin->value();
+			}
+			else
+			{
+				if ( gw->rbPAL->isChecked() )
+					yoff = 576-(gensub.height() + gw->sbBottomMargin->value() );
+				else
+					yoff = 480-(gensub.height() + gw->sbBottomMargin->value() );
+			}
+			if ( gw->cbHoriz->currentItem() == 1 )
+			{	// Left
+				xoff = gw->sbLeftMargin->value();
+			}
+			else if ( gw->cbHoriz->currentItem() == 2 )
+			{	// Right
+				xoff = 720 - gw->sbRightMargin->value() - gensub.width();
+			}
+			else
+			{	// Center
+				xoff = (720 - gw->sbRightMargin->value() - gw->sbLeftMargin->value() - gensub.width() ) / 2;
+			}
+			if ( xoff < 0 ) xoff = 0;
+			if ( yoff < 0 ) yoff = 0;
+
+			QImage img = gensub.convertToImage();
+			name.sprintf( "%s%4.4d.png",gw->leBaseName->text().ascii(), ctr++ );
+			img.convertDepth( 8 ).save( name, "PNG" );
+
+			stream << " image=\"" << name << "\"";
+			if ( gw->cbConvert->isChecked() )
+			{
+				QProcess ps;
+				ps.addArgument( "convert" );
+				ps.addArgument( name );
+				ps.addArgument( "-transparent" );
+				ps.addArgument( "black" );
+				ps.addArgument( "-colors" );
+				ps.addArgument( "3" );
+				ps.addArgument( name );
+				ps.start();
+			}
+			else
+			{
+				stream << " transparent=\"000000\"";
+			}
+			stream << " xoffset=\"" << xoff << "\"";
+			stream << " yoffset=\"" << yoff << "\"";
+			stream << " />" << endl;
+		}
+		stream << "  </stream>" << endl;
+		stream << "</subpictures>" << endl;
+	}
+	else
+	{
+		QMessageBox::information( this, "submgmt", "Erreur ecriture fichier");
+	}
+	setCursor( Qt::ArrowCursor );
 }
