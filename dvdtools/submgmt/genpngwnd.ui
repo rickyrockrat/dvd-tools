@@ -323,7 +323,7 @@
                         <cstring>sbTopMargin</cstring>
                     </property>
                     <property name="value">
-                        <number>10</number>
+                        <number>30</number>
                     </property>
                 </widget>
             </hbox>
@@ -358,7 +358,7 @@
                         <cstring>sbBottomMargin</cstring>
                     </property>
                     <property name="value">
-                        <number>10</number>
+                        <number>30</number>
                     </property>
                 </widget>
             </hbox>
@@ -377,20 +377,6 @@
                     </property>
                     <property name="text">
                         <string>Subtitle color</string>
-                    </property>
-                </widget>
-                <widget class="QCheckBox">
-                    <property name="name">
-                        <cstring>cbConvert</cstring>
-                    </property>
-                    <property name="text">
-                        <string>Convert to &amp;3 colors</string>
-                    </property>
-                    <property name="accel">
-                        <string>Alt+3</string>
-                    </property>
-                    <property name="checked">
-                        <bool>true</bool>
                     </property>
                 </widget>
             </hbox>
@@ -423,6 +409,9 @@
                 <widget class="QLineEdit">
                     <property name="name">
                         <cstring>leBaseName</cstring>
+                    </property>
+                    <property name="text">
+                        <string>sub</string>
                     </property>
                 </widget>
             </hbox>

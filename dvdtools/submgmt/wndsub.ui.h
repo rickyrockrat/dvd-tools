@@ -1246,16 +1246,25 @@ void WndSub::genPngForSpumux()
 				if ( r.width() > maxw ) maxw = r.width();
 				maxh += r.height() + fm.leading();
 			}
-			maxw += gw->sbLeftMargin->value() + gw->sbRightMargin->value();	
-			maxh += gw->sbTopMargin->value() + gw->sbBottomMargin->value();	
-			if ( maxw > 720 ) maxw = 720;
+			int dispow = 720 - gw->sbLeftMargin->value() - gw->sbRightMargin->value();	
+			int dispoh;
+			if ( maxw > dispow )
+			{
+				maxw = dispow;
+				QMessageBox::information( this, "submgmt", "Subtitle " + *its + " is too wide" );
+			}
 			if ( gw->rbPAL->isChecked() )
 			{
-				if ( maxh > 576 ) maxh = 576;
+				dispoh = 576 - gw->sbTopMargin->value() - gw->sbBottomMargin->value();	
 			}
 			else
 			{
-				if ( maxh > 480 ) maxh = 480;
+				dispoh = 480 - gw->sbTopMargin->value() - gw->sbBottomMargin->value();	
+			}
+			if ( maxh > dispoh )
+			{
+				maxh = dispoh;
+				QMessageBox::information( this, "submgmt", "Subtitle " + *its + " is too high" );
 			}
 
 			// drawing the text
@@ -1263,6 +1272,17 @@ void WndSub::genPngForSpumux()
 			gensub.fill( black );
 			QPainter p( &gensub );
 			QString s;
+			int clip = 10;
+			QColor textcol = gw->pbSubColor->paletteBackgroundColor();
+			if ( ( (textcol.red()-clip) <= 0 )
+				&& ( (textcol.green()-clip) <= 0 )
+				&& ( (textcol.blue()-clip) <= 0 ) )
+			{
+				QMessageBox::information( this, "submgmt", "The subtitle color you choose is too near black." );
+				return;
+
+			}
+			QRgb textrgb = textcol.rgb();
 			int x = 0, y = 0;
 			for ( its = it->subs.begin(); its != it->subs.end(); its++ )
 			{
@@ -1299,7 +1319,8 @@ void WndSub::genPngForSpumux()
 				x = ( maxw - r.width() ) / 2;
 				break;
 				}
-				p.setPen( QPen( gw->pbSubColor->paletteBackgroundColor() ) );
+				p.setPen( QPen( textcol ) );
+				p.setBrush( QBrush( textcol, Qt::SolidPattern ) );
 				p.drawText( x, y+r.height(), s );
 				y += r.height() + fm.leading();
 			}
@@ -1333,26 +1354,29 @@ void WndSub::genPngForSpumux()
 			if ( yoff < 0 ) yoff = 0;
 
 			QImage img = gensub.convertToImage();
+			std::cout << "numcol=" << img.numColors() << std::endl;
+			for ( int x = 0; x < img.width(); x++ )
+			{
+				for ( int y = 0; y < img.height(); y++ )
+				{
+					QRgb rgb = img.pixel( x, y );
+					QColor c( rgb );
+					if ( ( (c.red()-clip) <= 0 )
+						&& ( (c.green()-clip) <= 0 )
+						&& ( (c.blue()-clip) <= 0 ) )
+					{
+						img.setPixel( x, y, black.rgb() );
+					}
+					else
+						img.setPixel( x, y, textrgb );
+				}
+			}
+			img.setNumColors( 3 );
 			name.sprintf( "%s%4.4d.png",gw->leBaseName->text().ascii(), ctr++ );
-			img.convertDepth( 8 ).save( name, "PNG" );
+			img.save( name, "PNG" );
 
 			stream << " image=\"" << name << "\"";
-			if ( gw->cbConvert->isChecked() )
-			{
-				QProcess ps;
-				ps.addArgument( "convert" );
-				ps.addArgument( name );
-				ps.addArgument( "-transparent" );
-				ps.addArgument( "black" );
-				ps.addArgument( "-colors" );
-				ps.addArgument( "3" );
-				ps.addArgument( name );
-				ps.start();
-			}
-			else
-			{
-				stream << " transparent=\"000000\"";
-			}
+			stream << " transparent=\"000000\"";
 			stream << " xoffset=\"" << xoff << "\"";
 			stream << " yoffset=\"" << yoff << "\"";
 			stream << " />" << endl;
@@ -1364,5 +1388,6 @@ void WndSub::genPngForSpumux()
 	{
 		QMessageBox::information( this, "submgmt", "Erreur ecriture fichier");
 	}
+	delete gw;
 	setCursor( Qt::ArrowCursor );
 }

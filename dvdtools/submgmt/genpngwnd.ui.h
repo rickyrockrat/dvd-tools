@@ -20,6 +20,7 @@ void genpngWnd::init()
 	connect( pbSubColor, SIGNAL(clicked()), this, SLOT(selSubColor()));
 	connect( pbOk, SIGNAL(clicked()), this, SLOT(accept()));
 	connect( pbCancel, SIGNAL(clicked()), this, SLOT(reject()));
+	pbSubColor->setPaletteBackgroundColor( white );
 }
 
 void genpngWnd::selNormalFont()
