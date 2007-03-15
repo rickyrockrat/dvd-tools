@@ -179,7 +179,7 @@ Picture</string>
             <cstring>aNewDVD</cstring>
         </property>
         <property name="iconSet">
-            <iconset>ic_newdvd.png</iconset>
+            <iconset></iconset>
         </property>
         <property name="text">
             <string>New DVD</string>
@@ -193,7 +193,7 @@ Picture</string>
             <bool>false</bool>
         </property>
         <property name="iconSet">
-            <iconset>ic_title.png</iconset>
+            <iconset></iconset>
         </property>
         <property name="text">
             <string>Add Title</string>
@@ -204,7 +204,7 @@ Picture</string>
             <cstring>aAddVideo</cstring>
         </property>
         <property name="iconSet">
-            <iconset>ic_video.png</iconset>
+            <iconset></iconset>
         </property>
         <property name="text">
             <string>Add Video</string>
@@ -215,7 +215,7 @@ Picture</string>
             <cstring>aFont</cstring>
         </property>
         <property name="iconSet">
-            <iconset>ic_font.png</iconset>
+            <iconset></iconset>
         </property>
         <property name="text">
             <string>Font</string>
@@ -226,7 +226,7 @@ Picture</string>
             <cstring>aBgColor</cstring>
         </property>
         <property name="iconSet">
-            <iconset>ic_bgcolor.png</iconset>
+            <iconset></iconset>
         </property>
         <property name="text">
             <string>Background Color</string>
@@ -237,7 +237,7 @@ Picture</string>
             <cstring>aPreview</cstring>
         </property>
         <property name="iconSet">
-            <iconset>ic_preview.png</iconset>
+            <iconset></iconset>
         </property>
         <property name="text">
             <string>Preview</string>
@@ -248,7 +248,7 @@ Picture</string>
             <cstring>aRemove</cstring>
         </property>
         <property name="iconSet">
-            <iconset>ic_remove.png</iconset>
+            <iconset></iconset>
         </property>
         <property name="text">
             <string>Remove</string>
@@ -259,7 +259,7 @@ Picture</string>
             <cstring>aEncode</cstring>
         </property>
         <property name="iconSet">
-            <iconset>ic_run.png</iconset>
+            <iconset></iconset>
         </property>
         <property name="text">
             <string>Encode</string>
@@ -270,7 +270,7 @@ Picture</string>
             <cstring>aExit</cstring>
         </property>
         <property name="iconSet">
-            <iconset>ic_exit.png</iconset>
+            <iconset></iconset>
         </property>
         <property name="text">
             <string>Exit</string>
@@ -287,7 +287,7 @@ Picture</string>
             <bool>true</bool>
         </property>
         <property name="iconSet">
-            <iconset>ic_mencoder.png</iconset>
+            <iconset></iconset>
         </property>
         <property name="text">
             <string>Mencoder</string>
@@ -304,7 +304,7 @@ Picture</string>
             <bool>true</bool>
         </property>
         <property name="iconSet">
-            <iconset>ic_directplay.png</iconset>
+            <iconset></iconset>
         </property>
         <property name="text">
             <string>Direct Play</string>
@@ -315,7 +315,7 @@ Picture</string>
             <cstring>aNew</cstring>
         </property>
         <property name="iconSet">
-            <iconset>ic_new.png</iconset>
+            <iconset></iconset>
         </property>
         <property name="text">
             <string>New project</string>
@@ -326,7 +326,7 @@ Picture</string>
             <cstring>aOpen</cstring>
         </property>
         <property name="iconSet">
-            <iconset>ic_open.png</iconset>
+            <iconset></iconset>
         </property>
         <property name="text">
             <string>Open project</string>
@@ -337,7 +337,7 @@ Picture</string>
             <cstring>aSave</cstring>
         </property>
         <property name="iconSet">
-            <iconset>ic_save.png</iconset>
+            <iconset></iconset>
         </property>
         <property name="text">
             <string>Save project</string>
@@ -402,12 +402,13 @@ Picture</string>
     <slot>genMenuCommand( QStringList titles, QTextStream &amp; stream, QString color, QString outputName, int pg, int npages )</slot>
     <slot>selectBgPic()</slot>
     <slot>selectSound()</slot>
-    <slot returnType="QPixmap &amp;">drawButtons(QPixmap &amp; fond, QColor, QString, QString, QTextStream *, int, int, std::vector&lt;QRect&gt;*)</slot>
+    <slot>clipColors( QImage &amp; img, const QColor &amp; destcol )</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>
     <function returnType="QString">stringListeEnd( QStringList &amp; liste, int depart )</function>
-    <function returnType="QPixmap">drawMenu(QPixmap &amp; fond, int currentpage, int totalpages)</function>
+    <function returnType="QPixmap">drawMenu( QPixmap &amp; fond, int currentpage, int totalpages )</function>
+    <function returnType="QPixmap &amp;">drawButtons( QPixmap &amp; fond, QColor c, int currentpage, int totalpages, std::vector&lt;QRect&gt; * vrects )</function>
 </functions>
 <pixmapinproject/>
 <layoutdefaults spacing="6" margin="11"/>

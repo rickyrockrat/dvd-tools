@@ -30,6 +30,21 @@ void dvdmenuWnd::init()
 	font.setStyleStrategy( QFont::PreferAntialias );
 	font = QFont( "Bitstream Vera Sans Mono", 28 );
 
+	aAddTitle->setIconSet( QIconSet( QPixmap::fromMimeSource( "ic_title.png" ) ) );
+	aAddVideo->setIconSet( QIconSet( QPixmap::fromMimeSource( "ic_video.png" ) ) );
+	aBgColor->setIconSet( QIconSet( QPixmap::fromMimeSource( "ic_bgcolor.png" ) ) );
+	aDirectPlay->setIconSet( QIconSet( QPixmap::fromMimeSource( "ic_directplay.png" ) ) );
+	aEncode->setIconSet( QIconSet( QPixmap::fromMimeSource( "ic_run.png" ) ) );
+	aExit->setIconSet( QIconSet( QPixmap::fromMimeSource( "ic_exit.png" ) ) );
+	aFont->setIconSet( QIconSet( QPixmap::fromMimeSource( "ic_font.png" ) ) );
+	aMEncoder->setIconSet( QIconSet( QPixmap::fromMimeSource( "ic_mencoder.png" ) ) );
+	aNew->setIconSet( QIconSet( QPixmap::fromMimeSource( "ic_new.png" ) ) );
+	aNewDVD->setIconSet( QIconSet( QPixmap::fromMimeSource( "ic_newdvd.png" ) ) );
+	aOpen->setIconSet( QIconSet( QPixmap::fromMimeSource( "ic_open.png" ) ) );
+	aPreview->setIconSet( QIconSet( QPixmap::fromMimeSource( "ic_preview.png" ) ) );
+	aRemove->setIconSet( QIconSet( QPixmap::fromMimeSource( "ic_remove.png" ) ) );
+	aSave->setIconSet( QIconSet( QPixmap::fromMimeSource( "ic_save.png" ) ) );
+
 	connect( aNew, SIGNAL(activated()), this, SLOT(newProject()) );
 	connect( aOpen, SIGNAL(activated()), this, SLOT(openProject()) );
 	connect( aSave, SIGNAL(activated()), this, SLOT(saveProject()) );
@@ -479,15 +494,33 @@ void dvdmenuWnd::encode()
 					outputhName.sprintf( "picH%04d.png", pg );
 					outputsName.sprintf( "picS%04d.png", pg );
 		
-					QPixmap bp = QPixmap::fromMimeSource( "black.jpg" );
+					QPixmap bp1 = QPixmap::fromMimeSource( "black.jpg" );
 					std::vector<QRect> vr;
 
-					QPixmap pic1 = drawButtons( bp, Qt::white, "white", outputName, &stream, pg, npages,&vr );
+					QRgb pal[ 4 ];
+					pal[ 0 ] = Qt::black.rgb();
+					pal[ 1 ] = Qt::white.rgb();
+					pal[ 2 ] = Qt::yellow.rgb();
+					pal[ 3 ] = Qt::blue.rgb();
+					QPixmap pic1 = drawButtons( bp1, Qt::white, pg, npages,&vr );
+					//QImage img1 = pic1.convertToImage().convertDepth( 8 );
+					QImage img1 = pic1.convertToImage();
+					clipColors( img1, Qt::white );
+					img1.save( outputName , "PNG" );
+
 					int nc = 2;
 
-					QPixmap pic2 = drawButtons( bp, Qt::yellow, "yellow", outputhName, &stream, pg, npages,&vr );
+					QPixmap bp2 = QPixmap::fromMimeSource( "black.jpg" );
+					QPixmap pic2 = drawButtons( bp2, Qt::yellow, pg, npages,&vr );
+					QImage img2 = pic2.convertToImage();
+					clipColors( img2, Qt::yellow );
+					img2.save( outputhName , "PNG" );
 
-					QPixmap pic3 = drawButtons( bp, Qt::red, "red", outputsName, &stream, pg, npages,&vr );
+					QPixmap bp3 = QPixmap::fromMimeSource( "black.jpg" );
+					QPixmap pic3 = drawButtons( bp3, Qt::blue, pg, npages,&vr );
+					QImage img3 = pic3.convertToImage();
+					clipColors( img3, Qt::blue );
+					img3.save( outputsName , "PNG" );
 
 					// encoding bg to mpeg2
 					outputMpeg.sprintf( "menu_base.m2v" );
@@ -513,8 +546,8 @@ void dvdmenuWnd::encode()
 					stream << "image=\"" << outputName << "\"" << endl;
 					stream << "select=\"" << outputsName << "\"" << endl;
 					stream << "highlight=\"" << outputhName << "\"" << endl;
-					/*
 					stream << "transparent=\"000000\" " << endl;
+					/*
 					stream << "autooutline=\"infer\"" << endl;
 					stream << "outlinewidth=\"30\"" << endl;
 					stream << "autoorder=\"rows\">" << endl;
@@ -735,7 +768,7 @@ QPixmap dvdmenuWnd::drawMenu( QPixmap &fond, int currentpage, int totalpages )
 			QFontMetrics fm( font );
 			QRect titleRect = fm.boundingRect( item->text( ID_NAME ) );
 			int x = ( 720-titleRect.width() ) / 2;
-			p.drawText( x, 30, item->text( ID_NAME ) );
+			p.drawText( x, 30+titleRect.height(), item->text( ID_NAME ) );
 		}
 		if ( ( ct / 4 ) == currentpage )
 			break;
@@ -765,13 +798,14 @@ QPixmap dvdmenuWnd::drawMenu( QPixmap &fond, int currentpage, int totalpages )
 	return fond;
 }
 
-QPixmap &dvdmenuWnd::drawButtons( QPixmap &fond, QColor c, QString cname,
-	QString fname, QTextStream *stream, int currentpage, int totalpages, std::vector<QRect> *vrects )
+QPixmap &dvdmenuWnd::drawButtons( QPixmap &fond, QColor c, 
+	int currentpage, int totalpages, std::vector<QRect> *vrects )
 {
 	QPainter p;
 
 	p.begin( &fond );
 	p.setPen( QPen( c, 8 ) );
+	p.setBrush( QBrush( c, Qt::SolidPattern ) );
 	p.setFont( font );
 	vrects->clear();
 
@@ -795,14 +829,6 @@ QPixmap &dvdmenuWnd::drawButtons( QPixmap &fond, QColor c, QString cname,
 		it++;
 	}
 	ct = 0;
-	if ( stream )
-	{
-		*stream << "convert -size 720x576 xc:transparent ";
-		*stream << "-family \"" << font.family() << "\" ";
-		*stream << "-fill " << cname << " ";
-		*stream << "-stroke " << cname << " ";
-		*stream << "-strokewidth 2 -colors 3 +antialias ";
-	}
 	while ( it.current() )
 	{
 		item = it.current();
@@ -825,12 +851,6 @@ QPixmap &dvdmenuWnd::drawButtons( QPixmap &fond, QColor c, QString cname,
 			int y = tabr[ct].y()+tabr[ct].height() + font.pointSize() + 10;
 			p.drawText( x, y, item->text( ID_NAME ) );
 
-			if ( stream )
-			{
-				*stream << "-pointsize " << font.pointSize() << " ";
-				*stream << "-draw \"text " << x << "," << y << " \\\"";
-				*stream << item->text(ID_NAME) << "\\\"\" ";
-			}
 
 
 			QRect endrect( x, y-titleRect.height(), titleRect.width()+3, titleRect.height()+3 );
@@ -852,12 +872,6 @@ QPixmap &dvdmenuWnd::drawButtons( QPixmap &fond, QColor c, QString cname,
 		QRect prevRect = fm.boundingRect( prev );
 		p.drawText( 30, 550, prev );
 
-		if ( stream )
-		{
-			*stream << "-pointsize " << font.pointSize() << " ";
-			*stream << "-draw \"text 30,550 " << " \\\"";
-			*stream << prev << "\\\"\" ";
-		}
 
 		QRect endrect( 30, 550-prevRect.height(), 
 				prevRect.width()+3, prevRect.height()+3 );
@@ -870,12 +884,6 @@ QPixmap &dvdmenuWnd::drawButtons( QPixmap &fond, QColor c, QString cname,
 		QRect nextRect = fm.boundingRect( next );
 		p.drawText( 600, 550, next );
 
-		if ( stream )
-		{
-			*stream << "-pointsize " << font.pointSize() << " ";
-			*stream << "-draw \"text 600,550 " << " \\\"";
-			*stream << next << "\\\"\" ";
-		}
 
 		QRect endrect( 600, 550-nextRect.height(), 
 				nextRect.width()+3, nextRect.height()+3 );
@@ -883,10 +891,6 @@ QPixmap &dvdmenuWnd::drawButtons( QPixmap &fond, QColor c, QString cname,
 	}
 	font.setPointSize( ps );
 	p.end();
-	if ( stream )
-	{
-		*stream << " -quality 100 " << fname << endl;
-	}
 	return fond;
 }
 
@@ -957,7 +961,7 @@ void dvdmenuWnd::preview()
 		}
 		std::vector<QRect> vr;
 		bg = drawMenu( bg, 0, n );
-		bg = drawButtons( bg, Qt::white, "white", "", 0, 0, n, &vr );
+		bg = drawButtons( bg, Qt::white, 0, n, &vr );
 
 		previewWnd *pw = new previewWnd();
 		pw->tlPixmap->setPixmap( bg );
@@ -1082,3 +1086,26 @@ void dvdmenuWnd::selectSound( )
 		"Choose a sound for the menu" );
 }
 
+void dvdmenuWnd::clipColors( QImage &img, const QColor &destcol )
+{
+//return;
+	QRgb destrgb = destcol.rgb();
+	int clip = 0;
+	for ( int x = 0; x < img.width(); x++ )
+	{
+		for ( int y = 0; y < img.height(); y++ )
+		{
+			QRgb rgb = img.pixel( x, y );
+			QColor c( rgb );
+			if ( ( (c.red()-clip) <= 0 )
+				&& ( (c.green()-clip) <= 0 )
+				&& ( (c.blue()-clip) <= 0 ) )
+			{
+				img.setPixel( x, y, black.rgb() );
+			}
+			else
+				img.setPixel( x, y, destrgb );
+		}
+	}
+	img.setNumColors( 3 );
+}
