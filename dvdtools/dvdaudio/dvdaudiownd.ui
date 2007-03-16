@@ -45,6 +45,9 @@
                     <property name="name">
                         <cstring>lvDVD</cstring>
                     </property>
+                    <property name="enabled">
+                        <bool>true</bool>
+                    </property>
                     <property name="frameShape">
                         <enum>StyledPanel</enum>
                     </property>
@@ -253,7 +256,7 @@
             <cstring>aNewDVD</cstring>
         </property>
         <property name="iconSet">
-            <iconset>ic_newdvd.png</iconset>
+            <iconset></iconset>
         </property>
         <property name="text">
             <string>New DVD</string>
@@ -267,7 +270,7 @@
             <bool>false</bool>
         </property>
         <property name="iconSet">
-            <iconset>ic_album.png</iconset>
+            <iconset></iconset>
         </property>
         <property name="text">
             <string>Add Album</string>
@@ -278,7 +281,7 @@
             <cstring>aAddTracks</cstring>
         </property>
         <property name="iconSet">
-            <iconset>ic_track.png</iconset>
+            <iconset></iconset>
         </property>
         <property name="text">
             <string>Add Tracks</string>
@@ -289,7 +292,7 @@
             <cstring>aFont</cstring>
         </property>
         <property name="iconSet">
-            <iconset>ic_font.png</iconset>
+            <iconset></iconset>
         </property>
         <property name="text">
             <string>Font</string>
@@ -300,7 +303,7 @@
             <cstring>aBgColor</cstring>
         </property>
         <property name="iconSet">
-            <iconset>ic_bgcolor.png</iconset>
+            <iconset></iconset>
         </property>
         <property name="text">
             <string>Background Color</string>
@@ -311,7 +314,7 @@
             <cstring>aPreview</cstring>
         </property>
         <property name="iconSet">
-            <iconset>ic_preview.png</iconset>
+            <iconset></iconset>
         </property>
         <property name="text">
             <string>Preview</string>
@@ -322,7 +325,7 @@
             <cstring>aRemove</cstring>
         </property>
         <property name="iconSet">
-            <iconset>ic_remove.png</iconset>
+            <iconset></iconset>
         </property>
         <property name="text">
             <string>Remove</string>
@@ -333,7 +336,7 @@
             <cstring>aEncode</cstring>
         </property>
         <property name="iconSet">
-            <iconset>ic_run.png</iconset>
+            <iconset></iconset>
         </property>
         <property name="text">
             <string>Encode</string>
@@ -344,7 +347,7 @@
             <cstring>aExit</cstring>
         </property>
         <property name="iconSet">
-            <iconset>ic_exit.png</iconset>
+            <iconset></iconset>
         </property>
         <property name="text">
             <string>Exit</string>
@@ -361,7 +364,7 @@
             <bool>true</bool>
         </property>
         <property name="iconSet">
-            <iconset>ic_mencoder.png</iconset>
+            <iconset></iconset>
         </property>
         <property name="text">
             <string>Mencoder</string>
@@ -378,7 +381,7 @@
             <bool>true</bool>
         </property>
         <property name="iconSet">
-            <iconset>ic_directplay.png</iconset>
+            <iconset></iconset>
         </property>
         <property name="text">
             <string>Direct Play</string>
@@ -389,7 +392,7 @@
             <cstring>aNew</cstring>
         </property>
         <property name="iconSet">
-            <iconset>ic_new.png</iconset>
+            <iconset></iconset>
         </property>
         <property name="text">
             <string>New project</string>
@@ -400,7 +403,7 @@
             <cstring>aOpen</cstring>
         </property>
         <property name="iconSet">
-            <iconset>ic_open.png</iconset>
+            <iconset></iconset>
         </property>
         <property name="text">
             <string>Open project</string>
@@ -411,7 +414,7 @@
             <cstring>aSave</cstring>
         </property>
         <property name="iconSet">
-            <iconset>ic_save.png</iconset>
+            <iconset></iconset>
         </property>
         <property name="text">
             <string>Save project</string>
@@ -432,6 +435,7 @@
     <include location="global" impldecl="in declaration">qfontdialog.h</include>
     <include location="global" impldecl="in declaration">qcolordialog.h</include>
     <include location="global" impldecl="in declaration">qdom.h</include>
+    <include location="global" impldecl="in declaration">vector</include>
     <include location="local" impldecl="in implementation">dvdaudiownd.ui.h</include>
 </includes>
 <variables>
@@ -455,9 +459,9 @@
     <slot>addTracks()</slot>
     <slot>selectBgColor()</slot>
     <slot>selectFont()</slot>
-    <slot access="">newProject()</slot>
-    <slot access="">openProject()</slot>
-    <slot access="">saveProject()</slot>
+    <slot>newProject()</slot>
+    <slot>openProject()</slot>
+    <slot>saveProject()</slot>
     <slot>encode()</slot>
     <slot>readProcMplayer()</slot>
     <slot>readProcMpginfo()</slot>
@@ -467,8 +471,9 @@
     <slot>makeDvd()</slot>
     <slot>setOptions( trackPreviewWnd * t )</slot>
     <slot>cleanAlbumNames( QStringList &amp; albums )</slot>
-    <slot>genMenuCommand( QStringList albums, QTextStream &amp; stream, QString color, QString outputName, int pg, int npages )</slot>
+    <slot>genMenuCommand( QStringList albums, const QColor &amp; color, QString outputName, int pg, int npages, std::vector&lt;QRect&gt; * vr )</slot>
     <slot>selectBgPic()</slot>
+    <slot>clipColors( QImage &amp; img, const QColor &amp; destcol )</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>

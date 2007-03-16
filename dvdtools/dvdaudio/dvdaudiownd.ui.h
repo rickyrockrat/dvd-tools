@@ -29,6 +29,21 @@ void dvdaudioWnd::init()
 	trackDir = QDir::currentDirPath();
 	font = QFont( "Bitstream Vera Sans Mono", 28 );
 
+	aAddAlbum->setIconSet( QIconSet( QPixmap::fromMimeSource( "ic_album.png" ) ) );
+	aAddTracks->setIconSet( QIconSet( QPixmap::fromMimeSource( "ic_track.png" ) ) );
+	aBgColor->setIconSet( QIconSet( QPixmap::fromMimeSource( "ic_bgcolor.png" ) ) );
+	aDirectPlay->setIconSet( QIconSet( QPixmap::fromMimeSource( "ic_directplay.png" ) ) );
+	aEncode->setIconSet( QIconSet( QPixmap::fromMimeSource( "ic_run.png" ) ) );
+	aExit->setIconSet( QIconSet( QPixmap::fromMimeSource( "ic_exit.png" ) ) );
+	aFont->setIconSet( QIconSet( QPixmap::fromMimeSource( "ic_font.png" ) ) );
+	aMEncoder->setIconSet( QIconSet( QPixmap::fromMimeSource( "ic_mencoder.png" ) ) );
+	aNew->setIconSet( QIconSet( QPixmap::fromMimeSource( "ic_new.png" ) ) );
+	aNewDVD->setIconSet( QIconSet( QPixmap::fromMimeSource( "ic_newdvd.png" ) ) );
+	aOpen->setIconSet( QIconSet( QPixmap::fromMimeSource( "ic_open.png" ) ) );
+	aPreview->setIconSet( QIconSet( QPixmap::fromMimeSource( "ic_preview.png" ) ) );
+	aRemove->setIconSet( QIconSet( QPixmap::fromMimeSource( "ic_remove.png" ) ) );
+	aSave->setIconSet( QIconSet( QPixmap::fromMimeSource( "ic_save.png" ) ) );
+
 	connect( aNew, SIGNAL(activated()), this, SLOT(newProject()) );
 	connect( aOpen, SIGNAL(activated()), this, SLOT(openProject()) );
 	connect( aSave, SIGNAL(activated()), this, SLOT(saveProject()) );
@@ -524,9 +539,9 @@ void dvdaudioWnd::encode()
 					stream << " | mpeg2enc -a 2 -F 3 -b 500 -n p -f 8 ";
 					stream << " -o /dev/stdout | mplex -f 8 -o ";
 					stream << outputName << " /dev/stdin " << outputMp2 << endl;
-					stream << "rm -f " << outputMp2;
+					stream << "# rm -f " << outputMp2;
 				}
-				stream << "rm -f " << name << endl;
+				stream << "# rm -f " << name << endl;
 			}
 			fEnc.close();
 			procEncode = new QProcess(this );
@@ -764,43 +779,72 @@ void dvdaudioWnd::makeMenu( QStringList albums )
 			int x = ( 720 - r.width() ) / 2;
 			if ( bgPic.isNull( ) )
 			{
+				QPixmap bgPix( 720, 576 );
+				bgPix.fill( black );
+				QPainter p( &bgPix );
+				p.setPen( QPen( blue, 8 ) );
+				p.setBrush( QBrush( blue, Qt::SolidPattern ) );
+				QFont ff = font;
+				ff.setPointSize( sbFontSize->value() + 2 );
+				p.setFont( ff );
+				p.drawText( x, 40, dvdItem->text( ID_NAME ) );
+				QImage im = bgPix.convertToImage().convertDepth( 8 );
+				im.save( "bg.ppm", "PPM" );
+
+				/*
 				stream << "convert -size 720x576 -depth 8 xc:black ";
 				stream << "-fill blue -pointsize " << sbFontSize->value()+2;
 				stream << " -draw \"text " << x;
 				stream << ",40 '" << dvdItem->text( ID_NAME );
 				stream << "'\" bg.ppm";
 				stream << endl;
+				*/
 			}
 			else
 			{
+				QPixmap bgPix( bgPic );
+				bgPix.resize( 720, 576 );
+				QPainter p( &bgPix );
+				p.setPen( QPen( blue, 8 ) );
+				p.setBrush( QBrush( blue, Qt::SolidPattern ) );
+				QFont ff = font;
+				ff.setPointSize( sbFontSize->value() + 2 );
+				p.setFont( ff );
+				p.drawText( x, 40, dvdItem->text( ID_NAME ) );
+				QImage im = bgPix.convertToImage().convertDepth( 8 );
+				im.save( "bg.ppm", "PPM" );
+
+				/*
 				stream << "convert " << bgPic;
 				stream << " -fill blue -pointsize " << sbFontSize->value()+2;
 				stream << " -draw \"text " << x;
 				stream << ",40 '" << dvdItem->text( ID_NAME );
 				stream << "'\" -depth 8 -resize 720x576 bg.ppm" << endl;
+				*/
 			}
 			// encoding bg to mpeg2
-			outputMpeg.sprintf( "menu_base.m2v" );
+			outputMpeg.sprintf( "menubase.m2v" );
 			stream << "ppmtoy4m -n 1 -F25:1 -A 59:54 bg.ppm -S 420mpeg2 ";
 			stream << " | mpeg2enc -f 8 -o " << outputMpeg << endl;
-			stream << "rm -f bg.ppm" << endl;
+			stream << "# rm -f bg.ppm" << endl;
 
 
 			cleanAlbumNames( albums );
+			std::vector<QRect> vrects;
 			for ( int pg = 0; pg < npages; pg++ )
 			{
 				stream << "echo Generating menu " << pg << " of " << npages << endl;
-				outputName.sprintf( "menu_%04d.png", pg );
-				genMenuCommand( albums, stream, "white", outputName, pg, npages );
+				outputName.sprintf( "menun%04d.png", pg );
+				genMenuCommand( albums, white, outputName, pg, npages, &vrects);
 
-				outputhName.sprintf( "menuh_%04d.png", pg );
-				genMenuCommand( albums, stream, "yellow", outputhName, pg, npages );
+				outputhName.sprintf( "menuh%04d.png", pg );
+				genMenuCommand( albums, yellow, outputhName, pg, npages,&vrects);
 
-				outputsName.sprintf( "menus_%04d.png", pg );
-				genMenuCommand( albums, stream, "red", outputsName, pg, npages );
+				outputsName.sprintf( "menus%04d.png", pg );
+				genMenuCommand( albums, red, outputsName, pg, npages, &vrects );
 	
-				outputXml.sprintf( "menus_%04d.xml", pg );
-				outputMenu.sprintf( "menus_%04d.mpg", pg );
+				outputXml.sprintf( "menus%04d.xml", pg );
+				outputMenu.sprintf( "menus%04d.mpg", pg );
 				// spumux control file
 				stream << "echo '<subpictures>" << endl;
 				stream << "<stream>" << endl;
@@ -810,9 +854,24 @@ void dvdaudioWnd::makeMenu( QStringList albums )
 				stream << "image=\"" << outputName << "\"" << endl;
 				stream << "select=\"" << outputsName << "\"" << endl;
 				stream << "highlight=\"" << outputhName << "\"" << endl;
-				stream << "autooutline=\"infer\"" << endl;
-				stream << "outlinewidth=\"20\"" << endl;
-				stream << "autoorder=\"rows\">" << endl;
+				stream << "transparent=\"000000\"" << endl;
+				stream << " >" << endl;
+				int x0 = 0, x1 = 0, y0 = 0, y1 = 0;
+				for (int i = 0; i < vrects.size(); i++ )
+				{
+					QRect r = vrects[i];
+					// turn values to even
+					x0 = ((r.x()-1)/2)*2;
+					y0 = ((r.y()-1)/2)*2;
+					x1 = ((r.x()+r.width())/2)*2;
+					y1 = ((r.y()+r.height())/2)*2;
+
+					stream << "<button name=\"" << i+1 << "\" x0=\"";
+					stream << x0 << "\" y0=\"" << y0;
+					stream << "\" x1=\"" << x1;
+					stream << "\" y1=\"" << y1<< "\" />";
+					stream << endl;
+				}
 				stream << "</spu>" << endl;
 				stream << "</stream>" << endl;
 				stream << "</subpictures>' >" << outputXml << endl;
@@ -820,10 +879,10 @@ void dvdaudioWnd::makeMenu( QStringList albums )
 				stream << " silence.mp2 | ";
 				stream << "spumux " << outputXml;
 				stream << " > " << outputMenu << endl;
-				stream << "rm -f " << outputName << endl;
-				stream << "rm -f " << outputhName << endl;
-				stream << "rm -f " << outputsName << endl;
-				stream << "rm -f " << outputXml << endl;
+				stream << "# rm -f " << outputName << endl;
+				stream << "# rm -f " << outputhName << endl;
+				stream << "# rm -f " << outputsName << endl;
+				stream << "# rm -f " << outputXml << endl;
 
 				//stXml << "<pgc entry=\"root\" pause=\"0\">" << endl;
 				stXml << "<pgc pause=\"0\">" << endl;
@@ -848,8 +907,8 @@ void dvdaudioWnd::makeMenu( QStringList albums )
 				}
 				stXml << "</pgc>" << endl;
 			}
-			stream << "rm -f " << outputMpeg << endl;
-			stream << "rm -f silence.mp2" << endl;
+			stream << "# rm -f " << outputMpeg << endl;
+			stream << "# rm -f silence.mp2" << endl;
 
 			stXml << "</menus>" << endl;
 			stXml << "<titles>" << endl;
@@ -877,7 +936,7 @@ void dvdaudioWnd::makeMenu( QStringList albums )
 		    stream << "dvdauthor -x dvd.xml" << endl;
 			// Here we should clean the vob files, 
 			// the dvd.xml file and the ouputMenu file, BUT
-			// by no deleting them, user can rerun manually dvdauthor
+			// by not deleting them, user can rerun manually dvdauthor
 			// if something went wrong and is not obliged to reencode
 			// everything
 		}
@@ -932,31 +991,42 @@ void dvdaudioWnd::cleanAlbumNames(QStringList &albums)
 	}
 }
 
-void dvdaudioWnd::genMenuCommand( QStringList albums, QTextStream &stream, QString color, QString outputName, int pg, int npages )
+void dvdaudioWnd::genMenuCommand( QStringList albums, const QColor &color, QString outputName, int pg, int npages, std::vector<QRect> *vr )
 {
 	//convert -size 720x576 xc:transparent -pointsize 28 -fill red -stroke red -strokewidth 2 -colors 3 +antialias -draw "text 80,150 \"Album 1\"" -draw "text 80,200 \"Album 2\"" -quality 100 menuh.png
 	int ctr;
-	stream << "convert -size 720x576 xc:transparent -pointsize " << sbFontSize->value();
-	stream << " -fill " << color << " -stroke " << color;
-	stream << " -strokewidth 2 -colors 3 +antialias";
+	vr->clear();
+	QPixmap pm( 720, 576 );
+	pm.fill( black );
+	QPainter p( &pm );
+	QFont ff = font;
+	ff.setPointSize( sbFontSize->value() );
+	QFontMetrics fm( ff );
+	p.setFont( ff );
+	p.setPen( QPen( color, 5 ) );
+	p.setBrush( QBrush( color, Qt::SolidPattern ) );
+
 	for ( ctr = 0; (ctr < 8) && ( ((pg*8)+ctr) < albums.count()); ctr++ )
 	{
-		stream << " -draw 'text 80," << 100+ctr*50 << " \"";
-		stream << albums[(pg*8)+ctr] << "\"'";
+		p.drawText( 80, 100+ctr*50, albums[(pg*8)+ctr] );
+		QRect r = fm.boundingRect( albums[(pg*8)+ctr] );
+		vr->push_back( QRect( 80, (100+ctr*50)-r.height(), r.width(), r.height() ) );
 	}
 	if ( ( pg != (npages-1) ) && ( npages > 1 ) )
 	{
-		// next
-		stream << " -draw 'text 600,550" << " \"";
-		stream << "Next>>" << "\"'";
+		p.drawText( 600, 550, "Next>>" );
+		QRect r = fm.boundingRect( "Next>>" );
+		vr->push_back( QRect( 600, 550-r.height(), r.width(), r.height() ) );
 	}
 	if ( ( pg != 0 ) && ( npages > 1 ) )
 	{
-		// prev
-		stream << " -draw 'text 400,550" << " \"";
-		stream << "<<Prev" << "\"'";
+		p.drawText( 400, 550, "<<Prev" );
+		QRect r = fm.boundingRect( "<<Prev" );
+		vr->push_back( QRect( 400, 550-r.height(), r.width(), r.height() ) );
 	}
-	stream << " -quality 100 " << outputName << endl;
+	QImage im = pm.convertToImage();
+	clipColors( im, color );
+	im.save( outputName, "PNG" );
 }
 
 void dvdaudioWnd::selectBgPic( )
@@ -967,3 +1037,24 @@ void dvdaudioWnd::selectBgPic( )
 		"Choose a background image for the menu" );
 }
 
+void dvdaudioWnd::clipColors( QImage &img, const QColor &destcol )
+{
+	int clip = 10;
+	QRgb destrgb = destcol.rgb();
+	for ( int x = 0; x < img.width(); x++ )
+	{
+		for ( int y = 0; y < img.height(); y++ )
+		{
+			QRgb rgb = img.pixel( x, y );
+			QColor c( rgb );
+			if ( ( (c.red()-clip) <= 0 )
+				&& ( (c.green()-clip) <= 0 )
+				&& ( (c.blue()-clip) <= 0 ) )
+			{
+				img.setPixel( x, y, black.rgb() );
+			}
+			else
+				img.setPixel( x, y, destrgb );
+		}
+	}
+}
