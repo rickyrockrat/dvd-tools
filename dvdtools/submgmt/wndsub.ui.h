@@ -864,16 +864,16 @@ void WndSub::saveSpumux()
 			ts = it->begin;
 			te = it->end;
 			stream << "    <spu";
-			stream << " start=\"" << ts.toString( SPU_TIME_FMT ) << "\"";;
-			stream << " end=\"" << te.toString( SPU_TIME_FMT ) << "\"";;
+			stream << " start=\"" << ts.toString( SPU_TIME_FMT ) << "\"";
+			stream << " end=\"" << te.toString( SPU_TIME_FMT ) << "\" ";
 
 			QStringList::iterator its;
 			for ( its = it->subs.begin(); its != it->subs.end(); its++ )
 			{
 				if ( its != it->subs.begin() ) stream << endl;
-				stream << codec->fromUnicode( *its );
+				stream << " image=\"" << codec->fromUnicode( *its ) << "\"";
 			}
-			stream << " </spu>" << endl;
+			stream << " />" << endl;
 		}
 		stream << "  </stream>" << endl;
 		stream << "</subpictures>" << endl;
