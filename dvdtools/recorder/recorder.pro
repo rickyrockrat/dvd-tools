@@ -9,6 +9,11 @@ FORMS	= recwnd.ui
 
 IMAGES	= pix/ic_open.png
 
+recorder.path = /usr/bin
+recorder.files = recorder
+
+INSTALLS += recorder
+
 unix {
   UI_DIR = .ui
   MOC_DIR = .moc

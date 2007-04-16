@@ -34,6 +34,8 @@ void recWnd::init()
 
 	dteDebut->setDateTime( QDateTime::currentDateTime() );
 	teDuree->setTime( QTime( 1, 0 ) );
+
+	refreshProgs();
 }
 
 void recWnd::selFile()
@@ -67,9 +69,14 @@ void recWnd::newRec()
 	tmpf.open( IO_WriteOnly );
 	QTextStream stream( &tmpf );
 	stream.setEncoding( QTextStream::UnicodeUTF8 );
-	stream << "mplayer -vf harddup -playlist \"";
-	stream << url << "\" -cache 1024 -cache-min 90 -o ";
-	stream << leFile->text() << " & " << endl;
+	stream << "#!/bin/bash" << endl;
+	stream << "exec 2>/tmp/rec.log" << endl;
+	stream << "set -x" << endl;
+	stream << "u=`wget -O - \"" << url << "\" |grep mms | cut -f4 -d'\"'` ";
+	stream << endl;
+	stream << "mencoder -vf harddup -oac copy -ovc copy ";
+	stream << "-cache 1024 -cache-min 90 -o ";
+	stream << leFile->text() << " $u & " << endl;
 	QTime t = teDuree->time();
 	int secs  = t.hour() * 3600 + t.minute() * 60 + t.second();
 	stream << "sleep " << secs << endl;
