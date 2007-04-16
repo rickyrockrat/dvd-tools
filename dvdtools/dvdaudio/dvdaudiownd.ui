@@ -12,7 +12,7 @@
             <x>0</x>
             <y>0</y>
             <width>471</width>
-            <height>440</height>
+            <height>456</height>
         </rect>
     </property>
     <property name="caption">
@@ -248,6 +248,7 @@
         <action name="aDirectPlay"/>
         <separator/>
         <action name="aEncode"/>
+        <action name="aGenOnly"/>
     </toolbar>
 </toolbars>
 <actions>
@@ -418,6 +419,20 @@
         </property>
         <property name="text">
             <string>Save project</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>aGenOnly</cstring>
+        </property>
+        <property name="toggleAction">
+            <bool>true</bool>
+        </property>
+        <property name="text">
+            <string>GenSH only</string>
+        </property>
+        <property name="toolTip">
+            <string>Generate command file but doesn't run it</string>
         </property>
     </action>
 </actions>

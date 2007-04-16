@@ -14,6 +14,7 @@ FORMS	= encodewnd.ui \
 
 IMAGES	= pix/ic_album.png \
 	pix/ic_bgcolor.png \
+	pix/ic_gen.png \
 	pix/ic_font.png \
 	pix/ic_newdvd.png \
 	pix/ic_preview.png \

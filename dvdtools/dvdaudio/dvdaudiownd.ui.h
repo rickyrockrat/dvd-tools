@@ -43,6 +43,7 @@ void dvdaudioWnd::init()
 	aPreview->setIconSet( QIconSet( QPixmap::fromMimeSource( "ic_preview.png" ) ) );
 	aRemove->setIconSet( QIconSet( QPixmap::fromMimeSource( "ic_remove.png" ) ) );
 	aSave->setIconSet( QIconSet( QPixmap::fromMimeSource( "ic_save.png" ) ) );
+	aGenOnly->setIconSet( QIconSet( QPixmap::fromMimeSource( "ic_gen.png" ) ) );
 
 	connect( aNew, SIGNAL(activated()), this, SLOT(newProject()) );
 	connect( aOpen, SIGNAL(activated()), this, SLOT(openProject()) );
@@ -432,6 +433,7 @@ void dvdaudioWnd::saveProject()
 			QMessageBox::information( this, "error", "Cannot open file" );
 		}
 		QTextStream st( &f );
+		st.setEncoding( QTextStream::UnicodeUTF8 );
 		st << doc.toString().utf8();
 		f.close();
 	}
@@ -544,27 +546,30 @@ void dvdaudioWnd::encode()
 				stream << "# rm -f " << name << endl;
 			}
 			fEnc.close();
-			procEncode = new QProcess(this );
-			procEncode->setWorkingDirectory(QDir::current() );
-			encodeWnd *encoding = new encodeWnd( this, "Encode", Qt::WType_Dialog );
-			encoding->procEncode = procEncode;
+			if ( !aGenOnly->isOn() )
+			{
+				procEncode = new QProcess(this );
+				procEncode->setWorkingDirectory(QDir::current() );
+				encodeWnd *encoding = new encodeWnd( this, "Encode", Qt::WType_Dialog );
+				encoding->procEncode = procEncode;
 
-			procEncode->addArgument( "bash" );
-			procEncode->addArgument( shName );
-			if ( !procEncode->start() )
-			{
-				QMessageBox::information( this, "Encode",
-						"Problem starting encode" );
+				procEncode->addArgument( "bash" );
+				procEncode->addArgument( shName );
+				if ( !procEncode->start() )
+				{
+					QMessageBox::information( this, "Encode",
+							"Problem starting encode" );
+				}
+				QTime t = QTime::fromString( item->text( ID_DURATION ) );
+				int duration = t.hour() * 3600 + t.minute() * 60 + t.second();
+				encoding->demarrer( item->text(ID_FILENAME), duration*25 );
+				if ( !procEncode->normalExit() )
+				{
+					QMessageBox::information( this, "Problem",
+						"encoding error for file " + item->text( ID_FILENAME ) );
+				}
+				delete procEncode;
 			}
-			QTime t = QTime::fromString( item->text( ID_DURATION ) );
-			int duration = t.hour() * 3600 + t.minute() * 60 + t.second();
-			encoding->demarrer( item->text(ID_FILENAME), duration*25 );
-			if ( !procEncode->normalExit() )
-			{
-				QMessageBox::information( this, "Problem",
-					"encoding error for file " + item->text( ID_FILENAME ) );
-			}
-			delete procEncode;
 			//fEnc.remove();
 			files[ctAlbum].append( outputName );
 
@@ -573,7 +578,8 @@ void dvdaudioWnd::encode()
 		it++;
 	}
 	makeMenu( albums );
-	makeDvd();
+	if ( !aGenOnly->isOn() )
+		makeDvd();
 }
 
 
