@@ -31,11 +31,27 @@ void recWnd::init()
 				this, SLOT(cancelRec()) );
 	connect( pbQuit, SIGNAL(clicked()),
 				this, SLOT(close()) );
-
+	connect( lvPrevus, SIGNAL(clicked(QListViewItem*)),
+				this, SLOT(lvClicked()));
+	connect( pbRefresh, SIGNAL(clicked()),
+				this, SLOT(refreshProgs()) );
 	dteDebut->setDateTime( QDateTime::currentDateTime() );
 	teDuree->setTime( QTime( 1, 0 ) );
 
 	refreshProgs();
+}
+
+void recWnd::lvClicked()
+{
+	QListViewItem * item = lvPrevus->currentItem();
+	if ( item )
+	{
+		pbAnnuler->setEnabled( true );
+	}
+	else
+	{
+		pbAnnuler->setEnabled( false );
+	}
 }
 
 void recWnd::selFile()
@@ -112,6 +128,7 @@ void recWnd::newRec()
 void recWnd::refreshProgs()
 {
 	lvPrevus->clear();
+	pbAnnuler->setEnabled( false );
 
 	pAtq = new QProcess;
 	pAtq->addArgument( "atq" );

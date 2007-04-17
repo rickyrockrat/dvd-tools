@@ -11,7 +11,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>413</width>
+            <width>425</width>
             <height>326</height>
         </rect>
     </property>
@@ -188,6 +188,9 @@
                             <property name="name">
                                 <cstring>leFile</cstring>
                             </property>
+                            <property name="readOnly">
+                                <bool>true</bool>
+                            </property>
                         </widget>
                         <widget class="QPushButton">
                             <property name="name">
@@ -263,7 +266,7 @@
         </widget>
         <widget class="QLayoutWidget">
             <property name="name">
-                <cstring>layout27</cstring>
+                <cstring>layout7</cstring>
             </property>
             <hbox>
                 <property name="name">
@@ -274,13 +277,27 @@
                         <cstring>pbAnnuler</cstring>
                     </property>
                     <property name="enabled">
-                        <bool>true</bool>
+                        <bool>false</bool>
                     </property>
                     <property name="text">
                         <string>&amp;Annuler</string>
                     </property>
                     <property name="accel">
                         <string>Alt+A</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>pbRefresh</cstring>
+                    </property>
+                    <property name="enabled">
+                        <bool>true</bool>
+                    </property>
+                    <property name="text">
+                        <string>&amp;Rafraichir</string>
+                    </property>
+                    <property name="accel">
+                        <string>Alt+R</string>
                     </property>
                 </widget>
                 <spacer>
@@ -295,7 +312,7 @@
                     </property>
                     <property name="sizeHint">
                         <size>
-                            <width>110</width>
+                            <width>100</width>
                             <height>20</height>
                         </size>
                     </property>
@@ -331,6 +348,7 @@
     <slot>readAtq()</slot>
     <slot>itemSel()</slot>
     <slot>cancelRec()</slot>
+    <slot access="">lvClicked()</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>
