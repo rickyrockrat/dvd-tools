@@ -90,13 +90,19 @@ void recWnd::newRec()
 	stream << "set -x" << endl;
 	stream << "u=`wget -O - \"" << url << "\" |grep mms | cut -f4 -d'\"'` ";
 	stream << endl;
+	/*
 	stream << "mencoder -vf harddup -oac copy -ovc copy ";
 	stream << "-cache 1024 -cache-min 90 -o ";
 	stream << leFile->text() << " $u & " << endl;
+	*/
 	QTime t = teDuree->time();
 	int secs  = t.hour() * 3600 + t.minute() * 60 + t.second();
+	/*
 	stream << "sleep " << secs << endl;
 	stream << "kill $!" << endl;
+	*/
+	stream << "mmsrip -d " << secs << " -o " << leFile->text();
+	stream << " $u" << endl;
 
 	tmpf.close();
 
