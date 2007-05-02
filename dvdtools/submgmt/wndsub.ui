@@ -12,8 +12,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>636</width>
-            <height>479</height>
+            <width>648</width>
+            <height>501</height>
         </rect>
     </property>
     <property name="backgroundOrigin">
@@ -622,7 +622,7 @@
                                 <enum>Horizontal</enum>
                             </property>
                             <property name="sizeType">
-                                <enum>Expanding</enum>
+                                <enum>Preferred</enum>
                             </property>
                             <property name="sizeHint">
                                 <size>
@@ -990,10 +990,10 @@
     <slot>genPngForSpumux()</slot>
 </slots>
 <functions>
-    <function access="protected">autoDetectFormat()</function>
-    <function access="protected">loadSubFile()</function>
+    <function>autoDetectFormat()</function>
+    <function>loadSubFile()</function>
     <function access="protected">showOutputSubs()</function>
-    <function access="protected">showInputSubs()</function>
+    <function>showInputSubs()</function>
     <function access="protected">saveMicrodvd()</function>
     <function>saveSubrip()</function>
     <function access="protected">saveSubviewer()</function>

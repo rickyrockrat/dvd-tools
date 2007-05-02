@@ -1,24 +1,24 @@
-#ifdef KDE_SUBMGMT
-#include <kapplication.h>
-#include <kcmdlineargs.h>
-#include <krootpixmap.h>
-#else
 #include <qapplication.h>
-#endif
+#include <qfile.h>
+#include <qlineedit.h>
 #include "wndsub.h"
 
 int main( int argc, char ** argv )
 {
-#ifdef KDE_SUBMGMT
-	KCmdLineArgs::init(argc, argv, "submgmt", "sub",
-			        "subtitle manager", "1.0.0" );
-    KApplication a( argc, argv );
-#else
     QApplication a( argc, argv );
-#endif
     WndSub w;
 	a.setMainWidget( &w );
 
+	if ( argc == 2 )
+	{
+		if ( QFile::exists( argv[1] ) )
+		{
+			w.leInputFile->setText( argv[1] );
+			w.autoDetectFormat();
+			w.loadSubFile();
+			w.showInputSubs();
+		}
+	}
     w.show();
     a.connect( &a, SIGNAL( lastWindowClosed() ), &a, SLOT( quit() ) );
     return a.exec();

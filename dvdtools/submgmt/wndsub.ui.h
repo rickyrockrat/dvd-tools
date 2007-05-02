@@ -1244,7 +1244,7 @@ void WndSub::genPngForSpumux()
 					r = fm.boundingRect( *its );
 				}
 				if ( r.width() > maxw ) maxw = r.width();
-				maxh += r.height() + fm.leading();
+				maxh += r.height() + fm.leading() + fm.descent();
 			}
 			int dispow = 720 - gw->sbLeftMargin->value() - gw->sbRightMargin->value();	
 			int dispoh;
@@ -1282,7 +1282,9 @@ void WndSub::genPngForSpumux()
 				return;
 
 			}
-			QRgb textrgb = textcol.rgb();
+			int rc, gc, bc;
+			textcol.getRgb( &rc, &gc, &bc );
+			QRgb textrgb = qRgba( rc, gc, bc, 255 );	// opaque pixel
 			int x = 0, y = 0;
 			for ( its = it->subs.begin(); its != it->subs.end(); its++ )
 			{
@@ -1321,7 +1323,7 @@ void WndSub::genPngForSpumux()
 				}
 				p.setPen( QPen( textcol ) );
 				p.setBrush( QBrush( textcol, Qt::SolidPattern ) );
-				p.drawText( x, y+r.height(), s );
+				p.drawText( x, y+r.height() + fm.leading(), s );
 				y += r.height() + fm.leading();
 			}
 
@@ -1354,7 +1356,8 @@ void WndSub::genPngForSpumux()
 			if ( yoff < 0 ) yoff = 0;
 
 			QImage img = gensub.convertToImage();
-			std::cout << "numcol=" << img.numColors() << std::endl;
+			img.setAlphaBuffer( true );
+			//std::cout << "numcol=" << img.numColors() << std::endl;
 			for ( int x = 0; x < img.width(); x++ )
 			{
 				for ( int y = 0; y < img.height(); y++ )
@@ -1365,18 +1368,18 @@ void WndSub::genPngForSpumux()
 						&& ( (c.green()-clip) <= 0 )
 						&& ( (c.blue()-clip) <= 0 ) )
 					{
-						img.setPixel( x, y, black.rgb() );
+						img.setPixel( x, y, 0 /*black.rgb()*/ );
 					}
 					else
 						img.setPixel( x, y, textrgb );
 				}
 			}
-			img.setNumColors( 3 );
+			//img.setNumColors( 3 );
 			name.sprintf( "%s%4.4d.png",gw->leBaseName->text().ascii(), ctr++ );
 			img.save( name, "PNG" );
 
 			stream << " image=\"" << name << "\"";
-			stream << " transparent=\"000000\"";
+			//stream << " transparent=\"000000\"";
 			stream << " xoffset=\"" << xoff << "\"";
 			stream << " yoffset=\"" << yoff << "\"";
 			stream << " />" << endl;
