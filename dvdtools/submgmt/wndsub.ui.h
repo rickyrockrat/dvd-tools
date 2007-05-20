@@ -1222,7 +1222,8 @@ void WndSub::genPngForSpumux()
 			// computing metrics
 			for ( its = it->subs.begin(); its != it->subs.end(); its++ )
 			{
-				if ( (*its).contains( "<i>" ) )
+				if ( ( (*its).contains( "<i>" ) )
+					|| ( (*its).contains( "</i>" ) ) )
 				{
 					// we assume that the whole sub is italic...it's lot simpler
 					fm = QFontMetrics( gw->pbItalicFont->font() );
@@ -1230,7 +1231,8 @@ void WndSub::genPngForSpumux()
 					s.remove( "<i>" ).remove( "</i>" );
 					r = fm.boundingRect( s );
 				}
-				else if ( (*its).contains( "<b>" ) )
+				else if ( ( (*its).contains( "<b>" ) )
+					|| ( (*its).contains( "</b>" ) ) )
 				{
 					// we assume that the whole sub is bold...it's lot simpler
 					fm = QFontMetrics( gw->pbBoldFont->font() );
@@ -1289,14 +1291,16 @@ void WndSub::genPngForSpumux()
 			for ( its = it->subs.begin(); its != it->subs.end(); its++ )
 			{
 				s = QDeepCopy<QString>( *its );
-				if ( (*its).contains( "<i>" ) )
+				if ( ( (*its).contains( "<i>" ) )
+					|| ( (*its).contains( "</i>" ) ) )
 				{
 					fm = QFontMetrics( gw->pbItalicFont->font() );
 					p.setFont( gw->pbItalicFont->font() );
 					s.remove( "<i>" ).remove( "</i>" );
 					r = fm.boundingRect( s );
 				}
-				else if ( (*its).contains( "<b>" ) )
+				else if ( ( (*its).contains( "<b>" ) )
+					|| ( (*its).contains( "</b>" ) ) )
 				{
 					fm = QFontMetrics( gw->pbBoldFont->font() );
 					p.setFont( gw->pbBoldFont->font() );
@@ -1380,6 +1384,10 @@ void WndSub::genPngForSpumux()
 
 			stream << " image=\"" << name << "\"";
 			//stream << " transparent=\"000000\"";
+			if ( gw->cbForced->isChecked() )
+			{
+				stream << " force=\"yes\"";
+			}
 			stream << " xoffset=\"" << xoff << "\"";
 			stream << " yoffset=\"" << yoff << "\"";
 			stream << " />" << endl;

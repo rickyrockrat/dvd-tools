@@ -302,6 +302,7 @@ void dvdaudioWnd::openProject()
 			lvDVD->setRootIsDecorated( true );
 			dvdItem = new QListViewItem( lvDVD, dvdname.value(), CC_DVD );
 			dvdItem->setOpen(true);
+			dvdItem->setRenameEnabled( ID_NAME, true );
 
 			QDomNode n = docElem.firstChild();
 			while( !n.isNull() )
@@ -317,6 +318,7 @@ void dvdaudioWnd::openProject()
 							albumItem = new QListViewItem( dvdItem, albumItem, albumname.value(), CC_ALBUM );
 						else
 							albumItem = new QListViewItem( dvdItem, albumname.value(), CC_ALBUM );
+						albumItem->setRenameEnabled( ID_NAME, true );
 						QDomNode n1 = e.firstChild();
 						while( !n1.isNull() )
 						{
@@ -383,10 +385,20 @@ void dvdaudioWnd::saveProject()
 {
 	if ( dvdItem )
 	{
-		QDomDocument doc( "DvDAudio" );
-		QDomElement rootElem = doc.createElement( "DVDAUDIO" );
+		QDomDocument* doc = new QDomDocument();
+		///// add the <?xml> line
+		QDomProcessingInstruction instr =
+			doc->createProcessingInstruction("xml","version=\"1.0\" encoding=\"UTF-8\" ");
+		doc->appendChild(instr);
+		///// add the <!DOCTYPE> line
+		QDomImplementation impl;
+		QDomDocumentType type = impl.createDocumentType("DvDAudio",0, "");
+		doc->appendChild(type);
+
+		//QDomDocument doc( "DvDAudio" );
+		QDomElement rootElem = doc->createElement( "DVDAUDIO" );
 		rootElem.setAttribute( "NAME", dvdItem->text(ID_NAME) );
-		doc.appendChild( rootElem );
+		doc->appendChild( rootElem );
 
 		QListViewItemIterator it( lvDVD );
 		QListViewItem *item;
@@ -400,13 +412,13 @@ void dvdaudioWnd::saveProject()
 			if ( item->text( ID_IDENT ) == CC_ALBUM )
 			{
 
-				albumEl = doc.createElement( "ALBUM" );
+				albumEl = doc->createElement( "ALBUM" );
 				albumEl.setAttribute( "NAME", item->text( ID_NAME ) );
 				rootElem.appendChild( albumEl );
 			}
 			else if ( item->text( ID_IDENT ) == CC_TRACK )
 			{
-				el = doc.createElement( "TRACK" );
+				el = doc->createElement( "TRACK" );
 				el.setAttribute( "ID_NAME", item->text( ID_NAME ) );
 				el.setAttribute( "ID_DURATION", item->text( ID_DURATION ) );
 				el.setAttribute( "ID_ARTIST", item->text( ID_ARTIST ) );
@@ -434,7 +446,7 @@ void dvdaudioWnd::saveProject()
 		}
 		QTextStream st( &f );
 		st.setEncoding( QTextStream::UnicodeUTF8 );
-		st << doc.toString().utf8();
+		st << doc->toString().utf8();
 		f.close();
 	}
 }
@@ -568,6 +580,7 @@ void dvdaudioWnd::encode()
 					QMessageBox::information( this, "Problem",
 						"encoding error for file " + item->text( ID_FILENAME ) );
 				}
+				delete encoding;
 				delete procEncode;
 			}
 			//fEnc.remove();
@@ -870,7 +883,9 @@ void dvdaudioWnd::makeMenu( QStringList albums )
 					x0 = ((r.x()-1)/2)*2;
 					y0 = ((r.y()-1)/2)*2;
 					x1 = ((r.x()+r.width())/2)*2;
+					if ( x1 > 720 ) x1 = 720;
 					y1 = ((r.y()+r.height())/2)*2;
+					if ( y1 > 576 ) y1 = 576;
 
 					stream << "<button name=\"" << i+1 << "\" x0=\"";
 					stream << x0 << "\" y0=\"" << y0;

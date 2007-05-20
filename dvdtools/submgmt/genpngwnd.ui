@@ -11,8 +11,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>302</width>
-            <height>535</height>
+            <width>309</width>
+            <height>563</height>
         </rect>
     </property>
     <property name="caption">
@@ -381,6 +381,14 @@
                 </widget>
             </hbox>
         </widget>
+        <widget class="QCheckBox">
+            <property name="name">
+                <cstring>cbForced</cstring>
+            </property>
+            <property name="text">
+                <string>Forced subtitles</string>
+            </property>
+        </widget>
         <widget class="QLayoutWidget">
             <property name="name">
                 <cstring>layout19</cstring>
@@ -487,7 +495,7 @@
     <slot>selNormalFont()</slot>
     <slot>selItalicFont()</slot>
     <slot>selBoldFont()</slot>
-    <slot access="">selSubColor()</slot>
+    <slot>selSubColor()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

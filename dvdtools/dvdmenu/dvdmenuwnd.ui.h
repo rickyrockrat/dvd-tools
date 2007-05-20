@@ -786,7 +786,23 @@ QPixmap dvdmenuWnd::drawMenu( QPixmap &fond, int currentpage, int totalpages )
 		if ( item->text( ID_IDENT ) == CC_TITLE )
 		{
 			QPixmap pmt( item->text( ID_PICTURE ) );
-			p.drawPixmap( tabr[ ct ], pmt );
+			double aspect = (double)pmt.width() / (double)pmt.height();
+			QRect newr;
+			if ( aspect > 1 )
+			{
+				newr = QRect( tabr[ ct ].x(),
+								tabr[ ct ].y(),
+								tabr[ ct ].width(),
+								tabr[ ct ].height() * aspect );
+			}
+			else
+			{
+				newr = QRect( tabr[ ct ].x(),
+								tabr[ ct ].y(),
+								tabr[ ct ].width() * aspect,
+								tabr[ ct ].height() );
+			}
+			p.drawPixmap( newr, pmt );
 			ct++;
 		}
 		if ( ct == 4 ) break;
