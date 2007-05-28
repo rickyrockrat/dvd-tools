@@ -1220,6 +1220,39 @@ void WndSub::genPngForSpumux()
 			QFontMetrics fm( gw->pbNormalFont->font() );
 			QRect r;
 			// computing metrics
+			int x0 = gw->sbLeftMargin->value();
+			int y0 = 0 + gw->sbTopMargin->value();
+			int l0 = 720 - gw->sbRightMargin->value();
+			int h0;
+			if ( gw->rbPAL->isChecked() )
+			{
+				h0 = 576 - gw->sbBottomMargin->value();
+			}
+			else
+			{
+				h0 = 480 - gw->sbBottomMargin->value();
+			}
+			int flags = 0;
+			switch ( gw->cbHoriz->currentItem() )
+			{
+			case 1 : // Left alignment
+				flags |= AlignLeft;
+			break;
+			case 2 : // Right alignment
+				flags |= AlignRight;
+			break;
+			default : // center
+				flags |= AlignHCenter;
+			break;
+			}
+			if ( gw->cbVert->currentItem() == 1 )
+			{	// top align
+				flags |= AlignTop;
+			}
+			else
+			{
+				flags |= AlignBottom;
+			}
 			for ( its = it->subs.begin(); its != it->subs.end(); its++ )
 			{
 				if ( ( (*its).contains( "<i>" ) )
@@ -1229,7 +1262,7 @@ void WndSub::genPngForSpumux()
 					fm = QFontMetrics( gw->pbItalicFont->font() );
 					QString s = QDeepCopy<QString>( *its );
 					s.remove( "<i>" ).remove( "</i>" );
-					r = fm.boundingRect( s );
+					r = fm.boundingRect( x0, y0, l0, h0, flags, s, -1 );
 				}
 				else if ( ( (*its).contains( "<b>" ) )
 					|| ( (*its).contains( "</b>" ) ) )
@@ -1238,12 +1271,12 @@ void WndSub::genPngForSpumux()
 					fm = QFontMetrics( gw->pbBoldFont->font() );
 					QString s = QDeepCopy<QString>( *its );
 					s.remove( "<b>" ).remove( "</b>" );
-					r = fm.boundingRect( s );
+					r = fm.boundingRect( x0, y0, l0, h0, flags, s, -1 );
 				}
 				else
 				{
 					fm = QFontMetrics( gw->pbNormalFont->font() );
-					r = fm.boundingRect( *its );
+					r = fm.boundingRect( x0, y0, l0, h0, flags, *its, -1 );
 				}
 				if ( r.width() > maxw ) maxw = r.width();
 				maxh += r.height() + fm.leading() + fm.descent();
@@ -1297,7 +1330,7 @@ void WndSub::genPngForSpumux()
 					fm = QFontMetrics( gw->pbItalicFont->font() );
 					p.setFont( gw->pbItalicFont->font() );
 					s.remove( "<i>" ).remove( "</i>" );
-					r = fm.boundingRect( s );
+					r = fm.boundingRect( x0, y0, l0, h0, flags, s, -1 );
 				}
 				else if ( ( (*its).contains( "<b>" ) )
 					|| ( (*its).contains( "</b>" ) ) )
@@ -1305,13 +1338,13 @@ void WndSub::genPngForSpumux()
 					fm = QFontMetrics( gw->pbBoldFont->font() );
 					p.setFont( gw->pbBoldFont->font() );
 					s.remove( "<b>" ).remove( "</b>" );
-					r = fm.boundingRect( s );
+					r = fm.boundingRect( x0, y0, l0, h0, flags, s, -1 );
 				}
 				else
 				{
 					fm = QFontMetrics( gw->pbNormalFont->font() );
 					p.setFont( gw->pbNormalFont->font() );
-					r = fm.boundingRect( *its );
+					r = fm.boundingRect( x0, y0, l0, h0, flags, *its, -1 );
 				}
 				switch ( gw->cbHoriz->currentItem() )
 				{
@@ -1327,7 +1360,7 @@ void WndSub::genPngForSpumux()
 				}
 				p.setPen( QPen( textcol ) );
 				p.setBrush( QBrush( textcol, Qt::SolidPattern ) );
-				p.drawText( x, y+r.height() + fm.leading(), s );
+				p.drawText( x, y+r.height()+fm.leading(), s );
 				y += r.height() + fm.leading();
 			}
 
