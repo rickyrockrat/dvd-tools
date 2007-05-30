@@ -9,12 +9,27 @@
 ** These will automatically be called by the form's constructor and
 ** destructor.
 *****************************************************************************/
-//
+#include <iostream>
+
 void encodeWnd::readAuthor()
 {
 	if ( procEncode )
 	{
 		teAuthor->append( procEncode->readStderr() );
+	}
+}
+
+void encodeWnd::readEncMpeg()
+{
+	if ( procEncode )
+	{
+		QString in;
+		const QString sp(" ");
+		int frames;
+		in = QString( procEncode->readStderr() );
+		QStringList l1 = QStringList::split( "INFO: [mpeg2enc]", in );
+		QStringList pos = QStringList::split( sp, l1.join("") );
+		pbEncode->setProgress(pos[1].toInt() );
 	}
 }
 
@@ -26,12 +41,12 @@ void encodeWnd::readEncode()
 		const QString sp(" ");
 		int frames;
 		in = QString( procEncode->readStdout() );
-		//teEncode->append( in );
 		QStringList l = QStringList::split( "Pos:", in );
 		QStringList pos = QStringList::split( sp, l.join("") );
 		pbEncode->setProgress(pos[1].section( "f", 0, 0 ).toInt() );
 	}
 }
+//INFO: [mpeg2enc] Frame 16399 16399 P q=112.00 sum act=477462.15818
 
 void encodeWnd::demarrer(QString fn, int tf )
 {
@@ -45,6 +60,8 @@ void encodeWnd::demarrer(QString fn, int tf )
 	pbEncode->setTotalSteps( tf );
 	connect( procEncode, SIGNAL(readyReadStdout()),
 						this, SLOT(readEncode()));
+	connect( procEncode, SIGNAL(readyReadStderr()),
+						this, SLOT(readEncMpeg()));
 	connect( procEncode, SIGNAL(processExited()),
 						this, SLOT(accept()));
 	exec();

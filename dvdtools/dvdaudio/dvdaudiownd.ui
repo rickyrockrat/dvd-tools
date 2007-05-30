@@ -12,7 +12,7 @@
             <x>0</x>
             <y>0</y>
             <width>471</width>
-            <height>456</height>
+            <height>485</height>
         </rect>
     </property>
     <property name="caption">
@@ -67,7 +67,7 @@
         </widget>
         <widget class="QLayoutWidget">
             <property name="name">
-                <cstring>layout5</cstring>
+                <cstring>layout6</cstring>
             </property>
             <vbox>
                 <property name="name">
@@ -167,6 +167,22 @@
                             </property>
                         </widget>
                     </vbox>
+                </widget>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>pbUp</cstring>
+                    </property>
+                    <property name="text">
+                        <string>up</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>pbDown</cstring>
+                    </property>
+                    <property name="text">
+                        <string>down</string>
+                    </property>
                 </widget>
                 <widget class="QGroupBox">
                     <property name="name">
@@ -468,6 +484,8 @@
     <variable access="private">QString bgPic;</variable>
 </variables>
 <slots>
+    <slot>downClicked()</slot>
+    <slot>upClicked()</slot>
     <slot>newDVD()</slot>
     <slot>newAlbum()</slot>
     <slot>lvClicked( QListViewItem * item )</slot>

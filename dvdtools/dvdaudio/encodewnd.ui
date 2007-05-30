@@ -11,7 +11,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>371</width>
+            <width>383</width>
             <height>177</height>
         </rect>
     </property>
@@ -25,6 +25,12 @@
         <widget class="QTextEdit">
             <property name="name">
                 <cstring>teAuthor</cstring>
+            </property>
+            <property name="frameShape">
+                <enum>LineEditPanel</enum>
+            </property>
+            <property name="frameShadow">
+                <enum>Sunken</enum>
             </property>
         </widget>
         <widget class="QProgressBar">
@@ -108,6 +114,7 @@
 </variables>
 <slots>
     <slot>readAuthor()</slot>
+    <slot>readEncMpeg()</slot>
     <slot>readEncode()</slot>
     <slot>demarrer( QString fn, int tf )</slot>
     <slot>demarrerA()</slot>
