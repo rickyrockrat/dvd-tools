@@ -103,6 +103,12 @@ void WndSub::init()
 
 	connect( pbGenPng, SIGNAL(clicked()),
 		this, SLOT(genPngForSpumux()));
+
+	connect( cbSubst, SIGNAL(clicked()),
+		this, SLOT(checkSubst()));
+
+	connect( pbSelectSubstFile, SIGNAL(clicked()),
+		this, SLOT(clicSelectSubstFile()));
 }
 
 void WndSub::clickedSave()
@@ -137,10 +143,19 @@ void WndSub::clicSelectInputFile()
 		leInputFile->setText( s );
     }
 	autoDetectFormat();
-	loadSubFile();
+	loadSubFile( leInputFile->text(), subvec );
 	showInputSubs();
 }
 
+
+void WndSub::clicSelectSubstFile()
+{
+    QString s = QFileDialog::getOpenFileName("","*",this,"Select file", "Select a subtitle substitute file");
+    if ( s != NULL )
+    {
+		leSubstFile->setText( s );
+    }
+}
 
 void WndSub::clicSelectOutputFile()
 {
@@ -149,6 +164,20 @@ void WndSub::clicSelectOutputFile()
     {
 	leOutputFile->setText( s );
     }
+}
+
+void WndSub::checkSubst()
+{
+	if ( cbSubst->isChecked() )
+	{
+		leSubstFile->setEnabled( true );
+		pbSelectSubstFile->setEnabled( true );
+	}
+	else
+	{
+		leSubstFile->setEnabled( false );
+		pbSelectSubstFile->setEnabled( false );
+	}
 }
 
 void WndSub::checkFps()
@@ -466,12 +495,34 @@ void WndSub::clicProceed()
 	std::vector<subtitle>::iterator it;
 
 	v_subs.clear();
-	for ( it = subvec.begin(); it != subvec.end(); it++ )
+	if ( cbSubst->isChecked() )
 	{
-		if ( it->FrameBased )
-			frameBasedProceed( *it );
+		std::vector<subtitle> vsubst;
+		loadSubFile( leSubstFile->text(), vsubst);
+		if ( subvec.size() == vsubst.size() )
+		{
+			int ctr;
+			for ( ctr = 0, it = subvec.begin(); it != subvec.end(); it++ )
+			{
+				subtitle &origSub = (*it);
+				subtitle &newSub = vsubst[ ctr++ ];
+				origSub.subs = newSub.subs;
+			}
+		}
 		else
-			timeBasedProceed( *it );
+		{
+			QMessageBox::information(this, "Submgmt", "Cannot substitute because the number of subtitles differs" );
+		}
+	}
+	else
+	{
+		for ( it = subvec.begin(); it != subvec.end(); it++ )
+		{
+			if ( it->FrameBased )
+				frameBasedProceed( *it );
+			else
+				timeBasedProceed( *it );
+		}
 	}
 	showOutputSubs();
 }
@@ -554,24 +605,24 @@ void WndSub::autoDetectFormat()
 	cbTypeO->setCurrentItem( cbType->currentItem() );
 }
 
-void WndSub::loadSubFile()
+void WndSub::loadSubFile(QString fname, std::vector<subtitle> &vs)
 {
 	switch( cbType->currentItem() )
 	{
 	case 0 :	/* microdvd */
-		loadMicrodvd();
+		loadMicrodvd(fname, vs);
 		break;
 	case 2 : 	/* subrip */
-		loadSubrip();
+		loadSubrip(fname,vs);
 		break;
 	case 3 : 	/* subviewer */
-		loadSubviewer();
+		loadSubviewer(fname,vs);
 		break;
 	case 5 :	/* sami */
-		loadSami();
+		loadSami(fname,vs);
 		break;
 	case 17 : 	/* spumux */
-		loadSpumux();
+		loadSpumux(fname,vs);
 		break;
 	default :
 		QMessageBox::information( this, "submgmt", "Cannot load file" );
@@ -884,7 +935,7 @@ void WndSub::saveSpumux()
 	}
 }
 
-void WndSub::loadSami()
+void WndSub::loadSami(QString fname, std::vector<subtitle> &vs)
 {
 	QString Start;
 	QString End;
@@ -895,11 +946,11 @@ void WndSub::loadSami()
 	QRegExp br( "<br>" );
 	QRegExp spaces( "&nbsp;" );
 
-    QFile file( leInputFile->text() );
+    QFile file( fname );
 
     if ( file.open( IO_ReadOnly ) )
 	{
-		subvec.clear();
+		vs.clear();
         QTextStream stream( &file );
 		if ( cbInputEncoding->currentText() == "ISO 8859-1" )
 		{
@@ -944,14 +995,14 @@ void WndSub::loadSami()
 				
 				//std::cout << std::endl;
 				subtitle s( ts, te, subs );
-				subvec.push_back( s );
+				vs.push_back( s );
 			}
 		}
         file.close();
     }
 }
 
-void WndSub::loadSubviewer()
+void WndSub::loadSubviewer(QString fname, std::vector<subtitle> &vs)
 {
 	QString Start;
 	QString End;
@@ -959,11 +1010,11 @@ void WndSub::loadSubviewer()
 	QTime te;
 	QStringList subs;
 
-    QFile file( leInputFile->text() );
+    QFile file( fname );
 
     if ( file.open( IO_ReadOnly ) )
 	{
-		subvec.clear();
+		vs.clear();
         QTextStream stream( &file );
 		if ( cbInputEncoding->currentText() == "ISO 8859-1" )
 		{
@@ -994,14 +1045,14 @@ void WndSub::loadSubviewer()
 					subs.push_back( line );
 				}
 				subtitle s( ts, te, subs );
-				subvec.push_back( s );
+				vs.push_back( s );
 			}
 		}
         file.close();
     }
 }
 
-void WndSub::loadMicrodvd()
+void WndSub::loadMicrodvd(QString fname, std::vector<subtitle> &vs)
 {
 	QString Start;
 	QString End;
@@ -1009,11 +1060,11 @@ void WndSub::loadMicrodvd()
 	QStringList subs;
 	int start, end;
 
-    QFile file( leInputFile->text() );
+    QFile file( fname );
 
     if ( file.open( IO_ReadOnly ) )
 	{
-		subvec.clear();
+		vs.clear();
         QTextStream stream( &file );
 		if ( cbInputEncoding->currentText() == "ISO 8859-1" )
 		{
@@ -1042,14 +1093,14 @@ void WndSub::loadMicrodvd()
 				subs.clear();
 				subs = QStringList::split( "|", Text );
 				subtitle s( start, end, subs );
-				subvec.push_back( s );
+				vs.push_back( s );
 			}
 		}
         file.close();
     }
 }
 
-void WndSub::loadSubrip()
+void WndSub::loadSubrip(QString fname, std::vector<subtitle> &vs)
 {
 	QString Start;
 	QString End;
@@ -1057,11 +1108,11 @@ void WndSub::loadSubrip()
 	QTime te;
 	QStringList subs;
 
-    QFile file( leInputFile->text() );
+    QFile file( fname );
 
     if ( file.open( IO_ReadOnly ) )
 	{
-		subvec.clear();
+		vs.clear();
         QTextStream stream( &file );
 		if ( cbInputEncoding->currentText() == "ISO 8859-1" )
 		{
@@ -1092,14 +1143,14 @@ void WndSub::loadSubrip()
 					subs = QStringList::split( "[br]", line );
 				}
 				subtitle s( ts, te, subs );
-				subvec.push_back( s );
+				vs.push_back( s );
 			}
 		}
         file.close();
     }
 }
 
-void WndSub::loadSpumux()
+void WndSub::loadSpumux(QString fname, std::vector<subtitle> &vs)
 {
 	QString Start;
 	QString End;
@@ -1110,11 +1161,11 @@ void WndSub::loadSpumux()
 	QTime te;
 	QStringList subs;
 
-    QFile file( leInputFile->text() );
+    QFile file( fname );
 
     if ( file.open( IO_ReadOnly ) )
 	{
-		subvec.clear();
+		vs.clear();
         QTextStream stream( &file );
 		if ( cbInputEncoding->currentText() == "ISO 8859-1" )
 		{
@@ -1167,7 +1218,7 @@ void WndSub::loadSpumux()
 					}
 				}
 				subtitle s( ts, te, subs );
-				subvec.push_back( s );
+				vs.push_back( s );
 			}
 		}
         file.close();

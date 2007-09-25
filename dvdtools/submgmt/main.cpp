@@ -15,7 +15,7 @@ int main( int argc, char ** argv )
 		{
 			w.leInputFile->setText( argv[1] );
 			w.autoDetectFormat();
-			w.loadSubFile();
+			w.loadSubFile(w.leInputFile->text(),w.subvec);
 			w.showInputSubs();
 		}
 	}

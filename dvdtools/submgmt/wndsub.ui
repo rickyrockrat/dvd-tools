@@ -12,8 +12,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>648</width>
-            <height>501</height>
+            <width>638</width>
+            <height>509</height>
         </rect>
     </property>
     <property name="backgroundOrigin">
@@ -31,7 +31,7 @@
         </property>
         <widget class="QLayoutWidget">
             <property name="name">
-                <cstring>layout15</cstring>
+                <cstring>layout18</cstring>
             </property>
             <vbox>
                 <property name="name">
@@ -430,7 +430,7 @@
                                         <bool>false</bool>
                                     </property>
                                     <property name="text">
-                                        <string>synchonized with Firs&amp;t speak</string>
+                                        <string>sync with Firs&amp;t speak</string>
                                     </property>
                                     <property name="buddy" stdset="0">
                                         <cstring>timeFirstSpeak</cstring>
@@ -496,7 +496,7 @@
                                         <bool>false</bool>
                                     </property>
                                     <property name="text">
-                                        <string>synchonized with &amp;Last speak</string>
+                                        <string>sync with &amp;Last speak</string>
                                     </property>
                                     <property name="buddy" stdset="0">
                                         <cstring>timeLastSpeak</cstring>
@@ -520,7 +520,7 @@
                         </widget>
                         <widget class="QLayoutWidget">
                             <property name="name">
-                                <cstring>layout94</cstring>
+                                <cstring>layout14</cstring>
                             </property>
                             <hbox>
                                 <property name="name">
@@ -575,11 +575,57 @@
                                     </property>
                                     <property name="sizeHint">
                                         <size>
-                                            <width>134</width>
+                                            <width>136</width>
                                             <height>20</height>
                                         </size>
                                     </property>
                                 </spacer>
+                            </hbox>
+                        </widget>
+                        <widget class="QLayoutWidget">
+                            <property name="name">
+                                <cstring>layout16</cstring>
+                            </property>
+                            <hbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <widget class="QCheckBox">
+                                    <property name="name">
+                                        <cstring>cbSubst</cstring>
+                                    </property>
+                                    <property name="minimumSize">
+                                        <size>
+                                            <width>250</width>
+                                            <height>0</height>
+                                        </size>
+                                    </property>
+                                    <property name="text">
+                                        <string>Substitute subtitles with those of this file :</string>
+                                    </property>
+                                </widget>
+                                <widget class="QLineEdit">
+                                    <property name="name">
+                                        <cstring>leSubstFile</cstring>
+                                    </property>
+                                    <property name="enabled">
+                                        <bool>false</bool>
+                                    </property>
+                                </widget>
+                                <widget class="QPushButton">
+                                    <property name="name">
+                                        <cstring>pbSelectSubstFile</cstring>
+                                    </property>
+                                    <property name="enabled">
+                                        <bool>false</bool>
+                                    </property>
+                                    <property name="text">
+                                        <string></string>
+                                    </property>
+                                    <property name="pixmap">
+                                        <pixmap>image1</pixmap>
+                                    </property>
+                                </widget>
                             </hbox>
                         </widget>
                     </vbox>
@@ -790,7 +836,7 @@
                     <property name="sizeHint">
                         <size>
                             <width>20</width>
-                            <height>35</height>
+                            <height>23</height>
                         </size>
                     </property>
                 </spacer>
@@ -968,15 +1014,17 @@
     <forward>class subtitle;</forward>
 </forwards>
 <variables>
-    <variable>std::vector&lt;subtitle&gt; subvec;</variable>
     <variable>std::vector&lt;subtitle&gt; v_subs;</variable>
+    <variable access="public">std::vector&lt;subtitle&gt; subvec;</variable>
 </variables>
 <slots>
     <slot>filenameChanged()</slot>
     <slot>init()</slot>
     <slot>clickedSave()</slot>
     <slot>clicSelectInputFile()</slot>
+    <slot>clicSelectSubstFile()</slot>
     <slot>clicSelectOutputFile()</slot>
+    <slot>checkSubst()</slot>
     <slot>checkFps()</slot>
     <slot>checkExpand()</slot>
     <slot>checkShift()</slot>
@@ -985,23 +1033,23 @@
     <slot>timeBasedProceed( subtitle &amp; s )</slot>
     <slot>frameBasedProceed( subtitle &amp; s )</slot>
     <slot>clicProceed()</slot>
+    <slot>loadSubFile( QString fname, std::vector&lt;subtitle&gt; &amp; vs )</slot>
     <slot>saveSami()</slot>
-    <slot>loadSami()</slot>
+    <slot>loadSami( QString fname, std::vector&lt;subtitle&gt; &amp; vs )</slot>
+    <slot>loadSubviewer( QString fname, std::vector&lt;subtitle&gt; &amp; vs )</slot>
+    <slot>loadMicrodvd( QString fname, std::vector&lt;subtitle&gt; &amp; vs )</slot>
+    <slot>loadSubrip( QString fname, std::vector&lt;subtitle&gt; &amp; vs )</slot>
+    <slot>loadSpumux( QString fname, std::vector&lt;subtitle&gt; &amp; vs )</slot>
     <slot>genPngForSpumux()</slot>
 </slots>
 <functions>
     <function>autoDetectFormat()</function>
-    <function>loadSubFile()</function>
     <function access="protected">showOutputSubs()</function>
     <function>showInputSubs()</function>
     <function access="protected">saveMicrodvd()</function>
     <function>saveSubrip()</function>
     <function access="protected">saveSubviewer()</function>
     <function access="protected">saveSpumux()</function>
-    <function access="protected">loadSubviewer()</function>
-    <function access="protected">loadMicrodvd()</function>
-    <function access="protected">loadSubrip()</function>
-    <function>loadSpumux()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>
