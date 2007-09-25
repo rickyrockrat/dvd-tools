@@ -41,6 +41,8 @@ void encodeWnd::demarrer(QString fn, int tf )
 	setCaption( "Encoding to vob" );
 	setModal( true );
 	teAuthor->clear();
+	teAuthor->setTextFormat( Qt::LogText );
+	teAuthor->setMaxLogLines(1000);
 	teAuthor->append( fn );
 	pbEncode->setTotalSteps( tf );
 	connect( procEncode, SIGNAL(readyReadStdout()),
