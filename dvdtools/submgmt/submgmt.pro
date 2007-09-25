@@ -9,7 +9,8 @@ HEADERS	+= subtitle.h
 
 SOURCES	+= main.cpp
 
-FORMS	= wndsub.ui genpngwnd.ui
+FORMS	= wndsub.ui \
+	genpngwnd.ui
 
 IMAGES	= fileopen.xpm \
 	submgmt_icon.png
