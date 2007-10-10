@@ -5,12 +5,13 @@ CONFIG	+= qt warn_off debug
 
 LIBS	+= -lfreetype
 
-HEADERS	+= subtitle.h
+HEADERS	+= subtitle.h sublistboxitem.h
 
-SOURCES	+= main.cpp
+SOURCES	+= main.cpp subtitle.cpp sublistboxitem.cpp
 
 FORMS	= wndsub.ui \
-	genpngwnd.ui
+	genpngwnd.ui \
+	editsub.ui
 
 IMAGES	= fileopen.xpm \
 	submgmt_icon.png

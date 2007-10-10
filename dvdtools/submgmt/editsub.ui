@@ -1,0 +1,181 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>EditSub</class>
+<widget class="QDialog">
+    <property name="name">
+        <cstring>EditSub</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>391</width>
+            <height>243</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>Subtitle Editor</string>
+    </property>
+    <vbox>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <widget class="QGroupBox">
+            <property name="name">
+                <cstring>gbTime</cstring>
+            </property>
+            <property name="title">
+                <string>Time</string>
+            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QLabel">
+                    <property name="name">
+                        <cstring>textLabel1</cstring>
+                    </property>
+                    <property name="text">
+                        <string>&amp;Start</string>
+                    </property>
+                    <property name="buddy" stdset="0">
+                        <cstring>timeEdit1</cstring>
+                    </property>
+                </widget>
+                <widget class="QTimeEdit">
+                    <property name="name">
+                        <cstring>teStart</cstring>
+                    </property>
+                </widget>
+                <widget class="QLabel">
+                    <property name="name">
+                        <cstring>textLabel1_2</cstring>
+                    </property>
+                    <property name="text">
+                        <string>S&amp;top</string>
+                    </property>
+                    <property name="buddy" stdset="0">
+                        <cstring>timeEdit1_2</cstring>
+                    </property>
+                </widget>
+                <widget class="QTimeEdit">
+                    <property name="name">
+                        <cstring>teStop</cstring>
+                    </property>
+                </widget>
+            </hbox>
+        </widget>
+        <widget class="QGroupBox">
+            <property name="name">
+                <cstring>gbFrame</cstring>
+            </property>
+            <property name="title">
+                <string>Frame</string>
+            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QLabel">
+                    <property name="name">
+                        <cstring>textLabel1_3</cstring>
+                    </property>
+                    <property name="text">
+                        <string>&amp;Start</string>
+                    </property>
+                    <property name="buddy" stdset="0">
+                        <cstring>sbStart</cstring>
+                    </property>
+                </widget>
+                <widget class="QSpinBox">
+                    <property name="name">
+                        <cstring>sbStart</cstring>
+                    </property>
+                </widget>
+                <widget class="QLabel">
+                    <property name="name">
+                        <cstring>textLabel1_2_2</cstring>
+                    </property>
+                    <property name="text">
+                        <string>S&amp;top</string>
+                    </property>
+                    <property name="buddy" stdset="0">
+                        <cstring>sbStop</cstring>
+                    </property>
+                </widget>
+                <widget class="QSpinBox">
+                    <property name="name">
+                        <cstring>sbStop</cstring>
+                    </property>
+                </widget>
+            </hbox>
+        </widget>
+        <widget class="QTextEdit">
+            <property name="name">
+                <cstring>teSubs</cstring>
+            </property>
+        </widget>
+        <widget class="QLayoutWidget">
+            <property name="name">
+                <cstring>layout2</cstring>
+            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <spacer>
+                    <property name="name">
+                        <cstring>spacer1</cstring>
+                    </property>
+                    <property name="orientation">
+                        <enum>Horizontal</enum>
+                    </property>
+                    <property name="sizeType">
+                        <enum>Expanding</enum>
+                    </property>
+                    <property name="sizeHint">
+                        <size>
+                            <width>40</width>
+                            <height>20</height>
+                        </size>
+                    </property>
+                </spacer>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>pbCancel</cstring>
+                    </property>
+                    <property name="text">
+                        <string>&amp;Cancel</string>
+                    </property>
+                    <property name="accel">
+                        <string>Alt+C</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>pbOk</cstring>
+                    </property>
+                    <property name="text">
+                        <string>&amp;Ok</string>
+                    </property>
+                    <property name="accel">
+                        <string>Alt+O</string>
+                    </property>
+                </widget>
+            </hbox>
+        </widget>
+    </vbox>
+</widget>
+<includes>
+    <include location="local" impldecl="in declaration">subtitle.h</include>
+    <include location="local" impldecl="in declaration">sublistboxitem.h</include>
+    <include location="global" impldecl="in declaration">vector</include>
+    <include location="global" impldecl="in declaration">qdatetime.h</include>
+    <include location="global" impldecl="in declaration">qlistbox.h</include>
+    <include location="local" impldecl="in implementation">editsub.ui.h</include>
+</includes>
+<functions>
+    <function access="private" specifier="non virtual">init()</function>
+    <function>setSub( SubListBoxItem * item )</function>
+</functions>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>

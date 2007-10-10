@@ -13,12 +13,15 @@
 #include <qpainter.h>
 #include <qradiobutton.h>
 #include <qdeepcopy.h>
+#include <qpopupmenu.h>
 #include <qprocess.h>
 #include "genpngwnd.h"
+#include "sublistboxitem.h"
+#include "editsub.h"
 
 #define TIME_FMT	"hh:mm:ss,zzz"
 #define SPU_TIME_FMT	"hh:mm:ss.zzz"
-#define NUM_LINES	10
+#define NUM_LINES	30
 
 QRegExp microdvd = QRegExp( "\\{[0-9]+\\}\\{[0-9]*\\}" );
 QRegExp mpl2 = QRegExp( "\\[[0-9]+]\\[[0-9]+]" );
@@ -31,13 +34,15 @@ QRegExp jacosub2 = QRegExp( "@[0-9]+ @[0-9]+" );
 QRegExp vplayer = QRegExp( "[0-9]+;[0-9]+;[0-9]+" );
 QRegExp vplayer2 = QRegExp( "[0-9]+;[0-9]+;[0-9]+ " );
 QRegExp rt = QRegExp( "^<" );
-QRegExp ssa = QRegExp( "Dialogue: " );
+QRegExp ssa = QRegExp( "Format: " );
 QRegExp pjs = QRegExp( "[0-9]+,[0-9]+,\"." );
 QRegExp mpsub = QRegExp( "FORMAT=[0-9]+" );
 QRegExp mpsub2 = QRegExp( "FORMAT=TIM." );
 QRegExp aqtitle = QRegExp( "-->>" );
 QRegExp subrip9 = QRegExp( "\\[[0-9]+:[0-9]+:[0-9]+]" );
 QRegExp spumux = QRegExp( "<spu " );
+
+SubListBoxItem *curItem = 0;
 
 void WndSub::filenameChanged()
 {
@@ -109,6 +114,32 @@ void WndSub::init()
 
 	connect( pbSelectSubstFile, SIGNAL(clicked()),
 		this, SLOT(clicSelectSubstFile()));
+
+	connect( lbInputSubs,
+				SIGNAL( rightButtonClicked( QListBoxItem *, const QPoint& ) ),
+				this,
+				SLOT( rightClick( QListBoxItem *, const QPoint &) ) );
+}
+
+void WndSub::edit( )
+{
+	if ( curItem )
+	{
+		EditSub *es = new EditSub( 0, "edit" );
+		es->setSub( curItem );
+		es->exec();
+	}
+}
+
+void WndSub::rightClick(QListBoxItem *item, const QPoint &p )
+{
+	if ( item )
+	{
+		curItem = (SubListBoxItem *)item;
+		QPopupMenu *m = new QPopupMenu( lbInputSubs );
+		m->insertItem( tr("Edit..."), this, SLOT(edit()) );
+		m->exec( p );
+	}
 }
 
 void WndSub::clickedSave()
@@ -317,15 +348,15 @@ QTime operator /( const QTime &t1, const QTime &t2 )
 }
 */
 
-void WndSub::timeBasedProceed( subtitle &s )
+void WndSub::timeBasedProceed( Subtitle &s )
 {
 	static int passage;
 	QTime length, lengths;
 	QString str;
-	QStringList subs;
-	QTime &ts = s.begin;
-	QTime &te = s.end;
-	subs = s.subs;
+	std::vector<Subline> subs;
+	QTime ts = s.getBegin();
+	QTime te = s.getEnd();
+	subs = s.getSubs();
 
 	if ( cbShift->isChecked() )
 	{
@@ -334,13 +365,13 @@ void WndSub::timeBasedProceed( subtitle &s )
 	}
 	if ( cbExpand->isChecked() )
 	{
-		ts = s.begin * ( sbExpand->value() / 1000 );
-		te = s.end * ( sbExpand->value() / 1000 );
+		ts = s.getBegin() * ( sbExpand->value() / 1000 );
+		te = s.getEnd() * ( sbExpand->value() / 1000 );
 	}
 	if ( cbFps->isChecked() )
 	{
-		ts = s.begin * ( comboFpsOrig->currentText().toDouble() / comboFpsDest->currentText().toDouble() );
-		te = s.end * ( comboFpsOrig->currentText().toDouble() / comboFpsDest->currentText().toDouble() );
+		ts = s.getBegin() * ( comboFpsOrig->currentText().toDouble() / comboFpsDest->currentText().toDouble() );
+		te = s.getEnd() * ( comboFpsOrig->currentText().toDouble() / comboFpsDest->currentText().toDouble() );
 	}
 	if ( cbAuto->isChecked() )
 	{
@@ -350,8 +381,8 @@ void WndSub::timeBasedProceed( subtitle &s )
 		 *
 		 * first we move subs to 0 */
 
-		ts = s.begin - timeFirstSub->time();
-		te = s.end - timeFirstSub->time();
+		ts = s.getBegin() - timeFirstSub->time();
+		te = s.getEnd() - timeFirstSub->time();
 
 		/* Now we expand subs so that they have the same length that
 		 * the speakers */
@@ -378,39 +409,37 @@ void WndSub::timeBasedProceed( subtitle &s )
 		if ( sbShiftPos->value() > 0 )
 		{
 			v_subs.push_back( s );
-			s.subs.clear();		// first x subtitles are empty
+			s.getSubs().clear();		// first x subtitles are empty
 			if ( v_subs.size() >= (sbShiftPos->value()+1) )
 			{
 				int i = v_subs.size() - sbShiftPos->value() - 1;
-				s.subs = v_subs[ i ].subs;
+				s.setSubs( v_subs[ i ].getSubs() );
 			}
 		}
 		else if ( sbShiftPos->value() < 0 )
 		{
 			v_subs.push_back( s );
-			s.begin = QTime();	// null time
-			s.end = QTime();
+			s.setBegin( QTime() );	// null time
+			s.setEnd( QTime() );
 			if ( v_subs.size() >= (abs(sbShiftPos->value())+1) )
 			{
 				int i = v_subs.size() - abs(sbShiftPos->value()) - 1;
-				s.begin = v_subs[ i ].begin;
-				s.end = v_subs[ i ].end;
+				s.setBegin( v_subs[ i ].getBegin() );
+				s.setEnd( v_subs[ i ].getEnd() );
 			}
 
 		}
 	}
-		//lbSubs->insertItem( str );
-		//lbSubs->insertStringList( subs );
 }
 
-void WndSub::frameBasedProceed( subtitle &s )
+void WndSub::frameBasedProceed( Subtitle &s )
 {
 	QString str;
 	int length, lengths;
-	QStringList subs;
-	int &fs = s.fbegin;
-	int &fe = s.fend;
-	subs = s.subs;
+	std::vector<Subline> subs;
+	int fs = s.getFbegin();
+	int fe = s.getFend();
+	subs = s.getSubs();
 	int fFirstSub;
 	int fFirstSpeak;
 	int fLastSub;
@@ -424,13 +453,13 @@ void WndSub::frameBasedProceed( subtitle &s )
 	}
 	if ( cbExpand->isChecked() )
 	{
-		fs = s.fbegin * sbExpand->value() / 1000;
-		fe = s.fend * sbExpand->value() / 1000;
+		fs = s.getFbegin() * sbExpand->value() / 1000;
+		fe = s.getFend() * sbExpand->value() / 1000;
 	}
 	if ( cbFps->isChecked() )
 	{
-		fs = int( s.fbegin * ( fps / comboFpsDest->currentText().toDouble() ) );
-		fe = int( s.fend * ( fps / comboFpsDest->currentText().toDouble() ) );
+		fs = int( s.getFbegin() * ( fps / comboFpsDest->currentText().toDouble() ) );
+		fe = int( s.getFend() * ( fps / comboFpsDest->currentText().toDouble() ) );
 	}
 	if ( cbAuto->isChecked() )
 	{
@@ -445,8 +474,8 @@ void WndSub::frameBasedProceed( subtitle &s )
 		fLastSub =  (int)(milli( timeLastSub->time() ) / fps );
 		fLastSpeak =  (int)(milli( timeLastSpeak->time() ) / fps );
 
-		fs = s.fbegin - fFirstSub;
-		fe = s.fend - fFirstSub;
+		fs = s.getFbegin() - fFirstSub;
+		fe = s.getFend() - fFirstSub;
 
 		/* Now we expand subs so that they have the same length that
 		 * the speakers */
@@ -466,47 +495,45 @@ void WndSub::frameBasedProceed( subtitle &s )
 		if ( sbShiftPos->value() > 0 )
 		{
 			v_subs.push_back( s );
-			s.subs.clear();		// first x subtitles are empty
+			s.getSubs().clear();		// first x subtitles are empty
 			if ( v_subs.size() == (sbShiftPos->value()+1) )
 			{
 				int i = v_subs.size() - sbShiftPos->value() - 1;
-				s.subs = v_subs[ i ].subs;
+				s.setSubs( v_subs[ i ].getSubs() );
 			}
 		}
 		else if ( sbShiftPos->value() < 0 )
 		{
 			v_subs.push_back( s );
-			s.fbegin = 0;
-			s.fend = 0;
+			s.setFbegin( 0 );
+			s.setFend( 0 );
 			if ( v_subs.size() >= (abs(sbShiftPos->value())+1) )
 			{
 				int i = v_subs.size() - abs(sbShiftPos->value()) - 1;
-				s.fbegin = v_subs[ i ].fbegin;
-				s.fend = v_subs[ i ].fend;
+				s.setFbegin( v_subs[ i ].getFbegin() );
+				s.setFend( v_subs[ i ].getFend() );
 			}
 		}
 	}
-		//lbSubs->insertItem( str );
-		//lbSubs->insertStringList( subs );
 }
 
 void WndSub::clicProceed()
 {
-	std::vector<subtitle>::iterator it;
+	std::vector<Subtitle>::iterator it;
 
 	v_subs.clear();
 	if ( cbSubst->isChecked() )
 	{
-		std::vector<subtitle> vsubst;
+		std::vector<Subtitle> vsubst;
 		loadSubFile( leSubstFile->text(), vsubst);
 		if ( subvec.size() == vsubst.size() )
 		{
 			int ctr;
 			for ( ctr = 0, it = subvec.begin(); it != subvec.end(); it++ )
 			{
-				subtitle &origSub = (*it);
-				subtitle &newSub = vsubst[ ctr++ ];
-				origSub.subs = newSub.subs;
+				Subtitle &origSub = (*it);
+				Subtitle &newSub = vsubst[ ctr++ ];
+				origSub.setSubs( newSub.getSubs() );
 			}
 		}
 		else
@@ -518,7 +545,7 @@ void WndSub::clicProceed()
 	{
 		for ( it = subvec.begin(); it != subvec.end(); it++ )
 		{
-			if ( it->FrameBased )
+			if ( it->getFrameBased() )
 				frameBasedProceed( *it );
 			else
 				timeBasedProceed( *it );
@@ -605,7 +632,7 @@ void WndSub::autoDetectFormat()
 	cbTypeO->setCurrentItem( cbType->currentItem() );
 }
 
-void WndSub::loadSubFile(QString fname, std::vector<subtitle> &vs)
+void WndSub::loadSubFile(QString fname, std::vector<Subtitle> &vs)
 {
 	switch( cbType->currentItem() )
 	{
@@ -621,6 +648,9 @@ void WndSub::loadSubFile(QString fname, std::vector<subtitle> &vs)
 	case 5 :	/* sami */
 		loadSami(fname,vs);
 		break;
+	case 11 :	/* ssa */
+		loadSsa(fname,vs);
+		break;
 	case 17 : 	/* spumux */
 		loadSpumux(fname,vs);
 		break;
@@ -631,28 +661,26 @@ void WndSub::loadSubFile(QString fname, std::vector<subtitle> &vs)
 
 void WndSub::showOutputSubs()
 {
-	std::vector<subtitle>::iterator it;
+	std::vector<Subtitle>::iterator it;
 	QTime ts;
 	QTime te;
-	QStringList subs;
+	std::vector<Subline> subs;
 	QString str;
 
 	lbOutputSubs->clear();
 	for ( it = subvec.begin(); it != subvec.end(); it++ )
 	{
-		if ( it->FrameBased )
+		if ( it->getFrameBased() )
 		{
-			str.sprintf( "Frame %d to %d", it->fbegin, it->fend );
+			str.sprintf( "Frame %d to %d", it->getFbegin(), it->getFend() );
 		}
 		else
 		{
-			ts = it->begin;
-			te = it->end;
+			ts = it->getBegin();
+			te = it->getEnd();
 			str = ts.toString( TIME_FMT ) + " to " + te.toString( TIME_FMT );
 		}
-		subs = it->subs;
-		lbOutputSubs->insertItem( str );
-		lbOutputSubs->insertStringList( subs );
+		new SubListBoxItem( &(*it), lbOutputSubs );
 	}
 	tlOutputSubs->show();
 	lbOutputSubs->show();
@@ -660,48 +688,46 @@ void WndSub::showOutputSubs()
 
 void WndSub::showInputSubs()
 {
-	std::vector<subtitle>::iterator it;
+	std::vector<Subtitle>::iterator it;
 	QTime ts;
 	QTime te;
 	QTime prevte( 0, 0, 0, 0 );
-	QStringList subs;
+	std::vector<Subline> subs;
 	QString str;
 	int numero = 0, prevfe = 999999;
 
 	lbInputSubs->clear();
 	for ( it = subvec.begin(); it != subvec.end(); it++ )
 	{
-		if ( it->FrameBased )
+		if ( it->getFrameBased() )
 		{
-			if ( it->fbegin > it->fend )
+			if ( it->getFbegin() > it->getFend() )
 			{
-				std::cout << "Sub no " << numero << " frame debut (" << it->fbegin << ") > frame fin (" << it->fend << ")" << std::endl;
+				std::cout << "Sub no " << numero << " frame debut (" << it->getFbegin() << ") > frame fin (" << it->getFend() << ")" << std::endl;
 			}
-			else if ( it->fbegin < prevfe )
+			else if ( it->getFbegin() < prevfe )
 			{
-				std::cout << "Sub no " << numero << " frame debut (" << it->fbegin << ") < frame fin precedente (" << prevfe << ")" << std::endl;
+				std::cout << "Sub no " << numero << " frame debut (" << it->getFbegin() << ") < frame fin precedente (" << prevfe << ")" << std::endl;
 			}
-			str.sprintf( "Frame %d to %d", it->fbegin, it->fend );
-			prevfe = it->fend;
+			str.sprintf( "Frame %d to %d", it->getFbegin(), it->getFend() );
+			prevfe = it->getFend();
 		}
 		else
 		{
-			if ( it->begin > it->end )
+			if ( it->getBegin() > it->getEnd() )
 			{
-				std::cout << "Sub no " << numero << ": " << it->begin.toString( TIME_FMT ) << " > " << it->end.toString( TIME_FMT ) << std::endl;
+				//TODO std::cout << "Sub no " << numero << ": " << it->begin.toString( TIME_FMT ) << " > " << it->end.toString( TIME_FMT ) << std::endl;
 			}
-			else if ( it->begin < prevte )
+			else if ( it->getBegin() < prevte )
 			{
-				std::cout << "Sub no " << numero << ": " << it->begin.toString( TIME_FMT ) << " < " << prevte.toString( TIME_FMT ) << std::endl;
+				//TODO std::cout << "Sub no " << numero << ": " << it->begin.toString( TIME_FMT ) << " < " << prevte.toString( TIME_FMT ) << std::endl;
 			}
-			ts = it->begin;
-			te = it->end;
+			ts = it->getBegin();
+			te = it->getEnd();
 			str = ts.toString( TIME_FMT ) + " to " + te.toString( TIME_FMT );
-			prevte = it->end;
+			prevte = it->getEnd();
 		}
-		subs = it->subs;
-		lbInputSubs->insertItem( str );
-		lbInputSubs->insertStringList( subs );
+		new SubListBoxItem( &(*it), lbInputSubs );
 		numero++;
 	}
 	tlInputSubs->show();
@@ -710,7 +736,7 @@ void WndSub::showInputSubs()
 
 void WndSub::saveMicrodvd()
 {
-	std::vector<subtitle>::iterator it;
+	std::vector<Subtitle>::iterator it;
 
     QFile file( leOutputFile->text() );
     if ( file.open( IO_WriteOnly | IO_Truncate ) )
@@ -727,13 +753,13 @@ void WndSub::saveMicrodvd()
 		QTextCodec *codec = QTextCodec::codecForName(cbOutputEncoding->currentText());
 		for ( it = subvec.begin(); it != subvec.end(); it++ )
 		{
-			stream << "{" << it->fbegin << "}{" << it->fend << "}";
+			stream << "{" << it->getFbegin() << "}{" << it->getFend() << "}";
 
-			QStringList::iterator its;
-			for ( its = it->subs.begin(); its != it->subs.end(); its++ )
+			std::vector<Subline>::iterator its;
+			for ( its = it->getSubs().begin(); its != it->getSubs().end(); its++ )
 			{
-				if ( its != it->subs.begin() ) stream << "|";
-				stream << codec->fromUnicode( *its );
+				if ( its != it->getSubs().begin() ) stream << "|";
+					stream << *its;
 			}
 			stream << endl;
 		}
@@ -746,7 +772,7 @@ void WndSub::saveSubrip()
 	QString End;
 	QTime ts;
 	QTime te;
-	std::vector<subtitle>::iterator it;
+	std::vector<Subtitle>::iterator it;
 
     QFile file( leOutputFile->text() );
 
@@ -764,15 +790,15 @@ void WndSub::saveSubrip()
 		QTextCodec *codec = QTextCodec::codecForName(cbOutputEncoding->currentText());
 		for ( it = subvec.begin(); it != subvec.end(); it++ )
 		{
-			ts = it->begin;
-			te = it->end;
+			ts = it->getBegin();
+			te = it->getEnd();
 			stream << ts.toString( "hh:mm:ss" ) << "." << ts.msec() << "," << te.toString( "hh:mm:ss" ) << "." << te.msec() << endl;
 
-			QStringList::iterator its;
-			for ( its = it->subs.begin(); its != it->subs.end(); its++ )
+			std::vector<Subline>::iterator its;
+			for ( its = it->getSubs().begin(); its != it->getSubs().end(); its++ )
 			{
-				if ( its != it->subs.begin() ) stream << "[br]";
-				stream << codec->fromUnicode( *its );
+				if ( its != it->getSubs().begin() ) stream << "[br]";
+				stream << *its;
 			}
 			stream << endl << endl;
 		}
@@ -789,7 +815,7 @@ void WndSub::saveSami()
 	QString End;
 	QTime ts;
 	QTime te;
-	std::vector<subtitle>::iterator it;
+	std::vector<Subtitle>::iterator it;
 	int numero;
 
     QFile file( leOutputFile->text() );
@@ -818,16 +844,16 @@ void WndSub::saveSami()
 		stream << "<BODY>" << endl;
 		for ( it = subvec.begin(); it != subvec.end(); it++ )
 		{
-			ts = it->begin;
-			te = it->end;
+			ts = it->getBegin();
+			te = it->getEnd();
 			stream << "<SYNC START=" << milli( ts ) << ">" << endl;
 
-			QStringList::iterator its = it->subs.begin();
+			std::vector<Subline>::iterator its = it->getSubs().begin();
 			stream << "<P CLASS=SUBTTL>" << *its;
 			its++;
-			for ( ; its != it->subs.end(); its++ )
+			for ( ; its != it->getSubs().end(); its++ )
 			{
-				stream << "<br>" << codec->fromUnicode( *its );
+				stream << "<br>" << *its;
 			}
 			stream << endl;
 			stream << "<SYNC START=" << milli( te ) << ">" << endl;
@@ -846,7 +872,7 @@ void WndSub::saveSubviewer()
 	QString End;
 	QTime ts;
 	QTime te;
-	std::vector<subtitle>::iterator it;
+	std::vector<Subtitle>::iterator it;
 	int numero;
 
     QFile file( leOutputFile->text() );
@@ -866,15 +892,15 @@ void WndSub::saveSubviewer()
 		numero = 1;
 		for ( it = subvec.begin(); it != subvec.end(); it++ )
 		{
-			ts = it->begin;
-			te = it->end;
+			ts = it->getBegin();
+			te = it->getEnd();
 			stream << numero << endl;
 			stream << ts.toString( TIME_FMT ) << " --> " << te.toString( TIME_FMT ) << endl;
 
-			QStringList::iterator its;
-			for ( its = it->subs.begin(); its != it->subs.end(); its++ )
+			std::vector<Subline>::iterator its;
+			for ( its = it->getSubs().begin(); its != it->getSubs().end(); its++ )
 			{
-				stream << codec->fromUnicode( *its ) << endl;
+				stream << *its << endl;
 			}
 			stream << endl;
 			numero++;
@@ -892,7 +918,7 @@ void WndSub::saveSpumux()
 	QString End;
 	QTime ts;
 	QTime te;
-	std::vector<subtitle>::iterator it;
+	std::vector<Subtitle>::iterator it;
 
     QFile file( leOutputFile->text() );
 
@@ -912,17 +938,17 @@ void WndSub::saveSpumux()
 		stream << "  <stream>" << endl;
 		for ( it = subvec.begin(); it != subvec.end(); it++ )
 		{
-			ts = it->begin;
-			te = it->end;
+			ts = it->getBegin();
+			te = it->getEnd();
 			stream << "    <spu";
 			stream << " start=\"" << ts.toString( SPU_TIME_FMT ) << "\"";
 			stream << " end=\"" << te.toString( SPU_TIME_FMT ) << "\" ";
 
-			QStringList::iterator its;
-			for ( its = it->subs.begin(); its != it->subs.end(); its++ )
+			std::vector<Subline>::iterator its;
+			for ( its = it->getSubs().begin(); its != it->getSubs().end(); its++ )
 			{
-				if ( its != it->subs.begin() ) stream << endl;
-				stream << " image=\"" << codec->fromUnicode( *its ) << "\"";
+				if ( its != it->getSubs().begin() ) stream << endl;
+				stream << " image=\"" << *its << "\"";
 			}
 			stream << " />" << endl;
 		}
@@ -935,13 +961,105 @@ void WndSub::saveSpumux()
 	}
 }
 
-void WndSub::loadSami(QString fname, std::vector<subtitle> &vs)
+void WndSub::loadSsa(QString fname, std::vector<Subtitle> &vs)
+{
+	QString Start;
+	QString End;
+	QString Text;
+	QTime ts;
+	QTime te;
+	std::vector<Subline> subs;
+	QRegExp dial( "Dialogue:" );
+	int hh, mm, ss, cc;
+
+    QFile file( fname );
+
+    if ( file.open( IO_ReadOnly ) )
+	{
+		vs.clear();
+        QTextStream stream( &file );
+		if ( cbInputEncoding->currentText() == "ISO 8859-1" )
+		{
+			stream.setEncoding( QTextStream::Latin1 );
+		}
+		else
+		{
+			stream.setEncoding( QTextStream::UnicodeUTF8 );
+		}
+		QTextCodec *codec = QTextCodec::codecForName(cbInputEncoding->currentText());
+        QString line;
+        while ( !stream.atEnd() )
+		{
+            line = codec->toUnicode( stream.readLine()); // line of text excluding '\n'
+			//std::cout << "lu=" << line.ascii() << std::endl;
+			if ( line.contains( dial ) )
+			{
+/* Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text */
+/* Dialogue: 0,0:00:41.80,0:00:43.19,Default,,0000,0000,0000,,{\i1} I am sending you the code. {\i0} */
+				Start = line.section( ':', 1 ).section( ',', 1, 1 );
+				hh = Start.section( ":", 0, 0 ).toInt();
+				mm = Start.section( ":", 1, 1 ).toInt();
+				ss = Start.section( ":", 2 ).section( ".", 0, 0 ).toInt();
+				cc = Start.section( ".", 1 ).toInt();
+				ts = QTime( hh, mm, ss, cc );
+
+				End = line.section( ':', 1 ).section( ',', 2, 2 );
+				hh = End.section( ":", 0, 0 ).toInt();
+				mm = End.section( ":", 1, 1 ).toInt();
+				ss = End.section( ":", 2 ).section( ".", 0, 0 ).toInt();
+				cc = End.section( ".", 1 ).toInt();
+				te = QTime( hh, mm, ss, cc );
+
+				Text = line.section( ':', 1 ).section( ',', 9 );
+				
+				subs.clear();
+
+				Subline::FMT style;
+				QString sText;
+				if ( Text.contains( "{\\i1}" ) )
+				{
+					sText = Text.remove( "{\\i1} " ).remove( " {\\i0}" );
+					style = Subline::Italic;
+				}
+				else if ( Text.contains( "{\\b1}" ) )
+				{
+					sText = Text.remove( "{\\b1} " ).remove( " {\\b0}" );
+					style = Subline::Bold;
+				}
+				else
+				{
+					sText = Text;
+					style = Subline::Normal;
+				}
+				// We ignore all other tags
+				sText = sText.remove( QRegExp( "{.*}" ) );
+				QStringList l = QStringList::split( "\\N", sText );
+				QStringList::Iterator i;
+				for ( i = l.begin(); i != l.end(); i++ )
+				{
+					subs.push_back( Subline( *i, style ) );
+				}
+				
+				//std::cout << std::endl;
+				Subtitle s( ts, te, subs );
+				vs.push_back( s );
+			}
+			else
+			{
+			// TODO : add to the header ?
+			}
+		}
+        file.close();
+    }
+}
+
+void WndSub::loadSami(QString fname, std::vector<Subtitle> &vs)
 {
 	QString Start;
 	QString End;
 	QTime ts;
 	QTime te;
-	QStringList subs;
+	std::vector<Subline> subs;
 	QRegExp sync( "SYNC START=" );
 	QRegExp br( "<br>" );
 	QRegExp spaces( "&nbsp;" );
@@ -994,7 +1112,7 @@ void WndSub::loadSami(QString fname, std::vector<subtitle> &vs)
 				}
 				
 				//std::cout << std::endl;
-				subtitle s( ts, te, subs );
+				Subtitle s( ts, te, subs );
 				vs.push_back( s );
 			}
 		}
@@ -1002,13 +1120,13 @@ void WndSub::loadSami(QString fname, std::vector<subtitle> &vs)
     }
 }
 
-void WndSub::loadSubviewer(QString fname, std::vector<subtitle> &vs)
+void WndSub::loadSubviewer(QString fname, std::vector<Subtitle> &vs)
 {
 	QString Start;
 	QString End;
 	QTime ts;
 	QTime te;
-	QStringList subs;
+	std::vector<Subline> subs;
 
     QFile file( fname );
 
@@ -1042,9 +1160,25 @@ void WndSub::loadSubviewer(QString fname, std::vector<subtitle> &vs)
 					if ( line.isEmpty() )
 						break;
 					/* text */
-					subs.push_back( line );
+					QString s;
+					Subline::FMT style;
+					if ( line.contains( "<i>" ) )
+					{
+						style = Subline::Italic;
+						s = line.remove( QRegExp( "<.*>" ) );
+					}
+					else if ( line.contains( "<b>" ) )
+					{
+						style = Subline::Bold;
+						s = line.remove( QRegExp( "<.*>" ) );
+					}
+					else
+					{
+						s = line;
+					}
+					subs.push_back( Subline( s, style ) );
 				}
-				subtitle s( ts, te, subs );
+				Subtitle s( ts, te, subs );
 				vs.push_back( s );
 			}
 		}
@@ -1052,12 +1186,12 @@ void WndSub::loadSubviewer(QString fname, std::vector<subtitle> &vs)
     }
 }
 
-void WndSub::loadMicrodvd(QString fname, std::vector<subtitle> &vs)
+void WndSub::loadMicrodvd(QString fname, std::vector<Subtitle> &vs)
 {
 	QString Start;
 	QString End;
 	QString Text;
-	QStringList subs;
+	std::vector<Subline> subs;
 	int start, end;
 
     QFile file( fname );
@@ -1091,8 +1225,13 @@ void WndSub::loadMicrodvd(QString fname, std::vector<subtitle> &vs)
 				start = Start.toUInt( );
 				end = End.toUInt( );
 				subs.clear();
-				subs = QStringList::split( "|", Text );
-				subtitle s( start, end, subs );
+				QStringList sl = QStringList::split( "|", Text );
+				QStringList::Iterator it = sl.begin();
+				for ( ; it != sl.end(); it++ )
+				{
+					subs.push_back( Subline( *it, Subline::Normal ) );
+				}
+				Subtitle s( start, end, subs );
 				vs.push_back( s );
 			}
 		}
@@ -1100,13 +1239,13 @@ void WndSub::loadMicrodvd(QString fname, std::vector<subtitle> &vs)
     }
 }
 
-void WndSub::loadSubrip(QString fname, std::vector<subtitle> &vs)
+void WndSub::loadSubrip(QString fname, std::vector<Subtitle> &vs)
 {
 	QString Start;
 	QString End;
 	QTime ts;
 	QTime te;
-	QStringList subs;
+	std::vector<Subline> subs;
 
     QFile file( fname );
 
@@ -1140,9 +1279,14 @@ void WndSub::loadSubrip(QString fname, std::vector<subtitle> &vs)
 					if ( line.isEmpty() )
 						break;
 					/* text */
-					subs = QStringList::split( "[br]", line );
+					QStringList sl = QStringList::split( "[br]", line );
+					QStringList::Iterator it = sl.begin();
+					for ( ; it != sl.end(); it++ )
+					{
+						subs.push_back( Subline( *it, Subline::Normal ));
+					}
 				}
-				subtitle s( ts, te, subs );
+				Subtitle s( ts, te, subs );
 				vs.push_back( s );
 			}
 		}
@@ -1150,7 +1294,7 @@ void WndSub::loadSubrip(QString fname, std::vector<subtitle> &vs)
     }
 }
 
-void WndSub::loadSpumux(QString fname, std::vector<subtitle> &vs)
+void WndSub::loadSpumux(QString fname, std::vector<Subtitle> &vs)
 {
 	QString Start;
 	QString End;
@@ -1159,7 +1303,7 @@ void WndSub::loadSpumux(QString fname, std::vector<subtitle> &vs)
 	QString Chaine;
 	QTime ts;
 	QTime te;
-	QStringList subs;
+	std::vector<Subline> subs;
 
     QFile file( fname );
 
@@ -1217,7 +1361,7 @@ void WndSub::loadSpumux(QString fname, std::vector<subtitle> &vs)
 						}
 					}
 				}
-				subtitle s( ts, te, subs );
+				Subtitle s( ts, te, subs );
 				vs.push_back( s );
 			}
 		}
@@ -1236,7 +1380,7 @@ void WndSub::genPngForSpumux()
 	QString End;
 	QTime ts;
 	QTime te;
-	std::vector<subtitle>::iterator it;
+	std::vector<Subtitle>::iterator it;
 
 	QString xmlname;
 	QString name;
@@ -1260,14 +1404,14 @@ void WndSub::genPngForSpumux()
 		int ctr = 0;
 		for ( it = subvec.begin(); it != subvec.end(); it++ )
 		{
-			ts = it->begin;
-			te = it->end;
+			ts = it->getBegin();
+			te = it->getEnd();
 			stream << "    <spu";
 			stream << " start=\"" << ts.toString( SPU_TIME_FMT ) << "\"";;
 			stream << " end=\"" << te.toString( SPU_TIME_FMT ) << "\"";;
 
 			int maxw = 0, maxh = 0, interligne = 10;
-			QStringList::iterator its;
+			std::vector<Subline>::iterator its;
 			QFontMetrics fm( gw->pbNormalFont->font() );
 			QRect r;
 			// computing metrics
@@ -1304,30 +1448,22 @@ void WndSub::genPngForSpumux()
 			{
 				flags |= AlignBottom;
 			}
-			for ( its = it->subs.begin(); its != it->subs.end(); its++ )
+			for ( its = it->getSubs().begin(); its != it->getSubs().end(); its++ )
 			{
-				if ( ( (*its).contains( "<i>" ) )
-					|| ( (*its).contains( "</i>" ) ) )
+				if ( its->getFmt() == Subline::Italic )
 				{
-					// we assume that the whole sub is italic...it's lot simpler
 					fm = QFontMetrics( gw->pbItalicFont->font() );
-					QString s = QDeepCopy<QString>( *its );
-					s.remove( "<i>" ).remove( "</i>" );
-					r = fm.boundingRect( x0, y0, l0, h0, flags, s, -1 );
+					r = fm.boundingRect( x0, y0, l0, h0, flags, its->getLine(), -1 );
 				}
-				else if ( ( (*its).contains( "<b>" ) )
-					|| ( (*its).contains( "</b>" ) ) )
+				else if ( its->getFmt() == Subline::Bold )
 				{
-					// we assume that the whole sub is bold...it's lot simpler
 					fm = QFontMetrics( gw->pbBoldFont->font() );
-					QString s = QDeepCopy<QString>( *its );
-					s.remove( "<b>" ).remove( "</b>" );
-					r = fm.boundingRect( x0, y0, l0, h0, flags, s, -1 );
+					r = fm.boundingRect( x0, y0, l0, h0, flags, its->getLine(), -1 );
 				}
 				else
 				{
 					fm = QFontMetrics( gw->pbNormalFont->font() );
-					r = fm.boundingRect( x0, y0, l0, h0, flags, *its, -1 );
+					r = fm.boundingRect( x0, y0, l0, h0, flags, (*its).getLine(), -1 );
 				}
 				if ( r.width() > maxw ) maxw = r.width();
 				maxh += r.height() + fm.leading() + fm.descent();
@@ -1337,7 +1473,7 @@ void WndSub::genPngForSpumux()
 			if ( maxw > dispow )
 			{
 				maxw = dispow;
-				QMessageBox::information( this, "submgmt", "Subtitle " + *its + " is too wide" );
+				QMessageBox::information( this, "submgmt", "Subtitle " + (*its).getLine() + " is too wide" );
 			}
 			if ( gw->rbPAL->isChecked() )
 			{
@@ -1350,7 +1486,7 @@ void WndSub::genPngForSpumux()
 			if ( maxh > dispoh )
 			{
 				maxh = dispoh;
-				QMessageBox::information( this, "submgmt", "Subtitle " + *its + " is too high" );
+				QMessageBox::information( this, "submgmt", "Subtitle " + (*its).getLine() + " is too high" );
 			}
 
 			// drawing the text
@@ -1372,30 +1508,25 @@ void WndSub::genPngForSpumux()
 			textcol.getRgb( &rc, &gc, &bc );
 			QRgb textrgb = qRgba( rc, gc, bc, 255 );	// opaque pixel
 			int x = 0, y = 0;
-			for ( its = it->subs.begin(); its != it->subs.end(); its++ )
+			for ( its = it->getSubs().begin(); its != it->getSubs().end(); its++ )
 			{
-				s = QDeepCopy<QString>( *its );
-				if ( ( (*its).contains( "<i>" ) )
-					|| ( (*its).contains( "</i>" ) ) )
+				if ( its->getFmt() == Subline::Italic )
 				{
 					fm = QFontMetrics( gw->pbItalicFont->font() );
 					p.setFont( gw->pbItalicFont->font() );
-					s.remove( "<i>" ).remove( "</i>" );
-					r = fm.boundingRect( x0, y0, l0, h0, flags, s, -1 );
+					r = fm.boundingRect( x0, y0, l0, h0, flags, its->getLine(), -1 );
 				}
-				else if ( ( (*its).contains( "<b>" ) )
-					|| ( (*its).contains( "</b>" ) ) )
+				else if ( its->getFmt() == Subline::Bold )
 				{
 					fm = QFontMetrics( gw->pbBoldFont->font() );
 					p.setFont( gw->pbBoldFont->font() );
-					s.remove( "<b>" ).remove( "</b>" );
-					r = fm.boundingRect( x0, y0, l0, h0, flags, s, -1 );
+					r = fm.boundingRect( x0, y0, l0, h0, flags, its->getLine(), -1 );
 				}
 				else
 				{
 					fm = QFontMetrics( gw->pbNormalFont->font() );
 					p.setFont( gw->pbNormalFont->font() );
-					r = fm.boundingRect( x0, y0, l0, h0, flags, *its, -1 );
+					r = fm.boundingRect( x0, y0, l0, h0, flags, (*its).getLine(), -1 );
 				}
 				switch ( gw->cbHoriz->currentItem() )
 				{
