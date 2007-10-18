@@ -5,8 +5,8 @@
 class SubListBoxItem : public QListBoxItem
 {
 public :
-	SubListBoxItem(Subtitle *, QListBox * );
-	Subtitle *getSubtitle();
+	SubListBoxItem(Subtitle &, QListBox * );
+	Subtitle &getSubtitle();
 protected:
 	void paint(QPainter *);
 	int height ( const QListBox * ) const;

@@ -9,24 +9,29 @@
 
 #include "sublistboxitem.h"
 
-SubListBoxItem::SubListBoxItem( Subtitle *s, QListBox * listbox ) :QListBoxItem(listbox)
+SubListBoxItem::SubListBoxItem( Subtitle &s, QListBox * listbox ) :QListBoxItem(listbox)
 {
-	_subtitle = s;
+	_subtitle = &s;
 }
 
-Subtitle *SubListBoxItem::getSubtitle()
+Subtitle &SubListBoxItem::getSubtitle()
 {
-	return _subtitle;
+	return *_subtitle;
 }
 
 void SubListBoxItem::paint(QPainter *p)
 {
 	QFontMetrics fm = p->fontMetrics();
 	int begin =  fm.ascent();
+	if ( _subtitle->getProblem() )
+	{
+		p->setPen( Qt::red );
+	}
 	p->drawText( 3, begin, _subtitle->getTiming() );
 	
-	const std::vector<Subline> v = _subtitle->getSubs();
+	std::vector<Subline> v = _subtitle->getSubs();
 	std::vector<Subline>::const_iterator it;
+	QFont f0 = p->font();
 	for ( it = v.begin(); it != v.end(); it++ )
 	{
 		begin += fm.lineSpacing();
@@ -44,6 +49,7 @@ void SubListBoxItem::paint(QPainter *p)
 			p->setFont( f );
 		}
 		p->drawText( 3, begin, it->getLine() );
+		p->setFont( f0 );
 	}
 }
 

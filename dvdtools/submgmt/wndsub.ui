@@ -1008,14 +1008,14 @@
     <forward>class Subtitle;</forward>
 </forwards>
 <variables>
-    <variable>std::vector&lt;Subtitle&gt; v_subs;</variable>
     <variable access="public">std::vector&lt;Subtitle&gt; subvec;</variable>
+    <variable>std::vector&lt;Subtitle&gt; v_subs;</variable>
 </variables>
 <slots>
     <slot>filenameChanged()</slot>
-    <slot>edit()</slot>
     <slot>init()</slot>
-    <slot>rightClick( QListBoxItem * item, const QPoint &amp; )</slot>
+    <slot>edit()</slot>
+    <slot>rightClick( QListBoxItem * item, const QPoint &amp; p )</slot>
     <slot>clickedSave()</slot>
     <slot>clicSelectInputFile()</slot>
     <slot>clicSelectSubstFile()</slot>
@@ -1026,11 +1026,12 @@
     <slot>checkShift()</slot>
     <slot>checkShiftPos()</slot>
     <slot>checkAuto()</slot>
-    <slot>timeBasedProceed( Subtitle &amp; s )</slot>
-    <slot>frameBasedProceed( Subtitle &amp; s )</slot>
+    <slot>timeBasedProceed( Subtitle s )</slot>
+    <slot>frameBasedProceed( Subtitle s )</slot>
     <slot>clicProceed()</slot>
     <slot>loadSubFile( QString fname, std::vector&lt;Subtitle&gt; &amp; vs )</slot>
     <slot>saveSami()</slot>
+    <slot>saveSsa()</slot>
     <slot>loadSsa( QString fname, std::vector&lt;Subtitle&gt; &amp; vs )</slot>
     <slot>loadSami( QString fname, std::vector&lt;Subtitle&gt; &amp; vs )</slot>
     <slot>loadSubviewer( QString fname, std::vector&lt;Subtitle&gt; &amp; vs )</slot>
@@ -1038,6 +1039,7 @@
     <slot>loadSubrip( QString fname, std::vector&lt;Subtitle&gt; &amp; vs )</slot>
     <slot>loadSpumux( QString fname, std::vector&lt;Subtitle&gt; &amp; vs )</slot>
     <slot>genPngForSpumux()</slot>
+    <slot>dump()</slot>
 </slots>
 <functions>
     <function>autoDetectFormat()</function>
@@ -1047,6 +1049,7 @@
     <function>saveSubrip()</function>
     <function access="protected">saveSubviewer()</function>
     <function access="protected">saveSpumux()</function>
+    <function returnType="bool">hasFormat()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

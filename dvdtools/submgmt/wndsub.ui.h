@@ -43,6 +43,7 @@ QRegExp subrip9 = QRegExp( "\\[[0-9]+:[0-9]+:[0-9]+]" );
 QRegExp spumux = QRegExp( "<spu " );
 
 SubListBoxItem *curItem = 0;
+std::vector<QString> vHeader;
 
 void WndSub::filenameChanged()
 {
@@ -128,6 +129,7 @@ void WndSub::edit( )
 		EditSub *es = new EditSub( 0, "edit" );
 		es->setSub( curItem );
 		es->exec();
+		showInputSubs();
 	}
 }
 
@@ -157,6 +159,9 @@ void WndSub::clickedSave()
 		break;
 	case 5 : 	/* sami */
 		saveSami();
+		break;
+	case 11 : 	/* ssa */
+		saveSsa();
 		break;
 	case 17 : 	/* spumux */
 		saveSpumux();
@@ -348,15 +353,13 @@ QTime operator /( const QTime &t1, const QTime &t2 )
 }
 */
 
-void WndSub::timeBasedProceed( Subtitle &s )
+void WndSub::timeBasedProceed( Subtitle s )
 {
 	static int passage;
 	QTime length, lengths;
 	QString str;
-	std::vector<Subline> subs;
 	QTime ts = s.getBegin();
 	QTime te = s.getEnd();
-	subs = s.getSubs();
 
 	if ( cbShift->isChecked() )
 	{
@@ -432,14 +435,12 @@ void WndSub::timeBasedProceed( Subtitle &s )
 	}
 }
 
-void WndSub::frameBasedProceed( Subtitle &s )
+void WndSub::frameBasedProceed( Subtitle s )
 {
 	QString str;
 	int length, lengths;
-	std::vector<Subline> subs;
 	int fs = s.getFbegin();
 	int fe = s.getFend();
-	subs = s.getSubs();
 	int fFirstSub;
 	int fFirstSpeak;
 	int fLastSub;
@@ -531,8 +532,8 @@ void WndSub::clicProceed()
 			int ctr;
 			for ( ctr = 0, it = subvec.begin(); it != subvec.end(); it++ )
 			{
-				Subtitle &origSub = (*it);
-				Subtitle &newSub = vsubst[ ctr++ ];
+				Subtitle origSub = *it;
+				Subtitle newSub = vsubst[ ctr++ ];
 				origSub.setSubs( newSub.getSubs() );
 			}
 		}
@@ -664,7 +665,6 @@ void WndSub::showOutputSubs()
 	std::vector<Subtitle>::iterator it;
 	QTime ts;
 	QTime te;
-	std::vector<Subline> subs;
 	QString str;
 
 	lbOutputSubs->clear();
@@ -680,7 +680,7 @@ void WndSub::showOutputSubs()
 			te = it->getEnd();
 			str = ts.toString( TIME_FMT ) + " to " + te.toString( TIME_FMT );
 		}
-		new SubListBoxItem( &(*it), lbOutputSubs );
+		new SubListBoxItem( *it, lbOutputSubs );
 	}
 	tlOutputSubs->show();
 	lbOutputSubs->show();
@@ -692,7 +692,6 @@ void WndSub::showInputSubs()
 	QTime ts;
 	QTime te;
 	QTime prevte( 0, 0, 0, 0 );
-	std::vector<Subline> subs;
 	QString str;
 	int numero = 0, prevfe = 999999;
 
@@ -704,10 +703,12 @@ void WndSub::showInputSubs()
 			if ( it->getFbegin() > it->getFend() )
 			{
 				std::cout << "Sub no " << numero << " frame debut (" << it->getFbegin() << ") > frame fin (" << it->getFend() << ")" << std::endl;
+				it->setProblem( true );
 			}
 			else if ( it->getFbegin() < prevfe )
 			{
 				std::cout << "Sub no " << numero << " frame debut (" << it->getFbegin() << ") < frame fin precedente (" << prevfe << ")" << std::endl;
+				it->setProblem( true );
 			}
 			str.sprintf( "Frame %d to %d", it->getFbegin(), it->getFend() );
 			prevfe = it->getFend();
@@ -716,18 +717,26 @@ void WndSub::showInputSubs()
 		{
 			if ( it->getBegin() > it->getEnd() )
 			{
-				//TODO std::cout << "Sub no " << numero << ": " << it->begin.toString( TIME_FMT ) << " > " << it->end.toString( TIME_FMT ) << std::endl;
+				QString s1, s2;
+				s1 = it->getBegin().toString( TIME_FMT );
+				s2 = it->getEnd().toString( TIME_FMT );
+				std::cout << "Sub no " << numero << ": " << s1.ascii() << " > " << s2.ascii() << std::endl;
+				it->setProblem( true );
 			}
 			else if ( it->getBegin() < prevte )
 			{
-				//TODO std::cout << "Sub no " << numero << ": " << it->begin.toString( TIME_FMT ) << " < " << prevte.toString( TIME_FMT ) << std::endl;
+				QString s1, s2;
+				s1 = it->getBegin().toString( TIME_FMT );
+				s2 = prevte.toString( TIME_FMT );
+				std::cout << "Sub no " << numero << ": " << s1.ascii() << " < " << s2.ascii() << std::endl;
+				it->setProblem( true );
 			}
 			ts = it->getBegin();
 			te = it->getEnd();
 			str = ts.toString( TIME_FMT ) + " to " + te.toString( TIME_FMT );
 			prevte = it->getEnd();
 		}
-		new SubListBoxItem( &(*it), lbInputSubs );
+		new SubListBoxItem( *it, lbInputSubs );
 		numero++;
 	}
 	tlInputSubs->show();
@@ -736,6 +745,18 @@ void WndSub::showInputSubs()
 
 void WndSub::saveMicrodvd()
 {
+	if ( hasFormat() )
+	{
+		if ( QMessageBox::question( this, "Format",
+				"Advanced formats (bold, italics, ...) cannot be saved in this"
+				" kind of file. Do you wish to continue anyway ?",
+				QMessageBox::Yes,
+				QMessageBox::No ) 
+				== QMessageBox::No )
+		{
+			return;
+		}
+	}
 	std::vector<Subtitle>::iterator it;
 
     QFile file( leOutputFile->text() );
@@ -753,13 +774,14 @@ void WndSub::saveMicrodvd()
 		QTextCodec *codec = QTextCodec::codecForName(cbOutputEncoding->currentText());
 		for ( it = subvec.begin(); it != subvec.end(); it++ )
 		{
-			stream << "{" << it->getFbegin() << "}{" << it->getFend() << "}";
+			Subtitle st = *it;
+			stream << "{" << st.getFbegin() << "}{" << st.getFend() << "}";
 
 			std::vector<Subline>::iterator its;
-			for ( its = it->getSubs().begin(); its != it->getSubs().end(); its++ )
+			for ( its = st.getSubs().begin(); its != st.getSubs().end(); its++ )
 			{
-				if ( its != it->getSubs().begin() ) stream << "|";
-					stream << *its;
+				if ( its != st.getSubs().begin() ) stream << "|";
+					stream << its->getLine();
 			}
 			stream << endl;
 		}
@@ -768,6 +790,18 @@ void WndSub::saveMicrodvd()
 
 void WndSub::saveSubrip()
 {
+	if ( hasFormat() )
+	{
+		if ( QMessageBox::question( this, "Format",
+				"Advanced formats (bold, italics, ...) cannot be saved in this"
+				" kind of file. Do you wish to continue anyway ?",
+				QMessageBox::Yes,
+				QMessageBox::No ) 
+				== QMessageBox::No )
+		{
+			return;
+		}
+	}
 	QString Start;
 	QString End;
 	QTime ts;
@@ -798,7 +832,7 @@ void WndSub::saveSubrip()
 			for ( its = it->getSubs().begin(); its != it->getSubs().end(); its++ )
 			{
 				if ( its != it->getSubs().begin() ) stream << "[br]";
-				stream << *its;
+				stream << its->getLine();
 			}
 			stream << endl << endl;
 		}
@@ -811,6 +845,18 @@ void WndSub::saveSubrip()
 
 void WndSub::saveSami()
 {
+	if ( hasFormat() )
+	{
+		if ( QMessageBox::question( this, "Format",
+				"Advanced formats (bold, italics, ...) cannot be saved in this"
+				" kind of file. Do you wish to continue anyway ?",
+				QMessageBox::Yes,
+				QMessageBox::No ) 
+				== QMessageBox::No )
+		{
+			return;
+		}
+	}
 	QString Start;
 	QString End;
 	QTime ts;
@@ -853,7 +899,7 @@ void WndSub::saveSami()
 			its++;
 			for ( ; its != it->getSubs().end(); its++ )
 			{
-				stream << "<br>" << *its;
+				stream << "<br>" << its->getLine();
 			}
 			stream << endl;
 			stream << "<SYNC START=" << milli( te ) << ">" << endl;
@@ -897,10 +943,47 @@ void WndSub::saveSubviewer()
 			stream << numero << endl;
 			stream << ts.toString( TIME_FMT ) << " --> " << te.toString( TIME_FMT ) << endl;
 
-			std::vector<Subline>::iterator its;
+			std::vector<Subline>::const_iterator its;
 			for ( its = it->getSubs().begin(); its != it->getSubs().end(); its++ )
 			{
-				stream << *its << endl;
+				Subline l = *its;
+				if ( l.getFmt( ) == Subline::Bold )
+				{
+					stream << "<b>";
+				}
+				if ( l.getFmt( ) == Subline::Italic )
+				{
+					stream << "<i>";
+				}
+				if ( l.getFmt( ) == Subline::Underline )
+				{
+					stream << "<u>";
+				}
+				if ( l.getFmt( ) == Subline::Stroke )
+				{
+					stream << "<s>";		// what is the tag for stroke ?
+				}
+				if ( l.getLine() )
+				{
+					stream << l.getLine();
+				}
+				if ( l.getFmt( ) == Subline::Stroke )
+				{
+					stream << "</s>";		// what is the tag for stroke ?
+				}
+				if ( l.getFmt( ) == Subline::Underline )
+				{
+					stream << "</u>";
+				}
+				if ( l.getFmt( ) == Subline::Italic )
+				{
+					stream << "</i>";
+				}
+				if ( l.getFmt( ) == Subline::Bold )
+				{
+					stream << "</b>";
+				}
+				stream << endl;
 			}
 			stream << endl;
 			numero++;
@@ -914,6 +997,19 @@ void WndSub::saveSubviewer()
 
 void WndSub::saveSpumux()
 {
+	if ( hasFormat() )
+	{
+		if ( QMessageBox::question( this, "Format",
+				"Advanced formats (bold, italics, ...) cannot be saved in this"
+				" kind of file.\nYou should consider the generate png option"
+				"to preserve the format. Do you wish to continue anyway ?",
+				QMessageBox::Yes,
+				QMessageBox::No ) 
+				== QMessageBox::No )
+		{
+			return;
+		}
+	}
 	QString Start;
 	QString End;
 	QTime ts;
@@ -948,7 +1044,7 @@ void WndSub::saveSpumux()
 			for ( its = it->getSubs().begin(); its != it->getSubs().end(); its++ )
 			{
 				if ( its != it->getSubs().begin() ) stream << endl;
-				stream << " image=\"" << *its << "\"";
+				stream << " image=\"" << its->getLine() << "\"";
 			}
 			stream << " />" << endl;
 		}
@@ -958,6 +1054,92 @@ void WndSub::saveSpumux()
 	else
 	{
 		QMessageBox::information( this, "submgmt", "Erreur ecriture fichier");
+	}
+}
+
+void WndSub::saveSsa()
+{
+	QTime ts;
+	QTime te;
+    QFile file( leOutputFile->text() );
+
+    if ( file.open( IO_WriteOnly | IO_Truncate ) )
+	{
+        QTextStream stream( &file );
+		if ( cbOutputEncoding->currentText() == "ISO 8859-1" )
+		{
+			stream.setEncoding( QTextStream::Latin1 );
+		}
+		else
+		{
+			stream.setEncoding( QTextStream::UnicodeUTF8 );
+		}
+		QTextCodec *codec = QTextCodec::codecForName(cbOutputEncoding->currentText());
+		if ( vHeader.size() > 0 )
+		{
+			std::vector<QString>::iterator sit;
+			for ( sit = vHeader.begin(); sit != vHeader.end(); sit++ )
+			{
+				stream << *sit << endl;
+			}
+		}
+		else
+		{
+			stream << "[Script Info]" << endl;
+			stream << "; Script generated by submgmt v0.4 " << endl;
+			stream << "Title: Default submgmt header" << endl;
+			stream << "ScriptType: v4.00+" << endl;
+			stream << "PlayResX: 0" << endl;
+			stream << "PlayResY: 0" << endl;
+			stream << "WrapStyle: 0" << endl;
+			stream << "Last Style Storage: Default" << endl;
+			stream << "Video File: none" << endl;
+			stream << "Video Aspect Ratio: 0" << endl;
+			stream << "Video Zoom: 8" << endl;
+			stream << "Video Position: 178218" << endl;
+			stream << "" << endl;
+			stream << "[V4+ Styles]" << endl;
+			stream << "Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding" << endl;
+			stream << "Style: Default,Trebuchet MS,22,&H00888714,&H0000FFFF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1" << endl;
+			stream << "" << endl;
+			stream << "[Events]" << endl;
+		}
+		stream << "Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text" << endl;
+		std::vector<Subtitle>::iterator it;
+		for ( it = subvec.begin(); it != subvec.end(); it++ )
+		{
+			ts = it->getBegin();
+			te = it->getEnd();
+
+			stream << "Dialogue: 0";
+			stream << ts.toString( SPU_TIME_FMT).ascii();
+			stream << ",";
+			stream << te.toString( SPU_TIME_FMT).ascii();
+			stream << ",Default,,0000,0000,0000,,";
+			std::vector<Subline>::iterator its;
+			for ( its = it->getSubs().begin(); its != it->getSubs().end(); its++ )
+			{
+				if ( its->getFmt() == Subline::Bold )
+				{
+					stream << "{\\b1}";
+				}
+				if ( its->getFmt() == Subline::Italic )
+				{
+					stream << "{\\i1}";
+				}
+				// what are the other tags ?
+				stream << its->getLine();
+				if ( its->getFmt() == Subline::Bold )
+				{
+					stream << "{\\b0}";
+				}
+				if ( its->getFmt() == Subline::Italic )
+				{
+					stream << "{\\i0}";
+				}
+			}
+			stream << endl;
+		}
 	}
 }
 
@@ -976,7 +1158,7 @@ void WndSub::loadSsa(QString fname, std::vector<Subtitle> &vs)
 
     if ( file.open( IO_ReadOnly ) )
 	{
-		vs.clear();
+		subvec.clear();
         QTextStream stream( &file );
 		if ( cbInputEncoding->currentText() == "ISO 8859-1" )
 		{
@@ -988,13 +1170,17 @@ void WndSub::loadSsa(QString fname, std::vector<Subtitle> &vs)
 		}
 		QTextCodec *codec = QTextCodec::codecForName(cbInputEncoding->currentText());
         QString line;
+		vHeader.clear();
         while ( !stream.atEnd() )
 		{
             line = codec->toUnicode( stream.readLine()); // line of text excluding '\n'
-			//std::cout << "lu=" << line.ascii() << std::endl;
-			if ( line.contains( dial ) )
+			if ( line.contains( QRegExp( "^Format:" ) ) )
 			{
 /* Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text */
+				// do nothing for we have our own format when we save the file
+			}
+			else if ( line.contains( dial ) )
+			{
 /* Dialogue: 0,0:00:41.80,0:00:43.19,Default,,0000,0000,0000,,{\i1} I am sending you the code. {\i0} */
 				Start = line.section( ':', 1 ).section( ',', 1, 1 );
 				hh = Start.section( ":", 0, 0 ).toInt();
@@ -1037,16 +1223,17 @@ void WndSub::loadSsa(QString fname, std::vector<Subtitle> &vs)
 				QStringList::Iterator i;
 				for ( i = l.begin(); i != l.end(); i++ )
 				{
-					subs.push_back( Subline( *i, style ) );
+					QString *newS = &QString( *i );
+					Subline *sul = new Subline( *newS, style );
+					subs.push_back( *sul );
 				}
 				
-				//std::cout << std::endl;
-				Subtitle s( ts, te, subs );
-				vs.push_back( s );
+				Subtitle *sut = new Subtitle( ts, te, subs );
+				subvec.push_back( *sut );
 			}
 			else
 			{
-			// TODO : add to the header ?
+				vHeader.push_back( line );
 			}
 		}
         file.close();
@@ -1100,7 +1287,7 @@ void WndSub::loadSami(QString fname, std::vector<Subtitle> &vs)
 				for ( i = l.begin(); i != l.end(); i++ )
 				{
 					//std::cout << *i << std::endl;
-					subs.push_back( *i );
+					subs.push_back( Subline( *i ) );
 				}
 				
 				// get end
@@ -1229,7 +1416,7 @@ void WndSub::loadMicrodvd(QString fname, std::vector<Subtitle> &vs)
 				QStringList::Iterator it = sl.begin();
 				for ( ; it != sl.end(); it++ )
 				{
-					subs.push_back( Subline( *it, Subline::Normal ) );
+					subs.push_back( Subline( *it ) );
 				}
 				Subtitle s( start, end, subs );
 				vs.push_back( s );
@@ -1283,7 +1470,7 @@ void WndSub::loadSubrip(QString fname, std::vector<Subtitle> &vs)
 					QStringList::Iterator it = sl.begin();
 					for ( ; it != sl.end(); it++ )
 					{
-						subs.push_back( Subline( *it, Subline::Normal ));
+						subs.push_back( Subline( *it ));
 					}
 				}
 				Subtitle s( ts, te, subs );
@@ -1336,28 +1523,28 @@ void WndSub::loadSpumux(QString fname, std::vector<Subtitle> &vs)
 				if ( Reste.contains( "</spu>" ) )
 				{
 					Chaine = Debut + Reste.section( "</spu>", 0, 0 );
-					subs.push_back( Chaine );
+					subs.push_back( Subline( Chaine ) );
 				}
 				else if ( Reste.contains( "/>" ) )
 				{
 					Chaine = Debut + Reste.section( "/>", 0, 0 );
-					subs.push_back( Chaine );
+					subs.push_back( Subline( Chaine ) );
 				}
 				else
 				{
-					subs.push_back( Reste );
+					subs.push_back( Subline( Reste ) );
 					while ( !stream.atEnd() )
 					{
 						line = codec->toUnicode( stream.readLine() );
 						if ( line.contains( "</spu>") )
 						{
 							QString text = line.section( "</spu>", 0, 0 );
-							subs.push_back( text );
+							subs.push_back( Subline( text ) );
 							break;
 						}
 						else
 						{
-							subs.push_back( line );
+							subs.push_back( Subline( line ) );
 						}
 					}
 				}
@@ -1463,7 +1650,7 @@ void WndSub::genPngForSpumux()
 				else
 				{
 					fm = QFontMetrics( gw->pbNormalFont->font() );
-					r = fm.boundingRect( x0, y0, l0, h0, flags, (*its).getLine(), -1 );
+					r = fm.boundingRect( x0, y0, l0, h0, flags, its->getLine(), -1 );
 				}
 				if ( r.width() > maxw ) maxw = r.width();
 				maxh += r.height() + fm.leading() + fm.descent();
@@ -1473,7 +1660,7 @@ void WndSub::genPngForSpumux()
 			if ( maxw > dispow )
 			{
 				maxw = dispow;
-				QMessageBox::information( this, "submgmt", "Subtitle " + (*its).getLine() + " is too wide" );
+				QMessageBox::information( this, "submgmt", "Subtitle " + its->getLine() + " is too wide" );
 			}
 			if ( gw->rbPAL->isChecked() )
 			{
@@ -1486,7 +1673,7 @@ void WndSub::genPngForSpumux()
 			if ( maxh > dispoh )
 			{
 				maxh = dispoh;
-				QMessageBox::information( this, "submgmt", "Subtitle " + (*its).getLine() + " is too high" );
+				QMessageBox::information( this, "submgmt", "Subtitle " + its->getLine() + " is too high" );
 			}
 
 			// drawing the text
@@ -1526,7 +1713,7 @@ void WndSub::genPngForSpumux()
 				{
 					fm = QFontMetrics( gw->pbNormalFont->font() );
 					p.setFont( gw->pbNormalFont->font() );
-					r = fm.boundingRect( x0, y0, l0, h0, flags, (*its).getLine(), -1 );
+					r = fm.boundingRect( x0, y0, l0, h0, flags, its->getLine(), -1 );
 				}
 				switch ( gw->cbHoriz->currentItem() )
 				{
@@ -1616,4 +1803,38 @@ void WndSub::genPngForSpumux()
 	}
 	delete gw;
 	setCursor( Qt::ArrowCursor );
+}
+
+bool WndSub::hasFormat()
+{
+	std::vector<Subtitle>::iterator it;
+	for ( it = subvec.begin(); it != subvec.end(); it++ )
+	{
+		std::vector<Subline>::iterator its;
+		for ( its = it->getSubs().begin(); its != it->getSubs().end(); its++ )
+		{
+			if ( its->getFmt() != Subline::Normal )
+				return true;
+		}
+	}
+	return false;
+}
+
+void WndSub::dump()
+{
+	static int passage;
+
+	std::cout << passage++ << " passage" << std::endl;
+	std::vector<Subtitle>::iterator it;
+	std::vector<Subline>::const_iterator its;
+
+	for ( it = subvec.begin(); it != subvec.end(); it++ )
+	{
+		for ( its = it->getSubs().begin(); its != it->getSubs().end(); its++ )
+		{
+			QString s = its->getLine();
+			std::cout << "s=" << &s << std::endl;
+			std::cout << s.ascii() << std::endl;
+		}
+	}
 }

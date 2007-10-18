@@ -4,12 +4,15 @@
     <property name="name">
         <cstring>EditSub</cstring>
     </property>
+    <property name="enabled">
+        <bool>true</bool>
+    </property>
     <property name="geometry">
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>391</width>
-            <height>243</height>
+            <width>396</width>
+            <height>317</height>
         </rect>
     </property>
     <property name="caption">
@@ -38,12 +41,15 @@
                         <string>&amp;Start</string>
                     </property>
                     <property name="buddy" stdset="0">
-                        <cstring>timeEdit1</cstring>
+                        <cstring>teStart</cstring>
                     </property>
                 </widget>
                 <widget class="QTimeEdit">
                     <property name="name">
                         <cstring>teStart</cstring>
+                    </property>
+                    <property name="display">
+                        <set>Seconds|Minutes|Hours</set>
                     </property>
                 </widget>
                 <widget class="QLabel">
@@ -54,7 +60,7 @@
                         <string>S&amp;top</string>
                     </property>
                     <property name="buddy" stdset="0">
-                        <cstring>timeEdit1_2</cstring>
+                        <cstring>teStop</cstring>
                     </property>
                 </widget>
                 <widget class="QTimeEdit">
@@ -109,19 +115,207 @@
                 </widget>
             </hbox>
         </widget>
-        <widget class="QTextEdit">
-            <property name="name">
-                <cstring>teSubs</cstring>
-            </property>
-        </widget>
         <widget class="QLayoutWidget">
             <property name="name">
-                <cstring>layout2</cstring>
+                <cstring>layout26</cstring>
             </property>
             <hbox>
                 <property name="name">
                     <cstring>unnamed</cstring>
                 </property>
+                <widget class="QTable">
+                    <column>
+                        <property name="text">
+                            <string>Lines</string>
+                        </property>
+                        <property name="pixmap">
+                            <pixmap></pixmap>
+                        </property>
+                    </column>
+                    <property name="name">
+                        <cstring>tabLines</cstring>
+                    </property>
+                    <property name="numRows">
+                        <number>0</number>
+                    </property>
+                    <property name="numCols">
+                        <number>1</number>
+                    </property>
+                </widget>
+                <widget class="QLayoutWidget">
+                    <property name="name">
+                        <cstring>layout11</cstring>
+                    </property>
+                    <vbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>pbBold</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>1</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="maximumSize">
+                                <size>
+                                    <width>40</width>
+                                    <height>32767</height>
+                                </size>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <bold>1</bold>
+                                </font>
+                            </property>
+                            <property name="text">
+                                <string>B</string>
+                            </property>
+                            <property name="accel">
+                                <string>Ctrl+H</string>
+                            </property>
+                            <property name="toggleButton">
+                                <bool>false</bool>
+                            </property>
+                        </widget>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>pbItalic</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>0</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="maximumSize">
+                                <size>
+                                    <width>40</width>
+                                    <height>32767</height>
+                                </size>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <italic>1</italic>
+                                </font>
+                            </property>
+                            <property name="text">
+                                <string>I</string>
+                            </property>
+                            <property name="accel">
+                                <string>Ctrl+H</string>
+                            </property>
+                            <property name="toggleButton">
+                                <bool>false</bool>
+                            </property>
+                        </widget>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>pbUnderline</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>0</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="maximumSize">
+                                <size>
+                                    <width>40</width>
+                                    <height>32767</height>
+                                </size>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <underline>1</underline>
+                                </font>
+                            </property>
+                            <property name="text">
+                                <string>U</string>
+                            </property>
+                            <property name="accel">
+                                <string>Ctrl+H</string>
+                            </property>
+                            <property name="toggleButton">
+                                <bool>false</bool>
+                            </property>
+                        </widget>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>pbStrikeout</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>1</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="maximumSize">
+                                <size>
+                                    <width>40</width>
+                                    <height>32767</height>
+                                </size>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <strikeout>1</strikeout>
+                                </font>
+                            </property>
+                            <property name="text">
+                                <string>S</string>
+                            </property>
+                            <property name="accel">
+                                <string></string>
+                            </property>
+                            <property name="toggleButton">
+                                <bool>false</bool>
+                            </property>
+                        </widget>
+                    </vbox>
+                </widget>
+            </hbox>
+        </widget>
+        <widget class="QLayoutWidget">
+            <property name="name">
+                <cstring>layout10</cstring>
+            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>pbInsertLine</cstring>
+                    </property>
+                    <property name="text">
+                        <string>&amp;Insert line</string>
+                    </property>
+                    <property name="accel">
+                        <string>Alt+I</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>pbDeleteLine</cstring>
+                    </property>
+                    <property name="text">
+                        <string>&amp;Delete line</string>
+                    </property>
+                    <property name="accel">
+                        <string>Alt+D</string>
+                    </property>
+                </widget>
                 <spacer>
                     <property name="name">
                         <cstring>spacer1</cstring>
@@ -173,6 +367,19 @@
     <include location="global" impldecl="in declaration">qlistbox.h</include>
     <include location="local" impldecl="in implementation">editsub.ui.h</include>
 </includes>
+<variables>
+    <variable access="public">Subtitle *subtitle;</variable>
+</variables>
+<slots>
+    <slot access="">deleteLineClicked()</slot>
+    <slot>insertLineClicked()</slot>
+    <slot>boldClicked()</slot>
+    <slot>italicClicked()</slot>
+    <slot>underlineClicked()</slot>
+    <slot>strikeoutClicked()</slot>
+    <slot>valid()</slot>
+    <slot>setup()</slot>
+</slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>
     <function>setSub( SubListBoxItem * item )</function>
