@@ -98,6 +98,10 @@ void WndSub::init()
 	comboFpsDest->insertItem( "25" );
 	comboFpsDest->insertItem( "29.976" );
 
+	comboSaveFps->insertItem( "23,970" );
+	comboSaveFps->insertItem( "25" );
+	comboSaveFps->insertItem( "29.976" );
+
 	lbInputSubs->hide();
 	lbOutputSubs->hide();
 	tlInputSubs->hide();
@@ -120,6 +124,36 @@ void WndSub::init()
 				SIGNAL( rightButtonClicked( QListBoxItem *, const QPoint& ) ),
 				this,
 				SLOT( rightClick( QListBoxItem *, const QPoint &) ) );
+	connect (cbTypeO, SIGNAL(activated(int)),
+		this, SLOT(saveTypeCheck()));
+}
+
+void WndSub::saveTypeCheck( )
+{
+	int i = cbTypeO->currentItem();
+	if ( i == 0 )
+	{	// frame based format
+		if ( ( subvec.size() > 0 )
+		&& ( !subvec[0].getFrameBased() ) )
+		{
+			tlDestFps->setEnabled( true );
+			comboSaveFps->setEnabled( true );
+			return;
+		}
+	}
+	else
+	{	// time based formats 
+		if ( ( subvec.size() > 0 )
+		&& ( subvec[0].getFrameBased() ) )
+		{
+			tlDestFps->setEnabled( true );
+			comboSaveFps->setEnabled( true );
+			return;
+		}
+	}
+	tlDestFps->setEnabled( false );
+	comboSaveFps->setEnabled( false );
+	return;
 }
 
 void WndSub::edit( )
@@ -179,7 +213,7 @@ void WndSub::clicSelectInputFile()
 		leInputFile->setText( s );
     }
 	autoDetectFormat();
-	loadSubFile( leInputFile->text(), subvec );
+	loadSubFile( leInputFile->text() );
 	showInputSubs();
 }
 
@@ -353,7 +387,7 @@ QTime operator /( const QTime &t1, const QTime &t2 )
 }
 */
 
-void WndSub::timeBasedProceed( Subtitle s )
+void WndSub::timeBasedProceed( Subtitle &s )
 {
 	static int passage;
 	QTime length, lengths;
@@ -407,6 +441,8 @@ void WndSub::timeBasedProceed( Subtitle s )
 		te = te + timeFirstSpeak->time();
 
 	}
+	s.setBegin( ts );
+	s.setEnd( te );
 	if ( cbShiftPos->isChecked() )
 	{
 		if ( sbShiftPos->value() > 0 )
@@ -435,7 +471,7 @@ void WndSub::timeBasedProceed( Subtitle s )
 	}
 }
 
-void WndSub::frameBasedProceed( Subtitle s )
+void WndSub::frameBasedProceed( Subtitle &s )
 {
 	QString str;
 	int length, lengths;
@@ -491,6 +527,8 @@ void WndSub::frameBasedProceed( Subtitle s )
 		fe = fe + fFirstSpeak;
 
 	}
+	s.setFbegin( fs );
+	s.setFend( fe );
 	if ( cbShiftPos->isChecked() )
 	{
 		if ( sbShiftPos->value() > 0 )
@@ -525,17 +563,16 @@ void WndSub::clicProceed()
 	v_subs.clear();
 	if ( cbSubst->isChecked() )
 	{
-		std::vector<Subtitle> vsubst;
-		loadSubFile( leSubstFile->text(), vsubst);
-		if ( subvec.size() == vsubst.size() )
+		std::vector<Subtitle> vorig = subvec;
+		loadSubFile( leSubstFile->text());
+		if ( subvec.size() == vorig.size() )
 		{
 			int ctr;
-			for ( ctr = 0, it = subvec.begin(); it != subvec.end(); it++ )
+			for ( ctr = 0, it = vorig.begin(); it != vorig.end(); it++ )
 			{
-				Subtitle origSub = *it;
-				Subtitle newSub = vsubst[ ctr++ ];
-				origSub.setSubs( newSub.getSubs() );
+				it->setSubs( subvec[ctr++].getSubs() );
 			}
+			subvec = vorig;
 		}
 		else
 		{
@@ -633,27 +670,27 @@ void WndSub::autoDetectFormat()
 	cbTypeO->setCurrentItem( cbType->currentItem() );
 }
 
-void WndSub::loadSubFile(QString fname, std::vector<Subtitle> &vs)
+void WndSub::loadSubFile(QString fname)
 {
 	switch( cbType->currentItem() )
 	{
 	case 0 :	/* microdvd */
-		loadMicrodvd(fname, vs);
+		loadMicrodvd(fname);
 		break;
 	case 2 : 	/* subrip */
-		loadSubrip(fname,vs);
+		loadSubrip(fname);
 		break;
 	case 3 : 	/* subviewer */
-		loadSubviewer(fname,vs);
+		loadSubviewer(fname);
 		break;
 	case 5 :	/* sami */
-		loadSami(fname,vs);
+		loadSami(fname);
 		break;
 	case 11 :	/* ssa */
-		loadSsa(fname,vs);
+		loadSsa(fname);
 		break;
 	case 17 : 	/* spumux */
-		loadSpumux(fname,vs);
+		loadSpumux(fname);
 		break;
 	default :
 		QMessageBox::information( this, "submgmt", "Cannot load file" );
@@ -775,6 +812,15 @@ void WndSub::saveMicrodvd()
 		for ( it = subvec.begin(); it != subvec.end(); it++ )
 		{
 			Subtitle st = *it;
+			if ( comboSaveFps->isEnabled( ) )
+			{
+				double fDest = comboSaveFps->currentText().toDouble();
+				// convert the times in frame using the framerate
+				int fr = ((double)milli( st.getBegin() ) * fDest ) / 1000.0;
+				st.setFbegin( fr );
+				fr = ((double)milli( st.getEnd() ) * fDest ) / 1000.0;
+				st.setFend( fr );
+			}
 			stream << "{" << st.getFbegin() << "}{" << st.getFend() << "}";
 
 			std::vector<Subline>::iterator its;
@@ -824,6 +870,16 @@ void WndSub::saveSubrip()
 		QTextCodec *codec = QTextCodec::codecForName(cbOutputEncoding->currentText());
 		for ( it = subvec.begin(); it != subvec.end(); it++ )
 		{
+			if ( comboSaveFps->isEnabled( ) )
+			{
+				double fDest = comboSaveFps->currentText().toDouble();
+				// convert the frames in time using the framerate
+				int fr = ((double)milli( it->getBegin() ) * fDest ) / 1000.0;
+				QTime ts = timeFromMilli( it->getFbegin() * 1000.0 / fDest ); 
+				it->setBegin( ts );
+				QTime te = timeFromMilli( it->getFend() * 1000.0 / fDest ); 
+				it->setEnd( te );
+			}
 			ts = it->getBegin();
 			te = it->getEnd();
 			stream << ts.toString( "hh:mm:ss" ) << "." << ts.msec() << "," << te.toString( "hh:mm:ss" ) << "." << te.msec() << endl;
@@ -890,6 +946,16 @@ void WndSub::saveSami()
 		stream << "<BODY>" << endl;
 		for ( it = subvec.begin(); it != subvec.end(); it++ )
 		{
+			if ( comboSaveFps->isEnabled( ) )
+			{
+				double fDest = comboSaveFps->currentText().toDouble();
+				// convert the frames in time using the framerate
+				int fr = ((double)milli( it->getBegin() ) * fDest ) / 1000.0;
+				QTime ts = timeFromMilli( it->getFbegin() * 1000.0 / fDest ); 
+				it->setBegin( ts );
+				QTime te = timeFromMilli( it->getFend() * 1000.0 / fDest ); 
+				it->setEnd( te );
+			}
 			ts = it->getBegin();
 			te = it->getEnd();
 			stream << "<SYNC START=" << milli( ts ) << ">" << endl;
@@ -938,6 +1004,16 @@ void WndSub::saveSubviewer()
 		numero = 1;
 		for ( it = subvec.begin(); it != subvec.end(); it++ )
 		{
+			if ( comboSaveFps->isEnabled( ) )
+			{
+				double fDest = comboSaveFps->currentText().toDouble();
+				// convert the frames in time using the framerate
+				int fr = ((double)milli( it->getBegin() ) * fDest ) / 1000.0;
+				QTime ts = timeFromMilli( it->getFbegin() * 1000.0 / fDest ); 
+				it->setBegin( ts );
+				QTime te = timeFromMilli( it->getFend() * 1000.0 / fDest ); 
+				it->setEnd( te );
+			}
 			ts = it->getBegin();
 			te = it->getEnd();
 			stream << numero << endl;
@@ -1034,6 +1110,16 @@ void WndSub::saveSpumux()
 		stream << "  <stream>" << endl;
 		for ( it = subvec.begin(); it != subvec.end(); it++ )
 		{
+			if ( comboSaveFps->isEnabled( ) )
+			{
+				double fDest = comboSaveFps->currentText().toDouble();
+				// convert the frames in time using the framerate
+				int fr = ((double)milli( it->getBegin() ) * fDest ) / 1000.0;
+				QTime ts = timeFromMilli( it->getFbegin() * 1000.0 / fDest ); 
+				it->setBegin( ts );
+				QTime te = timeFromMilli( it->getFend() * 1000.0 / fDest ); 
+				it->setEnd( te );
+			}
 			ts = it->getBegin();
 			te = it->getEnd();
 			stream << "    <spu";
@@ -1108,6 +1194,16 @@ void WndSub::saveSsa()
 		std::vector<Subtitle>::iterator it;
 		for ( it = subvec.begin(); it != subvec.end(); it++ )
 		{
+			if ( comboSaveFps->isEnabled( ) )
+			{
+				double fDest = comboSaveFps->currentText().toDouble();
+				// convert the frames in time using the framerate
+				int fr = ((double)milli( it->getBegin() ) * fDest ) / 1000.0;
+				QTime ts = timeFromMilli( it->getFbegin() * 1000.0 / fDest ); 
+				it->setBegin( ts );
+				QTime te = timeFromMilli( it->getFend() * 1000.0 / fDest ); 
+				it->setEnd( te );
+			}
 			ts = it->getBegin();
 			te = it->getEnd();
 
@@ -1143,7 +1239,7 @@ void WndSub::saveSsa()
 	}
 }
 
-void WndSub::loadSsa(QString fname, std::vector<Subtitle> &vs)
+void WndSub::loadSsa(QString fname)
 {
 	QString Start;
 	QString End;
@@ -1240,7 +1336,7 @@ void WndSub::loadSsa(QString fname, std::vector<Subtitle> &vs)
     }
 }
 
-void WndSub::loadSami(QString fname, std::vector<Subtitle> &vs)
+void WndSub::loadSami(QString fname)
 {
 	QString Start;
 	QString End;
@@ -1255,7 +1351,7 @@ void WndSub::loadSami(QString fname, std::vector<Subtitle> &vs)
 
     if ( file.open( IO_ReadOnly ) )
 	{
-		vs.clear();
+		subvec.clear();
         QTextStream stream( &file );
 		if ( cbInputEncoding->currentText() == "ISO 8859-1" )
 		{
@@ -1287,7 +1383,8 @@ void WndSub::loadSami(QString fname, std::vector<Subtitle> &vs)
 				for ( i = l.begin(); i != l.end(); i++ )
 				{
 					//std::cout << *i << std::endl;
-					subs.push_back( Subline( *i ) );
+					Subline *sl = new Subline( *i );
+					subs.push_back( *sl );
 				}
 				
 				// get end
@@ -1299,15 +1396,15 @@ void WndSub::loadSami(QString fname, std::vector<Subtitle> &vs)
 				}
 				
 				//std::cout << std::endl;
-				Subtitle s( ts, te, subs );
-				vs.push_back( s );
+				Subtitle *s = new Subtitle( ts, te, subs );
+				subvec.push_back( *s );
 			}
 		}
         file.close();
     }
 }
 
-void WndSub::loadSubviewer(QString fname, std::vector<Subtitle> &vs)
+void WndSub::loadSubviewer(QString fname)
 {
 	QString Start;
 	QString End;
@@ -1319,7 +1416,7 @@ void WndSub::loadSubviewer(QString fname, std::vector<Subtitle> &vs)
 
     if ( file.open( IO_ReadOnly ) )
 	{
-		vs.clear();
+		subvec.clear();
         QTextStream stream( &file );
 		if ( cbInputEncoding->currentText() == "ISO 8859-1" )
 		{
@@ -1347,33 +1444,35 @@ void WndSub::loadSubviewer(QString fname, std::vector<Subtitle> &vs)
 					if ( line.isEmpty() )
 						break;
 					/* text */
-					QString s;
+					QString *s = new QString();
 					Subline::FMT style;
 					if ( line.contains( "<i>" ) )
 					{
 						style = Subline::Italic;
-						s = line.remove( QRegExp( "<.*>" ) );
+						*s = line.remove( QRegExp( "<i>" ) ).remove( QRegExp( "</i>") );
 					}
 					else if ( line.contains( "<b>" ) )
 					{
 						style = Subline::Bold;
-						s = line.remove( QRegExp( "<.*>" ) );
+						*s = line.remove( QRegExp( "<b>" ) ).remove( QRegExp( "</b>" ) );
 					}
 					else
 					{
-						s = line;
+						style = Subline::Normal;
+						*s = line;
 					}
-					subs.push_back( Subline( s, style ) );
+					Subline *sl = new Subline( *s, style );
+					subs.push_back( *sl );
 				}
-				Subtitle s( ts, te, subs );
-				vs.push_back( s );
+				Subtitle *st = new Subtitle( ts, te, subs );
+				subvec.push_back( *st );
 			}
 		}
         file.close();
     }
 }
 
-void WndSub::loadMicrodvd(QString fname, std::vector<Subtitle> &vs)
+void WndSub::loadMicrodvd(QString fname)
 {
 	QString Start;
 	QString End;
@@ -1385,7 +1484,7 @@ void WndSub::loadMicrodvd(QString fname, std::vector<Subtitle> &vs)
 
     if ( file.open( IO_ReadOnly ) )
 	{
-		vs.clear();
+		subvec.clear();
         QTextStream stream( &file );
 		if ( cbInputEncoding->currentText() == "ISO 8859-1" )
 		{
@@ -1416,17 +1515,18 @@ void WndSub::loadMicrodvd(QString fname, std::vector<Subtitle> &vs)
 				QStringList::Iterator it = sl.begin();
 				for ( ; it != sl.end(); it++ )
 				{
-					subs.push_back( Subline( *it ) );
+					Subline *sl = new Subline( *it );
+					subs.push_back( *sl );
 				}
-				Subtitle s( start, end, subs );
-				vs.push_back( s );
+				Subtitle *st = new Subtitle( start, end, subs );
+				subvec.push_back( *st );
 			}
 		}
         file.close();
     }
 }
 
-void WndSub::loadSubrip(QString fname, std::vector<Subtitle> &vs)
+void WndSub::loadSubrip(QString fname)
 {
 	QString Start;
 	QString End;
@@ -1438,7 +1538,7 @@ void WndSub::loadSubrip(QString fname, std::vector<Subtitle> &vs)
 
     if ( file.open( IO_ReadOnly ) )
 	{
-		vs.clear();
+		subvec.clear();
         QTextStream stream( &file );
 		if ( cbInputEncoding->currentText() == "ISO 8859-1" )
 		{
@@ -1470,18 +1570,19 @@ void WndSub::loadSubrip(QString fname, std::vector<Subtitle> &vs)
 					QStringList::Iterator it = sl.begin();
 					for ( ; it != sl.end(); it++ )
 					{
-						subs.push_back( Subline( *it ));
+						Subline *sl = new Subline( *it );
+						subs.push_back( *sl );
 					}
 				}
-				Subtitle s( ts, te, subs );
-				vs.push_back( s );
+				Subtitle *st = new Subtitle( ts, te, subs );
+				subvec.push_back( *st );
 			}
 		}
         file.close();
     }
 }
 
-void WndSub::loadSpumux(QString fname, std::vector<Subtitle> &vs)
+void WndSub::loadSpumux(QString fname)
 {
 	QString Start;
 	QString End;
@@ -1496,7 +1597,7 @@ void WndSub::loadSpumux(QString fname, std::vector<Subtitle> &vs)
 
     if ( file.open( IO_ReadOnly ) )
 	{
-		vs.clear();
+		subvec.clear();
         QTextStream stream( &file );
 		if ( cbInputEncoding->currentText() == "ISO 8859-1" )
 		{
@@ -1520,36 +1621,42 @@ void WndSub::loadSpumux(QString fname, std::vector<Subtitle> &vs)
 				ts = timeFromMilli( milli( Start, '.' ) );
 				te = timeFromMilli( milli( End, '.' ) );
 				subs.clear();
+				Subline *sl;
 				if ( Reste.contains( "</spu>" ) )
 				{
 					Chaine = Debut + Reste.section( "</spu>", 0, 0 );
-					subs.push_back( Subline( Chaine ) );
+					sl = new Subline( Chaine );
+					subs.push_back( *sl );
 				}
 				else if ( Reste.contains( "/>" ) )
 				{
 					Chaine = Debut + Reste.section( "/>", 0, 0 );
-					subs.push_back( Subline( Chaine ) );
+					sl = new Subline( Chaine );
+					subs.push_back( *sl );
 				}
 				else
 				{
-					subs.push_back( Subline( Reste ) );
+					sl = new Subline( Reste );
+					subs.push_back( *sl );
 					while ( !stream.atEnd() )
 					{
 						line = codec->toUnicode( stream.readLine() );
 						if ( line.contains( "</spu>") )
 						{
 							QString text = line.section( "</spu>", 0, 0 );
-							subs.push_back( Subline( text ) );
+							sl = new Subline( text );
+							subs.push_back( *sl );
 							break;
 						}
 						else
 						{
-							subs.push_back( Subline( line ) );
+							sl = new Subline( line );
+							subs.push_back( *sl );
 						}
 					}
 				}
-				Subtitle s( ts, te, subs );
-				vs.push_back( s );
+				Subtitle *st = new Subtitle( ts, te, subs );
+				subvec.push_back( *st );
 			}
 		}
         file.close();

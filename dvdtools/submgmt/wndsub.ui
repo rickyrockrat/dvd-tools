@@ -12,8 +12,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>638</width>
-            <height>509</height>
+            <width>688</width>
+            <height>559</height>
         </rect>
     </property>
     <property name="backgroundOrigin">
@@ -31,7 +31,7 @@
         </property>
         <widget class="QLayoutWidget">
             <property name="name">
-                <cstring>layout18</cstring>
+                <cstring>layout17</cstring>
             </property>
             <vbox>
                 <property name="name">
@@ -703,7 +703,7 @@
                         </property>
                         <widget class="QLayoutWidget">
                             <property name="name">
-                                <cstring>layout17</cstring>
+                                <cstring>layout15</cstring>
                             </property>
                             <hbox>
                                 <property name="name">
@@ -715,7 +715,7 @@
                                     </property>
                                     <property name="minimumSize">
                                         <size>
-                                            <width>100</width>
+                                            <width>0</width>
                                             <height>0</height>
                                         </size>
                                     </property>
@@ -741,13 +741,38 @@
                                 </widget>
                                 <widget class="QLabel">
                                     <property name="name">
+                                        <cstring>tlDestFps</cstring>
+                                    </property>
+                                    <property name="enabled">
+                                        <bool>false</bool>
+                                    </property>
+                                    <property name="backgroundOrigin">
+                                        <enum>WindowOrigin</enum>
+                                    </property>
+                                    <property name="text">
+                                        <string>dest fps</string>
+                                    </property>
+                                    <property name="buddy" stdset="0">
+                                        <cstring>cbType</cstring>
+                                    </property>
+                                </widget>
+                                <widget class="QComboBox">
+                                    <property name="name">
+                                        <cstring>comboSaveFps</cstring>
+                                    </property>
+                                    <property name="enabled">
+                                        <bool>false</bool>
+                                    </property>
+                                </widget>
+                                <widget class="QLabel">
+                                    <property name="name">
                                         <cstring>tlType_3_2</cstring>
                                     </property>
                                     <property name="backgroundOrigin">
                                         <enum>WindowOrigin</enum>
                                     </property>
                                     <property name="text">
-                                        <string>encoded to</string>
+                                        <string>coded</string>
                                     </property>
                                     <property name="buddy" stdset="0">
                                         <cstring>cbType</cstring>
@@ -836,7 +861,7 @@
                     <property name="sizeHint">
                         <size>
                             <width>20</width>
-                            <height>23</height>
+                            <height>16</height>
                         </size>
                     </property>
                 </spacer>
@@ -1014,6 +1039,7 @@
 <slots>
     <slot>filenameChanged()</slot>
     <slot>init()</slot>
+    <slot>saveTypeCheck()</slot>
     <slot>edit()</slot>
     <slot>rightClick( QListBoxItem * item, const QPoint &amp; p )</slot>
     <slot>clickedSave()</slot>
@@ -1026,18 +1052,18 @@
     <slot>checkShift()</slot>
     <slot>checkShiftPos()</slot>
     <slot>checkAuto()</slot>
-    <slot>timeBasedProceed( Subtitle s )</slot>
-    <slot>frameBasedProceed( Subtitle s )</slot>
+    <slot>timeBasedProceed( Subtitle &amp; s )</slot>
+    <slot>frameBasedProceed( Subtitle &amp; s )</slot>
     <slot>clicProceed()</slot>
-    <slot>loadSubFile( QString fname, std::vector&lt;Subtitle&gt; &amp; vs )</slot>
+    <slot>loadSubFile( QString fname )</slot>
     <slot>saveSami()</slot>
     <slot>saveSsa()</slot>
-    <slot>loadSsa( QString fname, std::vector&lt;Subtitle&gt; &amp; vs )</slot>
-    <slot>loadSami( QString fname, std::vector&lt;Subtitle&gt; &amp; vs )</slot>
-    <slot>loadSubviewer( QString fname, std::vector&lt;Subtitle&gt; &amp; vs )</slot>
-    <slot>loadMicrodvd( QString fname, std::vector&lt;Subtitle&gt; &amp; vs )</slot>
-    <slot>loadSubrip( QString fname, std::vector&lt;Subtitle&gt; &amp; vs )</slot>
-    <slot>loadSpumux( QString fname, std::vector&lt;Subtitle&gt; &amp; vs )</slot>
+    <slot>loadSsa( QString fname )</slot>
+    <slot>loadSami( QString fname )</slot>
+    <slot>loadSubviewer( QString fname )</slot>
+    <slot>loadMicrodvd( QString fname )</slot>
+    <slot>loadSubrip( QString fname )</slot>
+    <slot>loadSpumux( QString fname )</slot>
     <slot>genPngForSpumux()</slot>
     <slot>dump()</slot>
 </slots>
