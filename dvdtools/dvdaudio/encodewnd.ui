@@ -11,7 +11,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>383</width>
+            <width>408</width>
             <height>177</height>
         </rect>
     </property>
@@ -31,6 +31,12 @@
             </property>
             <property name="frameShadow">
                 <enum>Sunken</enum>
+            </property>
+            <property name="textFormat">
+                <enum>LogText</enum>
+            </property>
+            <property name="autoFormatting">
+                <set>AutoAll</set>
             </property>
         </widget>
         <widget class="QProgressBar">

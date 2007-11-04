@@ -55,6 +55,7 @@ void encodeWnd::demarrer(QString fn, int tf )
 	pbClose->hide();
 	setCaption( "Encoding to vob" );
 	setModal( true );
+	teAuthor->setMaxLogLines(1000);
 	teAuthor->clear();
 	teAuthor->append( fn );
 	pbEncode->setTotalSteps( tf );

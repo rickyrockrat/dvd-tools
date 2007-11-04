@@ -14,6 +14,7 @@
 #include "common.h"
 #include <iostream>
 #include <unistd.h>	// pour sleep
+#include <qtextcodec.h>
 
 void dvdaudioWnd::init()
 {
@@ -214,6 +215,27 @@ void dvdaudioWnd::newAlbum()
 				trackItem->setText( ID_FILENAME, filename );
 				if ( trackItem->text( ID_NAME ).isNull() )
 					trackItem->setText( ID_NAME, l[i] );
+				delete mpginfoProc;
+				// use sox to get exact duration...
+				mpginfoProc = new QProcess(this );
+				connect( mpginfoProc, SIGNAL(readyReadStderr()),
+							this, SLOT(readProcSox()));
+				mpginfoProc->addArgument( "sox" );
+				mpginfoProc->addArgument( filename );
+				mpginfoProc->addArgument( "-n" );
+				mpginfoProc->addArgument( "stat" );
+
+				mpginfoProc->start();
+
+				while ( mpginfoProc->isRunning() )
+				{
+					sleep( 2 );
+				}
+				if ( !mpginfoProc->normalExit() )
+				{
+					QMessageBox::information( this, "Problem",
+						"sox error for file " + filename );
+				}
 			}
 			delete mpginfoProc;
 			QFileInfo fi( filename );
@@ -288,6 +310,28 @@ void dvdaudioWnd::addTracks()
 				else
 				{
 					trackItem->setText( ID_FILENAME, *it );
+
+					delete mpginfoProc;
+					// use sox to get exact duration...
+					mpginfoProc = new QProcess(this );
+					connect( mpginfoProc, SIGNAL(readyReadStderr()),
+								this, SLOT(readProcSox()));
+					mpginfoProc->addArgument( "sox" );
+					mpginfoProc->addArgument( *it );
+					mpginfoProc->addArgument( "-n" );
+					mpginfoProc->addArgument( "stat" );
+
+					mpginfoProc->start();
+
+					while ( mpginfoProc->isRunning() )
+					{
+						sleep( 2 );
+					}
+					if ( !mpginfoProc->normalExit() )
+					{
+						QMessageBox::information( this, "Problem",
+							"sox error for file " + *it );
+					}
 				}
 				delete mpginfoProc;
 
@@ -687,14 +731,26 @@ void dvdaudioWnd::encode()
 }
 
 
+void dvdaudioWnd::readProcSox()
+{
+	QTextCodec *codec = QTextCodec::codecForName("UTF8");
+	QStringList list = QStringList::split( "\n",
+						codec->toUnicode( mpginfoProc->readStderr() ) );
+	QStringList dur = QStringList::split( ":", list.grep( "Length").join("") );
+	int x = strtol( dur[1].ascii(), NULL, 10 );
+	QTime t = QTime().addSecs( x );
+	trackItem->setText( ID_DURATION, t.toString() );
+}
+
 void dvdaudioWnd::readProcMplayer()
 {
 	QStringList abit, arate, ed, kb, ti, ar, al, tr, ye, ge, fn;
+	QTextCodec *codec = QTextCodec::codecForName("UTF8");
 	QStringList list = QStringList::split( "\n",
-										mpginfoProc->readStdout() );
+						codec->toUnicode( mpginfoProc->readStdout() ) );
 
 	fn = QStringList::split( "=", list.grep( "ID_FILENAME").join("") );
-	ed = QStringList::split( "=", list.grep( "ID_LENGTH").join("") );
+	//ed = QStringList::split( "=", list.grep( "ID_LENGTH").join("") );
 	abit = QStringList::split( "=", list.grep( "ID_AUDIO_BITRATE").join("=") );
 	arate = QStringList::split( "=", list.grep( "ID_AUDIO_RATE").join("=") );
 	ti = QStringList::split( "=", list.grep( "ID_CLIP_INFO_VALUE0").join("") );
@@ -704,8 +760,8 @@ void dvdaudioWnd::readProcMplayer()
 	ye = QStringList::split( "=", list.grep( "ID_CLIP_INFO_VALUE3").join("") );
 	ge = QStringList::split( "=", list.grep( "ID_CLIP_INFO_VALUE6").join("") );
 
-	int x = strtol( ed[1].ascii(), NULL, 10 );
-	QTime t = QTime().addSecs( x );
+	//int x = strtol( ed[1].ascii(), NULL, 10 );
+	//QTime t = QTime().addSecs( x );
 
 	QString filename;
 	if ( ti[1].isEmpty() )
@@ -721,7 +777,7 @@ void dvdaudioWnd::readProcMplayer()
 	else
 		trackItem = new QListViewItem( albumItem, filename );
 	trackItem->setText( ID_IDENT, CC_TRACK ); 
-	trackItem->setText( ID_DURATION, t.toString() );
+	//trackItem->setText( ID_DURATION, t.toString() );
 	trackItem->setText( ID_ARTIST, ar[1] );
 	trackItem->setText( ID_ALBUM, al[1] );
 	trackItem->setText( ID_TRACK, tr[1] );
@@ -743,8 +799,9 @@ void dvdaudioWnd::readProcMplayer()
 
 void dvdaudioWnd::readProcMpginfo()
 {
+	QTextCodec *codec = QTextCodec::codecForName("UTF8");
 	QStringList list = QStringList::split( "\n",
-	mpginfoProc->readStdout() );
+						codec->toUnicode( mpginfoProc->readStdout() ) );
 
 	QStringList ed, kb, ti, ar, al, tr, ye, ge;
 

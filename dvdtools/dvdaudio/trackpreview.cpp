@@ -69,6 +69,8 @@ void trackPreviewWnd::drawContents( QPainter *p )
 		p->fillRect( rect(), QBrush( m_bgcolor ) );
 		p->setPen( m_fgcolor );
 		p->setFont( m_font );
+		QFontMetrics fm( m_font );
+		m_step = fm.lineSpacing();
 
 		int y = m_yorig;
 		int x = m_xorig;
@@ -99,7 +101,7 @@ void trackPreviewWnd::drawContents( QPainter *p )
 		}
 		if ( md_track )
 		{
-			p->drawText( x, y, m_track->text( ID_TRACK ) );
+			p->drawText( x, y, "Track " + m_track->text( ID_TRACK ) );
 			y+=m_step;
 		}
 		if ( md_duration )

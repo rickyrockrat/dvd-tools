@@ -497,6 +497,7 @@
     <slot>saveProject()</slot>
     <slot>encode()</slot>
     <slot>readProcMplayer()</slot>
+    <slot>readProcSox()</slot>
     <slot>readProcMpginfo()</slot>
     <slot>preview()</slot>
     <slot>removeItem()</slot>
