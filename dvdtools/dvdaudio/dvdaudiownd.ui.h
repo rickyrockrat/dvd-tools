@@ -1191,17 +1191,17 @@ void dvdaudioWnd::genMenuCommand( QStringList albums, const QColor &color, QStri
 		QRect r = fm.boundingRect( albums[(pg*8)+ctr] );
 		vr->push_back( QRect( 80, (100+ctr*50)-r.height(), r.width(), r.height() ) );
 	}
-	if ( ( pg != (npages-1) ) && ( npages > 1 ) )
-	{
-		p.drawText( 600, 550, "Next>>" );
-		QRect r = fm.boundingRect( "Next>>" );
-		vr->push_back( QRect( 600, 550-r.height(), r.width(), r.height() ) );
-	}
 	if ( ( pg != 0 ) && ( npages > 1 ) )
 	{
 		p.drawText( 400, 550, "<<Prev" );
 		QRect r = fm.boundingRect( "<<Prev" );
 		vr->push_back( QRect( 400, 550-r.height(), r.width(), r.height() ) );
+	}
+	if ( ( pg != (npages-1) ) && ( npages > 1 ) )
+	{
+		p.drawText( 600, 550, "Next>>" );
+		QRect r = fm.boundingRect( "Next>>" );
+		vr->push_back( QRect( 600, 550-r.height(), r.width(), r.height() ) );
 	}
 	QImage im = pm.convertToImage();
 	clipColors( im, color );
