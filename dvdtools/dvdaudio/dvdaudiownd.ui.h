@@ -68,6 +68,10 @@ void dvdaudioWnd::init()
 	pbDown->setPixmap( QPixmap::fromMimeSource("ic_down.png"));
 
 	pbOccup->setTotalSteps( 4400000 );
+
+	aNew->setEnabled(false);
+	aAddAlbum->setEnabled(false);
+	aAddTracks->setEnabled(false);
 }
 
 void dvdaudioWnd::downClicked()
@@ -145,6 +149,7 @@ void dvdaudioWnd::newDVD()
 	workingDir = QFileDialog::getExistingDirectory(
 			QDir::currentDirPath(), this, "tempdir",
 			"Choose the temporary directory" );
+	aAddAlbum->setEnabled(true);
 }
 
 void dvdaudioWnd::newAlbum()
@@ -170,6 +175,7 @@ void dvdaudioWnd::newAlbum()
 	else
 		albumItem = new QListViewItem( dvdItem, a, CC_ALBUM );
 	albumItem->setRenameEnabled( 0, true );
+	aAddTracks->setEnabled(true);
 
 	if ( !s.isNull() )
 	{
@@ -284,87 +290,57 @@ void dvdaudioWnd::addTracks()
 		for ( it = l.begin(); it != l.end(); it++ )
 		{
 			mpginfoProc = new QProcess(this );
-			if ( (*it).contains( ".wav" ) )
+			connect( mpginfoProc, SIGNAL(readyReadStdout()),
+						this, SLOT(readProcMplayer()));
+			mpginfoProc->addArgument( "mplayer" );
+			mpginfoProc->addArgument( "-vo" );
+			mpginfoProc->addArgument( "null" );
+			mpginfoProc->addArgument( "-ao" );
+			mpginfoProc->addArgument( "null" );
+			mpginfoProc->addArgument( "-frames" );
+			mpginfoProc->addArgument( "0" );
+			mpginfoProc->addArgument( "-identify" );
+			mpginfoProc->addArgument( *it );
+
+			mpginfoProc->start();
+			while ( mpginfoProc->isRunning() )
 			{
-				connect( mpginfoProc, SIGNAL(readyReadStdout()),
-							this, SLOT(readProcMplayer()));
-				mpginfoProc->addArgument( "mplayer" );
-				mpginfoProc->addArgument( "-vo" );
-				mpginfoProc->addArgument( "null" );
-				mpginfoProc->addArgument( "-ao" );
-				mpginfoProc->addArgument( "null" );
-				mpginfoProc->addArgument( "-frames" );
-				mpginfoProc->addArgument( "0" );
-				mpginfoProc->addArgument( "-identify" );
-				mpginfoProc->addArgument( *it );
-
-				mpginfoProc->start();
-				while ( mpginfoProc->isRunning() )
-				{
-				}
-				if ( !mpginfoProc->normalExit() )
-				{
-					QMessageBox::information( this, "Problem",
-						"mplayer identify error for file " + *it );
-				}
-				else
-				{
-					trackItem->setText( ID_FILENAME, *it );
-
-					delete mpginfoProc;
-					// use sox to get exact duration...
-					mpginfoProc = new QProcess(this );
-					connect( mpginfoProc, SIGNAL(readyReadStderr()),
-								this, SLOT(readProcSox()));
-					mpginfoProc->addArgument( "sox" );
-					mpginfoProc->addArgument( *it );
-					mpginfoProc->addArgument( "-n" );
-					mpginfoProc->addArgument( "stat" );
-
-					mpginfoProc->start();
-
-					while ( mpginfoProc->isRunning() )
-					{
-						sleep( 2 );
-					}
-					if ( !mpginfoProc->normalExit() )
-					{
-						QMessageBox::information( this, "Problem",
-							"sox error for file " + *it );
-					}
-				}
-				delete mpginfoProc;
-
-				QFileInfo fi( *it );
-				pbOccup->setProgress( pbOccup->progress()+int(fi.size()*1.18/1024) );
+			}
+			if ( !mpginfoProc->normalExit() )
+			{
+				QMessageBox::information( this, "Problem",
+					"mplayer identify error for file " + *it );
 			}
 			else
 			{
-				connect( mpginfoProc, SIGNAL(readyReadStdout()),
-						this, SLOT(readProcMpginfo()));
-				mpginfoProc->addArgument( "mpginfo" );
+				trackItem->setText( ID_FILENAME, *it );
+
+				delete mpginfoProc;
+				// use sox to get exact duration...
+				mpginfoProc = new QProcess(this );
+				connect( mpginfoProc, SIGNAL(readyReadStderr()),
+							this, SLOT(readProcSox()));
+				mpginfoProc->addArgument( "sox" );
 				mpginfoProc->addArgument( *it );
+				mpginfoProc->addArgument( "-n" );
+				mpginfoProc->addArgument( "stat" );
 
 				mpginfoProc->start();
+
 				while ( mpginfoProc->isRunning() )
 				{
+					sleep( 2 );
 				}
 				if ( !mpginfoProc->normalExit() )
 				{
 					QMessageBox::information( this, "Problem",
-						/*"mplayer identify error for file " + *it );*/
-						"mpginfo error for file " + *it );
+						"sox error for file " + *it );
 				}
-				else
-				{
-					trackItem->setText( ID_FILENAME, *it );
-				}
-				delete mpginfoProc;
-
-				QFileInfo fi( *it );
-				pbOccup->setProgress( pbOccup->progress()+int(fi.size()*1.2/1024) );
 			}
+			delete mpginfoProc;
 
+			QFileInfo fi( *it );
+			pbOccup->setProgress( pbOccup->progress()+int(fi.size()*1.18/1024) );
 		}
 	}
 }
@@ -442,6 +418,7 @@ void dvdaudioWnd::openProject()
 						else
 							albumItem = new QListViewItem( dvdItem, albumname.value(), CC_ALBUM );
 						albumItem->setRenameEnabled( ID_NAME, true );
+						aAddAlbum->setEnabled(true);
 						QDomNode n1 = e.firstChild();
 						while( !n1.isNull() )
 						{
@@ -485,6 +462,7 @@ void dvdaudioWnd::openProject()
 									trackItem->setRenameEnabled( ID_GENRE, true );
 
 									albumItem->setOpen( true );
+									aAddTracks->setEnabled(true);
 								}
 							}
 							n1 = n1.nextSibling();
@@ -640,8 +618,10 @@ void dvdaudioWnd::encode()
 				outputPcm.sprintf( "pcm%04d.lpcm", ctr );
 				stream << "#!/bin/bash" << endl;
 				QTime t = QTime::fromString( item->text( ID_DURATION ) );
-				int duration = t.hour() * 3600 + t.minute() * 60 + t.second();
-				duration *= 25;		// pal
+				double msecs = item->text( ID_DURATION ).section( ".", 1, 1 ).toDouble();
+				double dur = t.hour() * 3600 + t.minute() * 60 + t.second() + msecs/1000.0;
+				std::cout << "ms=" << t.msec() << " dur=" << dur << std::endl;
+				int duration = dur * 25;		// pal
 				if ( item->text( ID_FILENAME ).contains( ".wav" ) )
 				{	// wav file
 					stream << "#sox \"" << item->text( ID_FILENAME );
@@ -737,9 +717,11 @@ void dvdaudioWnd::readProcSox()
 	QStringList list = QStringList::split( "\n",
 						codec->toUnicode( mpginfoProc->readStderr() ) );
 	QStringList dur = QStringList::split( ":", list.grep( "Length").join("") );
-	int x = strtol( dur[1].ascii(), NULL, 10 );
-	QTime t = QTime().addSecs( x );
-	trackItem->setText( ID_DURATION, t.toString() );
+	double x = strtod( dur[1].ascii(), NULL );
+	double msecs = (x - (int)x) * 1000;
+	//std::cout << " x=" << x << " ms=" << msecs << std::endl;
+	QTime t = QTime().addSecs( (int)x ).addMSecs( msecs );
+	trackItem->setText( ID_DURATION, t.toString("hh:mm:ss.zzz") );
 }
 
 void dvdaudioWnd::readProcMplayer()
@@ -902,11 +884,26 @@ void dvdaudioWnd::removeItem( )
 	{
 		delete albumItem;
 		albumItem = 0;
+		bool hasAlbums = false;
+		QListViewItemIterator it( lvDVD );
+		QListViewItem *item;
+		while ( it.current() )
+		{
+			item = it.current();
+			if ( item->text( ID_IDENT ) == CC_ALBUM )
+			{
+				hasAlbums = true;
+			}
+			it++;
+		}
+		aAddTracks->setEnabled(hasAlbums);
 	}
 	else if ( dvdItem )
 	{
 		delete dvdItem;
 		dvdItem = 0;
+		aAddAlbum->setEnabled(false);
+		aAddTracks->setEnabled(false);
 	}
 }
 
@@ -1237,3 +1234,5 @@ void dvdaudioWnd::clipColors( QImage &img, const QColor &destcol )
 		}
 	}
 }
+
+//vim: ts=4 sw=4
