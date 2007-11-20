@@ -1,9 +1,0 @@
-[Desktop Entry]
-Encoding=UTF-8
-Comment=VOB file creator
-Comment[ru]=VOB file creator
-Exec=qcreatevob
-Icon=qcreatevob
-Name=QCreateVOB
-Name[ru]=QCreateVOB
-Type=Application
