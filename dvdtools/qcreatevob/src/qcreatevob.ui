@@ -11,8 +11,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>551</width>
-            <height>490</height>
+            <width>576</width>
+            <height>597</height>
         </rect>
     </property>
     <property name="caption">
@@ -713,75 +713,206 @@
                             </widget>
                         </grid>
                     </widget>
-                    <widget class="QGroupBox">
+                    <widget class="QTabWidget">
                         <property name="name">
-                            <cstring>groupBox10</cstring>
+                            <cstring>tabWidget7</cstring>
                         </property>
-                        <property name="title">
-                            <string>Audio</string>
-                        </property>
-                        <hbox>
+                        <widget class="QWidget">
                             <property name="name">
-                                <cstring>unnamed</cstring>
+                                <cstring>tab</cstring>
                             </property>
-                            <widget class="QTable">
-                                <column>
-                                    <property name="text">
-                                        <string>Quality</string>
-                                    </property>
-                                </column>
-                                <column>
-                                    <property name="text">
-                                        <string>Format</string>
-                                    </property>
-                                </column>
-                                <column>
-                                    <property name="text">
-                                        <string>Bitrate</string>
-                                    </property>
-                                </column>
-                                <column>
-                                    <property name="text">
-                                        <string>Channels</string>
-                                    </property>
-                                </column>
-                                <column>
-                                    <property name="text">
-                                        <string>Bits</string>
-                                    </property>
-                                </column>
+                            <attribute name="title">
+                                <string>Audio</string>
+                            </attribute>
+                            <vbox>
                                 <property name="name">
-                                    <cstring>tableSound</cstring>
+                                    <cstring>unnamed</cstring>
                                 </property>
-                                <property name="numRows">
-                                    <number>0</number>
+                                <widget class="QTable">
+                                    <column>
+                                        <property name="text">
+                                            <string>Quality</string>
+                                        </property>
+                                        <property name="pixmap">
+                                            <pixmap></pixmap>
+                                        </property>
+                                    </column>
+                                    <column>
+                                        <property name="text">
+                                            <string>Format</string>
+                                        </property>
+                                        <property name="pixmap">
+                                            <pixmap></pixmap>
+                                        </property>
+                                    </column>
+                                    <column>
+                                        <property name="text">
+                                            <string>Bitrate</string>
+                                        </property>
+                                        <property name="pixmap">
+                                            <pixmap></pixmap>
+                                        </property>
+                                    </column>
+                                    <column>
+                                        <property name="text">
+                                            <string>Channels</string>
+                                        </property>
+                                        <property name="pixmap">
+                                            <pixmap></pixmap>
+                                        </property>
+                                    </column>
+                                    <column>
+                                        <property name="text">
+                                            <string>Bits</string>
+                                        </property>
+                                        <property name="pixmap">
+                                            <pixmap></pixmap>
+                                        </property>
+                                    </column>
+                                    <column>
+                                        <property name="text">
+                                            <string>Lang</string>
+                                        </property>
+                                        <property name="pixmap">
+                                            <pixmap></pixmap>
+                                        </property>
+                                    </column>
+                                    <column>
+                                        <property name="text">
+                                            <string>TrackNumber</string>
+                                        </property>
+                                        <property name="pixmap">
+                                            <pixmap></pixmap>
+                                        </property>
+                                    </column>
+                                    <property name="name">
+                                        <cstring>tableSound</cstring>
+                                    </property>
+                                    <property name="numRows">
+                                        <number>0</number>
+                                    </property>
+                                    <property name="numCols">
+                                        <number>7</number>
+                                    </property>
+                                    <property name="readOnly">
+                                        <bool>true</bool>
+                                    </property>
+                                </widget>
+                            </vbox>
+                        </widget>
+                        <widget class="QWidget">
+                            <property name="name">
+                                <cstring>tab</cstring>
+                            </property>
+                            <attribute name="title">
+                                <string>Subtitles</string>
+                            </attribute>
+                            <vbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
                                 </property>
-                                <property name="numCols">
-                                    <number>5</number>
+                                <widget class="QTable">
+                                    <column>
+                                        <property name="text">
+                                            <string>Language</string>
+                                        </property>
+                                    </column>
+                                    <column>
+                                        <property name="text">
+                                            <string>Format</string>
+                                        </property>
+                                    </column>
+                                    <column>
+                                        <property name="text">
+                                            <string>TrackNumber</string>
+                                        </property>
+                                    </column>
+                                    <property name="name">
+                                        <cstring>tabInputSub</cstring>
+                                    </property>
+                                    <property name="numRows">
+                                        <number>0</number>
+                                    </property>
+                                    <property name="numCols">
+                                        <number>3</number>
+                                    </property>
+                                </widget>
+                            </vbox>
+                        </widget>
+                        <widget class="QWidget">
+                            <property name="name">
+                                <cstring>TabPage</cstring>
+                            </property>
+                            <attribute name="title">
+                                <string>Attachments</string>
+                            </attribute>
+                            <vbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
                                 </property>
-                                <property name="readOnly">
-                                    <bool>true</bool>
+                                <widget class="QTable">
+                                    <column>
+                                        <property name="text">
+                                            <string>ID</string>
+                                        </property>
+                                    </column>
+                                    <column>
+                                        <property name="text">
+                                            <string>Name</string>
+                                        </property>
+                                    </column>
+                                    <column>
+                                        <property name="text">
+                                            <string>Mime</string>
+                                        </property>
+                                    </column>
+                                    <column>
+                                        <property name="text">
+                                            <string>Size</string>
+                                        </property>
+                                    </column>
+                                    <property name="name">
+                                        <cstring>tabInputAttachments</cstring>
+                                    </property>
+                                    <property name="numRows">
+                                        <number>0</number>
+                                    </property>
+                                    <property name="numCols">
+                                        <number>4</number>
+                                    </property>
+                                </widget>
+                            </vbox>
+                        </widget>
+                        <widget class="QWidget">
+                            <property name="name">
+                                <cstring>TabPage</cstring>
+                            </property>
+                            <attribute name="title">
+                                <string>Chapters</string>
+                            </attribute>
+                            <vbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
                                 </property>
-                            </widget>
-                        </hbox>
+                                <widget class="QTable">
+                                    <column>
+                                        <property name="text">
+                                            <string>Time</string>
+                                        </property>
+                                    </column>
+                                    <property name="name">
+                                        <cstring>tabInputchapters</cstring>
+                                    </property>
+                                    <property name="numRows">
+                                        <number>0</number>
+                                    </property>
+                                    <property name="numCols">
+                                        <number>1</number>
+                                    </property>
+                                </widget>
+                            </vbox>
+                        </widget>
                     </widget>
-                    <spacer>
-                        <property name="name">
-                            <cstring>spacer22</cstring>
-                        </property>
-                        <property name="orientation">
-                            <enum>Vertical</enum>
-                        </property>
-                        <property name="sizeType">
-                            <enum>Expanding</enum>
-                        </property>
-                        <property name="sizeHint">
-                            <size>
-                                <width>20</width>
-                                <height>20</height>
-                            </size>
-                        </property>
-                    </spacer>
                 </vbox>
             </widget>
             <widget class="QWidget">
@@ -1908,6 +2039,17 @@ will make the picture "brighter", a value above 1.0 will make it "darker".</stri
                                 <bool>true</bool>
                             </property>
                         </column>
+                        <column>
+                            <property name="text">
+                                <string>Codec</string>
+                            </property>
+                            <property name="clickable">
+                                <bool>true</bool>
+                            </property>
+                            <property name="resizable">
+                                <bool>true</bool>
+                            </property>
+                        </column>
                         <property name="name">
                             <cstring>lvSubs</cstring>
                         </property>
@@ -2402,6 +2544,16 @@ will make the picture "brighter", a value above 1.0 will make it "darker".</stri
     <slot>slotUpdateBitrate( int t, QString s )</slot>
     <slot>slotUpdateChannel( int t, QString s )</slot>
     <slot>slotUpdateBits( int t, QString s )</slot>
+    <slot>slotAudioLang( int t, QString s )</slot>
+    <slot>slotAudioTrackNumber( int t, QString s )</slot>
+    <slot>slotSubCodec( int t, QString s )</slot>
+    <slot>slotSubLang( int t, QString s )</slot>
+    <slot>slotSubTrackNumber( int t, QString s )</slot>
+    <slot>slotAttName(int t, QString s)</slot>
+    <slot>slotAttMime(int t, QString s)</slot>
+    <slot>slotAttSize(int t, QString s)</slot>
+    <slot>slotAttUid(int t, QString s)</slot>
+    <slot>slotAddChapter(int t, QString s)</slot>
     <slot>removeSub()</slot>
     <slot>addSub()</slot>
     <slot>selectedSub( QListViewItem * )</slot>
@@ -2409,12 +2561,12 @@ will make the picture "brighter", a value above 1.0 will make it "darker".</stri
     <slot>open()</slot>
     <slot>openTMP()</slot>
     <slot>inputFileSelected()</slot>
-    <slot>updateSound(int)</slot>
+    <slot>updateSound( int tracks )</slot>
     <slot>tempChanged()</slot>
     <slot>setTemp()</slot>
     <slot>getStrings()</slot>
     <slot>addScript()</slot>
-    <slot>audioSettingChange(int row, int col)</slot>
+    <slot>audioSettingChange( int row, int )</slot>
     <slot>settingChange()</slot>
     <slot>readSettings()</slot>
     <slot>writeSettings()</slot>
@@ -2434,7 +2586,7 @@ will make the picture "brighter", a value above 1.0 will make it "darker".</stri
 <layoutdefaults spacing="6" margin="11"/>
 <includehints>
     <includehint>mydoublebox.h</includehint>
-    <includehint>mplexingclass.h</includehint>
+    <includehint>src/mplexingclass.h</includehint>
     <includehint>scriptlist.h</includehint>
 </includehints>
 </UI>
