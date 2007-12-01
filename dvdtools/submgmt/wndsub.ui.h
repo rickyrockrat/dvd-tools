@@ -1804,23 +1804,24 @@ void WndSub::genPngForSpumux()
 			int x = 0, y = 0;
 			for ( its = it->getSubs().begin(); its != it->getSubs().end(); its++ )
 			{
+				s = its->getLine();
 				if ( its->getFmt() == Subline::Italic )
 				{
 					fm = QFontMetrics( gw->pbItalicFont->font() );
 					p.setFont( gw->pbItalicFont->font() );
-					r = fm.boundingRect( x0, y0, l0, h0, flags, its->getLine(), -1 );
+					r = fm.boundingRect( x0, y0, l0, h0, flags, s, -1 );
 				}
 				else if ( its->getFmt() == Subline::Bold )
 				{
 					fm = QFontMetrics( gw->pbBoldFont->font() );
 					p.setFont( gw->pbBoldFont->font() );
-					r = fm.boundingRect( x0, y0, l0, h0, flags, its->getLine(), -1 );
+					r = fm.boundingRect( x0, y0, l0, h0, flags, s, -1 );
 				}
 				else
 				{
 					fm = QFontMetrics( gw->pbNormalFont->font() );
 					p.setFont( gw->pbNormalFont->font() );
-					r = fm.boundingRect( x0, y0, l0, h0, flags, its->getLine(), -1 );
+					r = fm.boundingRect( x0, y0, l0, h0, flags, s, -1 );
 				}
 				switch ( gw->cbHoriz->currentItem() )
 				{
@@ -1888,7 +1889,7 @@ void WndSub::genPngForSpumux()
 				}
 			}
 			//img.setNumColors( 3 );
-			name.sprintf( "%s%4.4d.png",gw->leBaseName->text().ascii(), ctr++ );
+			name.sprintf( "%s%4.4d.png",gw->leBaseName->text().ascii(), ++ctr );
 			img.save( name, "PNG" );
 
 			stream << " image=\"" << name << "\"";
