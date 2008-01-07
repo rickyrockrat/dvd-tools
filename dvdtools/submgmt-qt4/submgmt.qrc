@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/pix" >
+        <file>fileopen.xpm</file>
+        <file>submgmt_icon.png</file>
+    </qresource>
+</RCC>
