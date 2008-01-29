@@ -8,6 +8,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QTextCodec>
+#include <QProgressDialog>
 
 #include "subtitle.h"
 #include "qt4genpngwnd.h"
@@ -123,6 +124,9 @@ qt4wndsub::qt4wndsub( QWidget *parent ) : QWidget(parent)
 
 	connect (cbTypeO, SIGNAL(activated(int)),
 		this, SLOT(saveTypeCheck()));
+
+	connect (pbNextWrongSub, SIGNAL(clicked()),
+		this, SLOT(nextWrongSub()));
 
 }
 
@@ -1670,8 +1674,15 @@ void qt4wndsub::genPngForSpumux()
 		stream << "<subpictures>" << endl;
 		stream << "  <stream>" << endl;
 		int ctr = 0;
+		QProgressDialog progress("Generating files...", "Abort", 0, 
+			subvec.size(), this);
+		progress.setWindowModality(Qt::WindowModal);
+		progress.setWindowTitle( "PNG Progress" );
+		int pgr = 0;
 		for ( it = subvec.begin(); it != subvec.end(); it++ )
 		{
+			progress.setValue( pgr++ );
+			if (progress.wasCanceled()) break;
 			ts = (*it)->getBegin();
 			te = (*it)->getEnd();
 			stream << "    <spu";
@@ -1716,6 +1727,7 @@ void qt4wndsub::genPngForSpumux()
 			{
 				flags |= Qt::AlignBottom;
 			}
+			QString maxs( "" );
 			for ( its = (*it)->getSubs().begin(); its != (*it)->getSubs().end(); its++ )
 			{
 				if ( its->getFmt() == Subline::Italic )
@@ -1733,7 +1745,11 @@ void qt4wndsub::genPngForSpumux()
 					fm = QFontMetrics( gw->pbNormalFont->font() );
 					r = fm.boundingRect( x0, y0, l0, h0, flags, its->getLine(), -1 );
 				}
-				if ( r.width() > maxw ) maxw = r.width();
+				if ( r.width() > maxw )
+				{
+					maxs = its->getLine();
+					maxw = r.width();
+				}
 				maxh += r.height() + fm.leading() + fm.descent();
 			}
 			int dispow = 720 - gw->sbLeftMargin->value() - gw->sbRightMargin->value();	
@@ -1741,7 +1757,8 @@ void qt4wndsub::genPngForSpumux()
 			if ( maxw > dispow )
 			{
 				maxw = dispow;
-				QMessageBox::information( this, "submgmt", "Subtitle " + its->getLine() + " is too wide" );
+				QMessageBox::information( this, "submgmt",
+										"Subtitle :\n" + maxs + "\nis too wide");
 			}
 			if ( gw->rbPAL->isChecked() )
 			{
@@ -1754,16 +1771,15 @@ void qt4wndsub::genPngForSpumux()
 			if ( maxh > dispoh )
 			{
 				maxh = dispoh;
-				QMessageBox::information( this, "submgmt", "Subtitle " + its->getLine() + " is too high" );
+				QMessageBox::information( this, "submgmt", "Subtitles are too high" );
 			}
 
 			// drawing the text
 			QPixmap gensub( maxw, maxh );
 			gensub.fill( Qt::black );
 			QPainter p( &gensub );
-			QString s;
 			int clip = 10;
-			QColor textcol = gw->pbSubColor->palette().color( QPalette::Background);
+			QColor textcol = gw->pbSubColor->palette().color( QPalette::Button);
 			if ( ( (textcol.red()-clip) <= 0 )
 				&& ( (textcol.green()-clip) <= 0 )
 				&& ( (textcol.blue()-clip) <= 0 ) )
@@ -1810,7 +1826,7 @@ void qt4wndsub::genPngForSpumux()
 				}
 				p.setPen( QPen( textcol ) );
 				p.setBrush( QBrush( textcol, Qt::SolidPattern ) );
-				p.drawText( x, y+r.height()+fm.leading(), s );
+				p.drawText( x, y+r.height()+fm.leading(), its->getLine() );
 				y += r.height() + fm.leading();
 			}
 
@@ -1876,6 +1892,7 @@ void qt4wndsub::genPngForSpumux()
 			stream << " yoffset=\"" << yoff << "\"";
 			stream << " />" << endl;
 		}
+		progress.setValue( subvec.size() );
 		stream << "  </stream>" << endl;
 		stream << "</subpictures>" << endl;
 	}
@@ -1931,3 +1948,26 @@ void qt4wndsub::setInputFile( char *fn )
 {
 	leInputFile->setText( fn );
 }
+
+void qt4wndsub::nextWrongSub()
+{
+	static int i;
+	SubModel *inputSubsModel = (SubModel*)lvInputSubs->model();
+	QModelIndex index;
+	QVariant var;
+	Subtitle *_subtitle;
+	while ( i < inputSubsModel->rowCount() )
+	{
+		index = inputSubsModel->index( i, 0 );
+		var = index.model()->data(index, Qt::DisplayRole);
+		_subtitle = var.value<Subtitle *>();
+		i++;
+		if ( _subtitle->getProblem() )
+		{
+			lvInputSubs->setCurrentIndex( index );
+			break;
+		}
+	}
+	if ( i == inputSubsModel->rowCount() ) i = 0;
+}
+

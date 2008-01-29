@@ -25,7 +25,7 @@ qt4genpngwnd::qt4genpngwnd( QWidget *parent ) : QDialog( parent )
 	connect( pbOk, SIGNAL(clicked()), this, SLOT(accept()));
 	connect( pbCancel, SIGNAL(clicked()), this, SLOT(reject()));
 	QPalette pal;
-	pal.setColor( QPalette::Background, Qt::white );
+	pal.setColor( QPalette::Button, Qt::white );
 	pbSubColor->setPalette( pal );
 }
 
@@ -47,6 +47,6 @@ void qt4genpngwnd::selBoldFont()
 void qt4genpngwnd::selSubColor()
 {
 	QPalette pal;
-	pal.setColor( QPalette::Background, QColorDialog::getColor() );
+	pal.setColor( QPalette::Button, QColorDialog::getColor() );
 	pbSubColor->setPalette( pal );
 }

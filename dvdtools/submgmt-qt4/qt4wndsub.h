@@ -58,6 +58,7 @@ public slots:
 	void clicSelectSubstFile();
 	void saveTypeCheck( );
 	void subeditclosed(QWidget* ed,QAbstractItemDelegate::EndEditHint h);
-};
+	void nextWrongSub();
 
+};
 #endif
