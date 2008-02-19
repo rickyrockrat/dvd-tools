@@ -23,7 +23,7 @@ QVariant SubModel::data(const QModelIndex &index, int role) const
 		return QVariant();
 
 	if (role == Qt::DisplayRole)
-		return QVariant::fromValue( _subs[index.row()] );
+		return qVariantFromValue( _subs[index.row()] );
 	else
 		return QVariant();
 }
@@ -41,7 +41,7 @@ bool SubModel::setData(const QModelIndex &index,
 {
 	if (index.isValid() && role == Qt::EditRole)
 	{
-		Subtitle *s = value.value<Subtitle *>();
+		Subtitle *s = qVariantValue<Subtitle *>(value);
 		_subs[ index.row() ] = s;
 		emit dataChanged(index, index);
 		return true;

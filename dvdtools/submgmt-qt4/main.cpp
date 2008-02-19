@@ -23,6 +23,7 @@ public:
 		{
 			std::cout << "erreur" << std::endl;
 		}
+		return true;
 	}
 };
 

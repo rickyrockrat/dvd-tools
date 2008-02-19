@@ -111,6 +111,11 @@ qt4wndsub::qt4wndsub( QWidget *parent ) : QWidget(parent)
 	comboFpsDest->setEnabled( false );
 	tlFps->setEnabled( false );
 	
+	timeFirstSub->setDisplayFormat( "hh:mm:ss.zzz" );
+	timeLastSub->setDisplayFormat( "hh:mm:ss.zzz" );
+	timeFirstSpeak->setDisplayFormat( "hh:mm:ss.zzz" );
+	timeLastSpeak->setDisplayFormat( "hh:mm:ss.zzz" );
+
 	curItem = 0;
 
 	connect( pbGenPng, SIGNAL(clicked()),
@@ -1357,7 +1362,7 @@ void qt4wndsub::loadSami(QString fname)
 				subs.clear();
 
 				line = stream.readLine( );
-				QString str = line.section( 'CLASS=SUBTTL>', 1 );
+				QString str = line.section( "CLASS=SUBTTL>", 1 );
 				if ( str.contains( spaces ) ) continue;
 				// handle <br>
 				QStringList l = str.split( br );
@@ -1960,7 +1965,7 @@ void qt4wndsub::nextWrongSub()
 	{
 		index = inputSubsModel->index( i, 0 );
 		var = index.model()->data(index, Qt::DisplayRole);
-		_subtitle = var.value<Subtitle *>();
+		_subtitle = qVariantValue<Subtitle *>(var);
 		i++;
 		if ( _subtitle->getProblem() )
 		{

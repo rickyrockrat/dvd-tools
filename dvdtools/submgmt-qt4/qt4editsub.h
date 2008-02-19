@@ -1,6 +1,6 @@
 
-#ifndef _QT4EDITSUB.H
-#define _QT4EDITSUB.H
+#ifndef _QT4EDITSUB_H
+#define _QT4EDITSUB_H
 
 #include <QDialog>
 #include "subitemdelegate.h"

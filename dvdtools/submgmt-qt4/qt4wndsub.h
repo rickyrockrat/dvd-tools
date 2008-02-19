@@ -1,6 +1,6 @@
 
-#ifndef _QT4WNDSUB.H
-#define _QT4WNDSUB.H
+#ifndef _QT4WNDSUB_H
+#define _QT4WNDSUB_H
 
 #include <QListWidgetItem>
 

@@ -7,7 +7,7 @@ SubEditor::SubEditor( const QModelIndex &index,
 						: QWidget( parent )
 {
 	QVariant var = index.model()->data(index, Qt::DisplayRole);
-	sub = var.value<Subtitle *>();
+	sub = qVariantValue<Subtitle *>(var);
 	frBegin = new QSpinBox( this );
 	frEnd = new QSpinBox( this );
 	teBegin = new QTimeEdit( this );

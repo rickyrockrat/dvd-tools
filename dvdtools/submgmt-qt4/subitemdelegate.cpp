@@ -26,7 +26,7 @@ void SubItemDelegate::setEditorData( QWidget *editor,
 {
 	SubEditor *edit = static_cast<SubEditor *>(editor);
 	QVariant v = index.model()->data(index, Qt::DisplayRole);
-	edit->setSub( v.value<Subtitle *>() );
+	edit->setSub( qVariantValue<Subtitle *>(v) );
 }
 
 void SubItemDelegate::setModelData( QWidget *editor,
@@ -35,7 +35,7 @@ void SubItemDelegate::setModelData( QWidget *editor,
 			) const
 {
 	SubEditor *edit = static_cast<SubEditor *>(editor);
-	QVariant value = QVariant::fromValue( edit->getSub() );
+	QVariant value = qVariantFromValue( edit->getSub() );
 
 	model->setData(index, value, Qt::EditRole);
 }
@@ -52,7 +52,7 @@ QSize SubItemDelegate::sizeHint( const QStyleOptionViewItem & option,
 				const QModelIndex & index ) const  
 {
 	QVariant var = index.model()->data(index, Qt::DisplayRole);
-	Subtitle *_subtitle = var.value<Subtitle *>();
+	Subtitle *_subtitle = qVariantValue<Subtitle *>(var);
 	QFontMetrics fm( QApplication::font() );
 	int h =	(_subtitle->getSubs().size() + 1) * fm.lineSpacing();
 	int w = fm.width( _subtitle->getTiming());
@@ -77,7 +77,7 @@ void SubItemDelegate::paint( QPainter * p,
 		p->setPen( Qt::white );
 	}
 	QVariant var = index.model()->data(index, Qt::DisplayRole);
-	Subtitle *_subtitle = var.value<Subtitle *>();
+	Subtitle *_subtitle = qVariantValue<Subtitle *>(var);
 	QFontMetrics fm( QApplication::font() );
 	p->setFont( QApplication::font() );
 	int begin =  option.rect.y() + fm.lineSpacing();
