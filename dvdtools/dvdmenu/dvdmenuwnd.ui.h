@@ -792,8 +792,8 @@ QPixmap dvdmenuWnd::drawMenu( QPixmap &fond, int currentpage, int totalpages )
 			{
 				newr = QRect( tabr[ ct ].x(),
 								tabr[ ct ].y(),
-								tabr[ ct ].width(),
-								tabr[ ct ].height() * aspect );
+								tabr[ ct ].width() / aspect,
+								tabr[ ct ].height() );
 			}
 			else
 			{
