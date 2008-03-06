@@ -1,0 +1,19 @@
+<RCC>
+    <qresource prefix="/" >
+        <file>pix/black.jpg</file>
+        <file>pix/ic_bgcolor.png</file>
+        <file>pix/ic_directplay.png</file>
+        <file>pix/ic_exit.png</file>
+        <file>pix/ic_font.png</file>
+        <file>pix/ic_mencoder.png</file>
+        <file>pix/ic_new.png</file>
+        <file>pix/ic_newdvd.png</file>
+        <file>pix/ic_open.png</file>
+        <file>pix/ic_preview.png</file>
+        <file>pix/ic_remove.png</file>
+        <file>pix/ic_run.png</file>
+        <file>pix/ic_save.png</file>
+        <file>pix/ic_title.png</file>
+        <file>pix/ic_video.png</file>
+    </qresource>
+</RCC>
