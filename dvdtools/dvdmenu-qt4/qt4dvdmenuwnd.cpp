@@ -44,8 +44,10 @@ qt4dvdmenuWnd::qt4dvdmenuWnd( QWidget *parent )
 	connect( aRemove, SIGNAL(activated()), this, SLOT(removeItem()) );
 	connect( pbMenuBg, SIGNAL(clicked()), this, SLOT(selectBgPic()) );
 	connect( pbMenuSound, SIGNAL(clicked()), this, SLOT(selectSound()) );
-	connect( lvDVD, SIGNAL(clicked(QTreeWidgetItem *)),
-	this, SLOT(lvClicked(QTreeWidgetItem*)));
+	connect( lvDVD, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
+			this, SLOT(lvClicked(QTreeWidgetItem*, int)));
+	connect( lvDVD, SIGNAL(itemActivated(QTreeWidgetItem *, int)),
+			this, SLOT(editItem(QTreeWidgetItem*, int)));
 
 	pbOccup->setMaximum( 4400000 );
 	r1 = QRect( 50, 70, 230, 180 );
@@ -61,9 +63,11 @@ qt4dvdmenuWnd::qt4dvdmenuWnd( QWidget *parent )
 void qt4dvdmenuWnd::newDVD()
 {
 	lvDVD->clear();
-	lvDVD->setColumnCount( 10 );
+	lvDVD->setColumnCount( 11 );
+	lvDVD->setColumnWidth( 1, 0 );
 	QStringList heads;
 
+	heads << "title";
 	heads << "ident";
 	heads << "picture/chapters";
 	heads << "aspect";
@@ -80,7 +84,7 @@ void qt4dvdmenuWnd::newDVD()
 	root << "New DVD" << CC_DVD;
 	dvdItem = new QTreeWidgetItem( lvDVD, root );
 	//FIXME dvdItem->setRenameEnabled( 0, true );
-	//FIXME dvdItem->setOpen( true );
+	lvDVD->expandItem( dvdItem );
 
 	workingDir = QFileDialog::getExistingDirectory( this,
 			"Choose the temporary directory",
@@ -121,11 +125,18 @@ void qt4dvdmenuWnd::addTitle()
 		titleItem->setRenameEnabled( ID_SUB4, true );
 		titleItem->setOpen( true );
 		*/
+		titleItem->setFlags( Qt::ItemIsEditable );
+		lvDVD->expandItem( titleItem );
 
 	}
 }
 
-void qt4dvdmenuWnd::lvClicked( QTreeWidgetItem *item )
+void qt4dvdmenuWnd::editItem( QTreeWidgetItem *item, int col )
+{
+	lvDVD->openPersistentEditor(item,col);
+}
+
+void qt4dvdmenuWnd::lvClicked( QTreeWidgetItem *item, int /*col*/ )
 {
 	if ( item )
 	{
@@ -221,9 +232,11 @@ void qt4dvdmenuWnd::openProject()
 
 			dvdname = docElem.attributeNode( "NAME" );
 			//std::cout << "dvd=" << dvdname.value() << std::endl;
-			lvDVD->setColumnCount( 10 );
+			lvDVD->setColumnCount( 11 );
+			lvDVD->setColumnWidth( 1, 0 );
 			QStringList heads;
 
+			heads << "name";
 			heads << "ident";
 			heads << "picture/chapters";
 			heads << "aspect";
@@ -243,6 +256,7 @@ void qt4dvdmenuWnd::openProject()
 			/*FIXME dvdItem->setRenameEnabled( ID_NAME, true );
 			dvdItem->setOpen(true);
 			*/
+			lvDVD->expandItem( dvdItem );
 
 			QDomNode n = docElem.firstChild();
 			while( !n.isNull() )
@@ -314,6 +328,7 @@ void qt4dvdmenuWnd::openProject()
 									att = e1.attributeNode( "ID_FILENAME" );
 									videoItem->setText( ID_FILENAME, QString/*::fromUtf8*/( att.value()) );
 									//titleItem->setOpen( true );
+									lvDVD->expandItem( videoItem );
 								}
 							}
 							n1 = n1.nextSibling();

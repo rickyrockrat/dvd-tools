@@ -20,13 +20,7 @@
     <item>
      <layout class="QVBoxLayout" >
       <item>
-       <widget class="QTreeWidget" name="lvDVD" >
-        <column>
-         <property name="text" >
-          <string>1</string>
-         </property>
-        </column>
-       </widget>
+       <widget class="QTreeWidget" name="lvDVD" />
       </item>
       <item>
        <widget class="QProgressBar" name="pbOccup" >

@@ -23,7 +23,8 @@ public:
 public slots:
 	void newDVD();
 	void addTitle();
-	void lvClicked( QTreeWidgetItem *item );
+	void lvClicked( QTreeWidgetItem *item, int );
+	void editItem( QTreeWidgetItem *item, int );
 	void addVideo();
 	void selectBgColor();
 	void selectFont();
