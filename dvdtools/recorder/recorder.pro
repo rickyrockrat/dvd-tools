@@ -1,18 +1,22 @@
 TEMPLATE	= app
 LANGUAGE	= C++
 
-CONFIG	+= qt warn_on release
+CONFIG	+= qt warn_on
 
-SOURCES	+= main.cpp
+SOURCES	+= main.cpp recwnd.cpp
+
+HEADERS += recwnd.h
 
 FORMS	= recwnd.ui
-
-IMAGES	= pix/ic_open.png
 
 recorder.path = /usr/bin
 recorder.files = recorder
 
 INSTALLS += recorder
+
+RESOURCES = recwnd.qrc
+
+LIBS += -lQtNetwork
 
 unix {
   UI_DIR = .ui
