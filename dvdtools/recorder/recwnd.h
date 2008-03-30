@@ -14,6 +14,8 @@ public:
 	void getOneImage();
 public slots:
 	void get();
+	void program();
+	void record();
 	void toggledProxy(bool);
 	void readResponse(bool);
 	void imReqFinished(int,bool);

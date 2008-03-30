@@ -7,6 +7,8 @@
 #include <QFileInfo>
 #include <QFileDialog>
 #include <QProcess>
+#include <QDateTime>
+#include <QTimer>
 #include "recwnd.h"
 
 #include <iostream>
@@ -18,11 +20,14 @@ recwnd::recwnd( QWidget *parent )
 
 	req = new QHttp(this);
 	imReq = new QHttp(this);
+	dteStart->setDateTime( QDateTime::currentDateTime());
 
 	connect( ckEnableProxy, SIGNAL(toggled(bool)),
 		this, SLOT(toggledProxy(bool)) );
 	connect ( pbGet, SIGNAL( clicked() ),
 		this, SLOT( get() ) );
+	connect ( pbProgram, SIGNAL( clicked() ),
+		this, SLOT( program() ) );
 	connect( req, SIGNAL(done(bool)),
 		this, SLOT(readResponse(bool)) );
 	connect( imReq, SIGNAL( requestFinished( int, bool )),
@@ -36,8 +41,29 @@ void recwnd::toggledProxy(bool b)
 	gbProxy->setEnabled(b);
 }
 
+void recwnd::record()
+{
+	QStringList arg;
+	arg << leKeyword->text();
+	arg << leDestFile->text();
+	arg << leUrl->text();
+	QProcess::execute( "/home/david/dvdtools/recorder/prog.sh", arg );
+}
+
+void recwnd::program()
+{
+	QDateTime progdt = dteStart->dateTime();
+	QDateTime curdt( QDateTime::currentDateTime() );
+	if ( progdt > curdt )
+	{
+		uint delay = progdt.toTime_t() - curdt.toTime_t();
+		QTimer::singleShot(delay * 1000, this, SLOT(record()));
+	}
+}
+
 void recwnd::get()
 {
+	lwVideos->clear();
 	if ( ckEnableProxy->isChecked() )
 	{
 		req->setProxy( leProxyHost->text(),
