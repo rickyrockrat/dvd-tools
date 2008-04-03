@@ -12,6 +12,8 @@ Q_OBJECT
 public:
 	recwnd( QWidget *parent = 0);
 	void getOneImage();
+	void clean();
+	void recordStart();
 public slots:
 	void get();
 	void program();
@@ -23,12 +25,18 @@ public slots:
 	void imReadResponseHeader(const QHttpResponseHeader &);
 	void vidDoubleClicked ( QListWidgetItem * ); 
 	void linkReadResponse(bool err);
+	void progLinkReadResponse(bool err );
 	void regarder( QString );
 	void enregistrer( QString );
+	void canProgram();
+	void selectDestFile();
+	void cancelGet();
+	void ok();
 private :
 	QHttp *req;
 	QHttp *imReq;
 	QHttp *linkReq;
+	QHttp *progLinkReq;
 	QString imName;
 	QStringList imageList;
 	QStringList nameList;
@@ -36,5 +44,9 @@ private :
 	int imGetId;
 	int ctr;
 	QFile *imFile;
+	std::vector<QFile *>toRemove;
+	bool cancel;
+	bool prog;
+	int retries;
 };
 #endif	// _RECWND_H }
