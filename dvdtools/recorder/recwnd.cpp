@@ -75,7 +75,7 @@ void recwnd::cancelGet()
 {
 	cancel = true;
 	if ( imReq ) imReq->abort();
-	prohbarGet->setVisible( false );
+	progbarGet->setVisible( false );
 	pbCancelGet->setEnabled(false);
 }
 
