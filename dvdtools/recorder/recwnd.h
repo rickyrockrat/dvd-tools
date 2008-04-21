@@ -38,6 +38,7 @@ private :
 	QHttp *linkReq;
 	QHttp *progLinkReq;
 	QString imName;
+	QStringList titleList;
 	QStringList imageList;
 	QStringList nameList;
 	QStringList linkList;

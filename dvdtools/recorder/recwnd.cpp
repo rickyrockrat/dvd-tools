@@ -9,6 +9,7 @@
 #include <QProcess>
 #include <QDateTime>
 #include <QTimer>
+#include <QtDebug>
 #include "recwnd.h"
 
 #include <iostream>
@@ -124,7 +125,8 @@ void recwnd::recordStart()
 	for ( int i = 0; i < linkList.size(); i++ )
 	{
 		QString s = linkList[ i ];
-		if ( s.contains( leKeyword->text() ) )
+		QString t = titleList[ i ];
+		if ( t.contains( leKeyword->text() ) )
 		{
 			kwFound = true;
 			QUrl link( s );
@@ -140,6 +142,7 @@ void recwnd::recordStart()
 			connect( progLinkReq, SIGNAL(done(bool)),
 				this, SLOT(progLinkReadResponse(bool)));
 			progLinkReq->get(link.path());
+			break;
 		}
 	}
 	if ( ( !kwFound ) && ( retries < 4 ) )
@@ -174,6 +177,9 @@ void recwnd::progLinkReadResponse(bool err )
 				arg << "-dumpfile";
 				arg << leDestFile->text();
 				arg << link;
+				QProcess::execute( "mplayer", arg );
+				arg.clear();
+				arg << "/usr/share/sounds/k3b_success1.wav";
 				QProcess::execute( "mplayer", arg );
 			}
 		}
@@ -234,11 +240,15 @@ void recwnd::readResponse(bool err)
 		{
 			// VideoListUne[1]=new VideoListItem('Mancini va partir', '', 'http://i.video.eurosport.fr/2008/03/12/424449-2776674-81-61.jpg', 'http://video.eurosport.fr/football/ligue-des-champions/2007-2008/video_vid67408.shtml', '2 257', 'Mer. 12/03/2008', '10:54','Football', '1', '0', '', '');
 			QStringList sl = s.split(',');
+			QStringList sl0 = sl[0].split('\'');
+			QString titre = sl0[1];
+			qDebug() << titre;
 			QString fn = sl[2].remove("'").remove(' ') ;
 			QString vidname = sl[0].section('\'', 1 ).remove("'").remove(' ') ;
 			QString link = sl[3].remove("'").remove(' ');
 			if ( !fn.isEmpty() )
 			{
+				titleList << titre;
 				imageList << fn;
 				nameList << vidname;
 				linkList << link;
@@ -322,7 +332,7 @@ void recwnd::imReqFinished(int curId, bool error )
 	if ( !cancel )
 	{
 		QIcon *ic = new QIcon( imFile->fileName() );
-		new QListWidgetItem( *ic, imName, lwVideos, ctr );
+		new QListWidgetItem( *ic, titleList[ctr], lwVideos, ctr );
 		imFile->close();
 		progbarGet->setValue( progbarGet->value() + 1 );
 		toRemove.push_back(imFile);
@@ -386,6 +396,7 @@ void recwnd::linkReadResponse(bool err)
 			QString link = sl[1];
 			if ( !link.isEmpty() )
 			{
+				link.replace( "mms", "http" );
 				QMessageBox msgBox;
 				msgBox.setWindowTitle( "Question" );
 				msgBox.setText("Voulez-vous regarder cette video ou l'enregistrer ?" );
@@ -428,6 +439,9 @@ void recwnd::enregistrer( QString link )
 	arg << "-dumpfile";
 	arg << destFile;
 	arg << link;
+	QProcess::execute( "mplayer", arg );
+	arg.clear();
+	arg << "/usr/share/sounds/k3b_success1.wav";
 	QProcess::execute( "mplayer", arg );
 }
 
