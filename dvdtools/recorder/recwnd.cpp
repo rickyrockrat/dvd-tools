@@ -10,6 +10,7 @@
 #include <QDateTime>
 #include <QTimer>
 #include <QtDebug>
+#include "detailwnd.h"
 #include "recwnd.h"
 
 #include <iostream>
@@ -400,25 +401,10 @@ void recwnd::linkReadResponse(bool err)
 			if ( !link.isEmpty() )
 			{
 				link.replace( "mms", "http" );
-				QMessageBox msgBox;
-				msgBox.setWindowTitle( "Question" );
-				msgBox.setText("Voulez-vous regarder cette video ou l'enregistrer ?" );
-				QPushButton *pbRegarder = msgBox.addButton(tr("Regarder"), QMessageBox::ActionRole);
-				QPushButton *pbEnregistrer = msgBox.addButton(tr("Enregistrer"), QMessageBox::ActionRole); 
-				QPushButton *pbAnnuler = msgBox.addButton("Annuler", QMessageBox::ActionRole); 
-				msgBox.exec();
 
-				if (msgBox.clickedButton() == pbRegarder)
-				{
-					regarder( link );
- 				}
-				else if (msgBox.clickedButton() == pbEnregistrer)
-				{
-					enregistrer( link );
-				}
-				else if ( msgBox.clickedButton() == pbAnnuler )
-				{
-				}
+				detailwnd *dw = new detailwnd(this);
+				dw->setLink(link);
+				dw->exec();
 			}
 		}
 	}

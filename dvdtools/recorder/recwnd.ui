@@ -16,7 +16,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle" >
-   <string>Dialog</string>
+   <string>Video Recorder</string>
   </property>
   <layout class="QVBoxLayout" >
    <item>

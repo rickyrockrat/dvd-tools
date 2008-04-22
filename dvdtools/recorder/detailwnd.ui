@@ -1,0 +1,65 @@
+<ui version="4.0" >
+ <class>detailWnd</class>
+ <widget class="QDialog" name="detailWnd" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>90</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Vidéo </string>
+  </property>
+  <layout class="QVBoxLayout" >
+   <item>
+    <widget class="QLineEdit" name="leAdresse" >
+     <property name="readOnly" >
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" >
+     <item>
+      <widget class="QPushButton" name="pbRegarder" >
+       <property name="text" >
+        <string>&amp;Regarder</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pbEnregistrer" >
+       <property name="text" >
+        <string>&amp;Enregistrer</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer>
+       <property name="orientation" >
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" >
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pbRetour" >
+       <property name="text" >
+        <string>R&amp;etour à la liste</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
