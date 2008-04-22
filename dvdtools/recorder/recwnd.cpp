@@ -172,7 +172,10 @@ void recwnd::progLinkReadResponse(bool err )
 			QString link = sl[1];
 			if ( !link.isEmpty() )
 			{
+				link.replace( "mms", "http" );
 				QStringList arg;
+				arg << "-cache";
+				arg << "4096";
 				arg << "-dumpstream";
 				arg << "-dumpfile";
 				arg << leDestFile->text();
@@ -432,9 +435,11 @@ void recwnd::enregistrer( QString link )
 {
 	QString destFile = QFileDialog::getSaveFileName(this, tr("Sauver la video"),
                             "/home/dige7306/"+link,
-                            tr("Video (*.asf *.asx *.wmv *.flv *.avi)"));
+                            tr("Video (*.asf *.asx *wsx *.wmv *.flv *.avi)"));
 	if ( destFile.isEmpty() ) return;
 	QStringList arg;
+	arg << "-cache";
+	arg << "4096";
 	arg << "-dumpstream";
 	arg << "-dumpfile";
 	arg << destFile;
