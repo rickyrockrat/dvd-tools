@@ -152,6 +152,16 @@ void recwnd::recordStart()
 		retries++;
 		QTimer::singleShot(120000, this, SLOT(record()));
 	}
+	else if ( retries < 4 )
+	{
+		// keyword found, let's check if we dumped something useful
+		QFile f( leDestFile->text() );
+		if ( f.size() < 10000000 )
+		{
+			retries++;
+			QTimer::singleShot(120000, this, SLOT(record()));
+		}
+	}
 }
 
 void recwnd::progLinkReadResponse(bool err )
@@ -173,7 +183,37 @@ void recwnd::progLinkReadResponse(bool err )
 			QString link = sl[1];
 			if ( !link.isEmpty() )
 			{
-				link.replace( "mms", "http" );
+				QString prox;
+				if ( ckEnableProxy->isChecked() )
+				{
+					if ( leProxyUser->text().isEmpty() )
+					{
+						prox = "http_proxy://" + leProxyHost->text() + ":"
+									+ QString::number( sbProxyPort->value() ) +
+									"/http://";
+					}
+					else
+					{
+						prox = "http_proxy://" +
+							leProxyUser->text() + ":" +
+							leProxyPassword->text() + "@" +
+							leProxyHost->text() + ":" +
+							QString::number( sbProxyPort->value() ) +
+							"/http://";
+					}
+				}
+				else
+				{
+					prox = "http://";
+				}
+				if ( link.contains("mms://") )
+				{
+					link.replace( "mms://", prox );
+				}
+				else
+				{
+					link.replace( "http://", prox );
+				}
 				QStringList arg;
 				arg << "-cache";
 				arg << "4096";
@@ -400,7 +440,37 @@ void recwnd::linkReadResponse(bool err)
 			QString link = sl[1];
 			if ( !link.isEmpty() )
 			{
-				link.replace( "mms", "http" );
+				QString prox;
+				if ( ckEnableProxy->isChecked() )
+				{
+					if ( leProxyUser->text().isEmpty() )
+					{
+						prox = "http_proxy://" + leProxyHost->text() + ":"
+									+ QString::number( sbProxyPort->value() ) +
+									"/http://";
+					}
+					else
+					{
+						prox = "http_proxy://" +
+							leProxyUser->text() + ":" +
+							leProxyPassword->text() + "@" +
+							leProxyHost->text() + ":" +
+							QString::number( sbProxyPort->value() ) +
+							"/http://";
+					}
+				}
+				else
+				{
+					prox = "http://";
+				}
+				if ( link.contains("mms://") )
+				{
+					link.replace( "mms://", prox );
+				}
+				else
+				{
+					link.replace( "http://", prox );
+				}
 
 				detailwnd *dw = new detailwnd(this);
 				dw->setLink(link);
