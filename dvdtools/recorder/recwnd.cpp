@@ -9,6 +9,7 @@
 #include <QProcess>
 #include <QDateTime>
 #include <QTimer>
+#include <unistd.h>
 #include <QtDebug>
 #include "detailwnd.h"
 #include "recwnd.h"
@@ -152,16 +153,6 @@ void recwnd::recordStart()
 		retries++;
 		QTimer::singleShot(120000, this, SLOT(record()));
 	}
-	else if ( retries < 4 )
-	{
-		// keyword found, let's check if we dumped something useful
-		QFile f( leDestFile->text() );
-		if ( f.size() < 10000000 )
-		{
-			retries++;
-			QTimer::singleShot(120000, this, SLOT(record()));
-		}
-	}
 }
 
 void recwnd::progLinkReadResponse(bool err )
@@ -214,14 +205,33 @@ void recwnd::progLinkReadResponse(bool err )
 				{
 					link.replace( "http://", prox );
 				}
+				int retries = 0;
 				QStringList arg;
-				arg << "-cache";
-				arg << "4096";
-				arg << "-dumpstream";
-				arg << "-dumpfile";
-				arg << leDestFile->text();
-				arg << link;
-				QProcess::execute( "mplayer", arg );
+				while( retries < 4 )
+				{
+					arg.clear();
+					arg << "-cache";
+					arg << "4096";
+					arg << "-dumpstream";
+					arg << "-dumpfile";
+					arg << leDestFile->text();
+					arg << link;
+					QProcess::execute( "mplayer", arg );
+					if ( retries < 4 )
+					{
+						// keyword found, let's check if we dumped something useful
+						QFile f( leDestFile->text() );
+						if ( f.size() < 10000000 )
+						{
+							sleep( 120 );
+							retries++;
+						}
+						else
+						{
+							retries = 4;	// sortie
+						}
+					}
+				}
 				arg.clear();
 				arg << "/usr/share/sounds/k3b_success1.wav";
 				QProcess::execute( "mplayer", arg );
