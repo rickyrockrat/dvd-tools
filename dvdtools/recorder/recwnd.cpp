@@ -110,8 +110,13 @@ void recwnd::toggledProxy(bool b)
 
 void recwnd::record()
 {
+	static int ctr;
 	prog = true;
+	leUrl->setText( progLinksList[ ctr ] );
+	leKeyword->setText( progKeywordsList[ ctr ]);
+	leDestFile->setText( progFilenamesList[ ctr ] );
 	this->get();
+	ctr++;
 }
 
 void recwnd::recordStart()
@@ -246,6 +251,9 @@ void recwnd::program()
 	if ( progdt > curdt )
 	{
 		uint delay = progdt.toTime_t() - curdt.toTime_t();
+		progLinksList << leUrl->text();
+		progKeywordsList << leKeyword->text();
+		progFilenamesList << leDestFile->text();
 		QTimer::singleShot(delay * 1000, this, SLOT(record()));
 		lwProgs->setVisible( true );
 		QString s;

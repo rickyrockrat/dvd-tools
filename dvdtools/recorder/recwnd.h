@@ -42,6 +42,9 @@ private :
 	QStringList imageList;
 	QStringList nameList;
 	QStringList linkList;
+	QStringList progFilenamesList;
+	QStringList progKeywordsList;
+	QStringList progLinksList;
 	int imGetId;
 	int ctr;
 	QFile *imFile;
