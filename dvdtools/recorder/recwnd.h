@@ -4,8 +4,9 @@
 #include "ui_recwnd.h"
 #include <QtNetwork/QHttp>
 #include <QFile>
+#include <QMainWindow>
 
-class recwnd : public QDialog, public Ui::recWnd
+class recwnd : public QMainWindow, public Ui::recWnd
 {
 Q_OBJECT
 
@@ -16,9 +17,9 @@ public:
 	void recordStart();
 public slots:
 	void get();
-	void program();
+	void addProgram();
+	void delProgram();
 	void record();
-	void toggledProxy(bool);
 	void readResponse(bool);
 	void imReqFinished(int,bool);
 	void imReqDone(bool);
@@ -28,10 +29,12 @@ public slots:
 	void progLinkReadResponse(bool err );
 	void regarder( QString );
 	void enregistrer( QString );
-	void canProgram();
-	void selectDestFile();
 	void cancelGet();
 	void ok();
+	void selDestFile();
+	void checkProg();
+	void showPrefs();
+	void readPrefs();
 private :
 	QHttp *req;
 	QHttp *imReq;
@@ -42,9 +45,9 @@ private :
 	QStringList imageList;
 	QStringList nameList;
 	QStringList linkList;
-	QStringList progFilenamesList;
-	QStringList progKeywordsList;
-	QStringList progLinksList;
+	QString progDestFile;
+	QString progKeyword;
+	QString progUrl;
 	int imGetId;
 	int ctr;
 	QFile *imFile;
@@ -52,5 +55,16 @@ private :
 	bool cancel;
 	bool prog;
 	int retries;
+	int numProgs;
+	QTimer *progTimer;
+	bool proxyEnabled;
+	QString proxyHost;
+	int proxyPort;
+	QString proxyUser;
+	QString proxyPassword;
+	QRegExp vidLinkRE;
+	QRegExp vidListRE;
+	QString defaultUrl;
+	int minSize;
 };
 #endif	// _RECWND_H }

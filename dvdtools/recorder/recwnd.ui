@@ -1,296 +1,213 @@
 <ui version="4.0" >
  <class>recWnd</class>
- <widget class="QDialog" name="recWnd" >
+ <widget class="QMainWindow" name="recWnd" >
   <property name="geometry" >
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>436</width>
-    <height>526</height>
+    <width>422</width>
+    <height>398</height>
    </rect>
   </property>
-  <property name="sizePolicy" >
-   <sizepolicy vsizetype="Minimum" hsizetype="Preferred" >
-    <horstretch>0</horstretch>
-    <verstretch>0</verstretch>
-   </sizepolicy>
-  </property>
   <property name="windowTitle" >
-   <string>Video Recorder</string>
+   <string>Recorder</string>
   </property>
-  <layout class="QVBoxLayout" >
-   <item>
-    <widget class="QCheckBox" name="ckEnableProxy" >
-     <property name="text" >
-      <string>Enable Proxy</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="gbProxy" >
-     <property name="enabled" >
-      <bool>false</bool>
-     </property>
-     <property name="title" >
-      <string>Proxy Settings</string>
-     </property>
-     <layout class="QVBoxLayout" >
+  <widget class="QWidget" name="centralwidget" >
+   <layout class="QVBoxLayout" >
+    <item>
+     <layout class="QHBoxLayout" >
       <item>
-       <layout class="QHBoxLayout" >
-        <item>
-         <widget class="QLabel" name="label" >
-          <property name="minimumSize" >
-           <size>
-            <width>50</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="text" >
-           <string>&amp;Host</string>
-          </property>
-          <property name="buddy" >
-           <cstring>leProxyHost</cstring>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="leProxyHost" >
-          <property name="text" >
-           <string>p-niceway</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_2" >
-          <property name="sizePolicy" >
-           <sizepolicy vsizetype="Preferred" hsizetype="Maximum" >
-            <horstretch>0</horstretch>
-            <verstretch>252</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize" >
-           <size>
-            <width>50</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="text" >
-           <string>&amp;Port</string>
-          </property>
-          <property name="buddy" >
-           <cstring>sbProxyPort</cstring>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QSpinBox" name="sbProxyPort" >
-          <property name="maximum" >
-           <number>65535</number>
-          </property>
-          <property name="value" >
-           <number>3128</number>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       <widget class="QSpinBox" name="sbNumber" >
+        <property name="value" >
+         <number>10</number>
+        </property>
+       </widget>
       </item>
       <item>
-       <layout class="QHBoxLayout" >
+       <widget class="QLabel" name="label_5" >
+        <property name="text" >
+         <string>&amp;Url</string>
+        </property>
+        <property name="buddy" >
+         <cstring>leUrl</cstring>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="leUrl" >
+        <property name="text" >
+         <string>http://video.eurosport.fr/</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pbGet" >
+        <property name="text" >
+         <string>Get</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" >
+      <item>
+       <spacer>
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" >
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QProgressBar" name="progbarGet" >
+        <property name="value" >
+         <number>24</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pbCancelGet" >
+        <property name="text" >
+         <string>Cancel</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" >
+      <item>
+       <widget class="QTableWidget" name="twProgs" >
+        <column>
+         <property name="text" >
+          <string>Keyword</string>
+         </property>
+        </column>
+        <column>
+         <property name="text" >
+          <string>Start</string>
+         </property>
+        </column>
+        <column>
+         <property name="text" >
+          <string>Save to</string>
+         </property>
+        </column>
+        <column>
+         <property name="text" >
+          <string>Source</string>
+         </property>
+        </column>
+       </widget>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" >
         <item>
-         <widget class="QLabel" name="label_3" >
-          <property name="minimumSize" >
-           <size>
-            <width>50</width>
-            <height>0</height>
-           </size>
-          </property>
+         <widget class="QPushButton" name="pbAddProgram" >
           <property name="text" >
-           <string>&amp;User</string>
-          </property>
-          <property name="buddy" >
-           <cstring>leProxyUser</cstring>
+           <string>Add prog</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="leProxyUser" />
-        </item>
-        <item>
-         <widget class="QLabel" name="label_4" >
-          <property name="minimumSize" >
-           <size>
-            <width>50</width>
-            <height>0</height>
-           </size>
-          </property>
+         <widget class="QPushButton" name="pbDelProgram" >
           <property name="text" >
-           <string>&amp;Password</string>
-          </property>
-          <property name="buddy" >
-           <cstring>leProxyPassword</cstring>
+           <string>Del prog</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="leProxyPassword" />
+         <widget class="QPushButton" name="pbDestFile" >
+          <property name="text" >
+           <string>Dest file</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer>
+          <property name="orientation" >
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" >
+           <size>
+            <width>20</width>
+            <height>31</height>
+           </size>
+          </property>
+         </spacer>
         </item>
        </layout>
       </item>
      </layout>
-    </widget>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" >
-     <item>
-      <widget class="QLabel" name="label_5" >
-       <property name="text" >
-        <string>&amp;Url</string>
-       </property>
-       <property name="buddy" >
-        <cstring>leUrl</cstring>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="leUrl" >
-       <property name="text" >
-        <string>http://video.eurosport.fr/</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pbGet" >
-       <property name="text" >
-        <string>Get</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" >
-     <item>
-      <spacer>
-       <property name="orientation" >
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" >
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QProgressBar" name="progbarGet" >
-       <property name="value" >
-        <number>24</number>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pbCancelGet" >
-       <property name="text" >
-        <string>Cancel</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" >
-     <item>
-      <widget class="QLabel" name="label_7" >
-       <property name="text" >
-        <string>Dest. file</string>
-       </property>
-       <property name="buddy" >
-        <cstring>leUrl</cstring>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="leDestFile" />
-     </item>
-     <item>
-      <widget class="QPushButton" name="pbSelDestFile" >
-       <property name="text" >
-        <string>...</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" >
-     <item>
-      <widget class="QDateTimeEdit" name="dteStart" />
-     </item>
-     <item>
-      <widget class="QLabel" name="label_6" >
-       <property name="text" >
-        <string>Keyword</string>
-       </property>
-       <property name="buddy" >
-        <cstring>leUrl</cstring>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="leKeyword" />
-     </item>
-     <item>
-      <widget class="QPushButton" name="pbProgram" >
-       <property name="text" >
-        <string>Program</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <widget class="QListWidget" name="lwProgs" >
-     <property name="sizePolicy" >
-      <sizepolicy vsizetype="Preferred" hsizetype="Expanding" >
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QListWidget" name="lwVideos" >
-     <property name="viewMode" >
-      <enum>QListView::IconMode</enum>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" >
-     <item>
-      <spacer>
-       <property name="orientation" >
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" >
-        <size>
-         <width>291</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pbQuit" >
-       <property name="text" >
-        <string>Quit</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-  </layout>
+    </item>
+    <item>
+     <widget class="QListWidget" name="lwVideos" >
+      <property name="viewMode" >
+       <enum>QListView::IconMode</enum>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" >
+      <item>
+       <spacer>
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" >
+         <size>
+          <width>291</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pbQuit" >
+        <property name="text" >
+         <string>Quit</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>422</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu_File" >
+    <property name="title" >
+     <string>&amp;File</string>
+    </property>
+    <addaction name="aPrefs" />
+    <addaction name="aExit" />
+   </widget>
+   <addaction name="menu_File" />
+  </widget>
+  <widget class="QStatusBar" name="statusbar" />
+  <action name="aPrefs" >
+   <property name="text" >
+    <string>&amp;Preferences</string>
+   </property>
+  </action>
+  <action name="aExit" >
+   <property name="text" >
+    <string>E&amp;xit</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

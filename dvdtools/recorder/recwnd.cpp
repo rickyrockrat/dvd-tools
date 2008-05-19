@@ -8,31 +8,33 @@
 #include <QFileDialog>
 #include <QProcess>
 #include <QDateTime>
+#include <QDateTimeEdit>
 #include <QTimer>
+#include <QSettings>
 #include <unistd.h>
 #include <QtDebug>
 #include "detailwnd.h"
+#include "prefswnd.h"
 #include "recwnd.h"
 
 #include <iostream>
 
 recwnd::recwnd( QWidget *parent )
-	: QDialog( parent )
+	: QMainWindow( parent )
 {
 	setupUi(this);
 
 	req = new QHttp(this);
 	imReq = new QHttp(this);
-	dteStart->setDateTime( QDateTime::currentDateTime());
 
-	connect( ckEnableProxy, SIGNAL(toggled(bool)),
-		this, SLOT(toggledProxy(bool)) );
 	connect ( pbGet, SIGNAL( clicked() ),
 		this, SLOT( get() ) );
-	connect ( pbSelDestFile, SIGNAL( clicked() ),
-		this, SLOT( selectDestFile() ) );
-	connect ( pbProgram, SIGNAL( clicked() ),
-		this, SLOT( program() ) );
+	connect ( pbAddProgram, SIGNAL( clicked() ),
+		this, SLOT( addProgram() ) );
+	connect ( pbDelProgram, SIGNAL( clicked() ),
+		this, SLOT( delProgram() ) );
+	connect ( pbDestFile, SIGNAL( clicked() ),
+		this, SLOT( selDestFile() ) );
 	connect ( pbCancelGet, SIGNAL( clicked() ),
 		this, SLOT( cancelGet() ) );
 	connect ( pbQuit, SIGNAL( clicked() ),
@@ -43,25 +45,44 @@ recwnd::recwnd( QWidget *parent )
 		this, SLOT(imReqFinished(int, bool)) );
 	connect( lwVideos, SIGNAL(itemDoubleClicked ( QListWidgetItem *)),
 		this, SLOT(vidDoubleClicked ( QListWidgetItem * )) ); 
-	connect( leDestFile, SIGNAL(textChanged (QString)),
-		this, SLOT(canProgram()) ); 
-	connect( leKeyword, SIGNAL(textChanged (QString)),
-		this, SLOT(canProgram()) ); 
-	connect( dteStart, SIGNAL(dateTimeChanged ( const QDateTime & )),
-		this, SLOT(canProgram()) );
-	pbProgram->setEnabled( false );
+
+	connect( aPrefs, SIGNAL(triggered()),
+			this, SLOT(showPrefs()));
+	connect( aExit, SIGNAL(triggered()),
+			this, SLOT(ok()));
 	pbCancelGet->setEnabled( false );
 	progbarGet->setVisible( false );
-	lwProgs->setVisible( false );
 	cancel = false;
 	prog = false;
 	retries = 0;
+	numProgs = 0;
+	progTimer = 0;
+	readPrefs();
+
+}
+
+void recwnd::readPrefs()
+{
+	QSettings prefs( "dvdtools","recorder");
+	proxyEnabled = prefs.value("proxy/enabled").toBool();
+	if ( proxyEnabled )
+	{
+		proxyHost = prefs.value("proxy/host").toString();
+		proxyPort = prefs.value("proxy/port").toInt();
+		proxyUser = prefs.value("proxy/user").toString();
+		proxyPassword = prefs.value("proxy/password").toString();
+	}
+	vidLinkRE = QRegExp( prefs.value("misc/vidlinkre").toString() );
+	vidListRE = QRegExp( prefs.value("misc/vidlistre").toString() );
+	defaultUrl = prefs.value("misc/defaulturl").toString();
+	retries = prefs.value("misc/maxretries").toInt();
+	minSize = prefs.value("misc/minsize").toInt();
 }
 
 void recwnd::ok()
 {
 	clean();
-	accept();
+	close();
 }
 
 void recwnd::clean()
@@ -82,68 +103,32 @@ void recwnd::cancelGet()
 	pbCancelGet->setEnabled(false);
 }
 
-void recwnd::selectDestFile()
-{
-	QString fn = QFileDialog::getSaveFileName( this, "Save to" );
-	if ( !fn.isEmpty() )
-		leDestFile->setText( fn );
-}
-
-void recwnd::canProgram()
-{
-	if ( ( !leDestFile->text().isEmpty() )
-	&& ( !leKeyword->text().isEmpty() )
-	&& ( dteStart->dateTime() >  QDateTime::currentDateTime() ) )
-	{
-		pbProgram->setEnabled( true );
-	}
-	else
-	{
-		pbProgram->setEnabled( false );
-	}
-}
-
-void recwnd::toggledProxy(bool b)
-{
-	gbProxy->setEnabled(b);
-}
-
 void recwnd::record()
 {
-	static int ctr;
 	prog = true;
-	leUrl->setText( progLinksList[ ctr ] );
-	leKeyword->setText( progKeywordsList[ ctr ]);
-	leDestFile->setText( progFilenamesList[ ctr ] );
 	this->get();
-	ctr++;
 }
 
 void recwnd::recordStart()
 {
-	/*
-	QStringList arg;
-	arg << leKeyword->text();
-	arg << leDestFile->text();
-	arg << leUrl->text();
-	QProcess::execute( "/home/david/dvdtools/recorder/prog.sh", arg );
-	*/
 	bool kwFound = false;
 	for ( int i = 0; i < linkList.size(); i++ )
 	{
 		QString s = linkList[ i ];
 		QString t = titleList[ i ];
-		if ( t.contains( leKeyword->text() ) )
+		QRegExp re( progKeyword );
+		if ( ( t.contains( re ) )
+		|| ( s.contains( re ) ) )
 		{
 			kwFound = true;
 			QUrl link( s );
 			progLinkReq = new QHttp( this );
-			if ( ckEnableProxy->isChecked() )
+			if ( proxyEnabled )
 			{
-				progLinkReq->setProxy( leProxyHost->text(),
-						sbProxyPort->value(),
-						leProxyUser->text(),
-						leProxyPassword->text() );
+				progLinkReq->setProxy( proxyHost,
+						proxyPort,
+						proxyUser,
+						proxyPassword );
 			}
 			progLinkReq->setHost( link.host() );
 			connect( progLinkReq, SIGNAL(done(bool)),
@@ -168,11 +153,10 @@ void recwnd::progLinkReadResponse(bool err )
 	}
 	QList<QByteArray> l = progLinkReq->readAll().split('\n');
 	QList<QByteArray>::Iterator it;
-	QRegExp vidregexp( "var videoUrl=" );
 	for ( it = l.begin(); it != l.end(); it++ )
 	{
 		QString s( *it );
-		if ( s.contains( vidregexp ) )
+		if ( s.contains( vidLinkRE ) )
 		{
 			//  var videoUrl='http://vodf.eurosport.com/2008/3/12/foot_demission_mancini_fr-67408-700-384-288.flv';
 			QStringList sl = s.split('\'');
@@ -180,21 +164,21 @@ void recwnd::progLinkReadResponse(bool err )
 			if ( !link.isEmpty() )
 			{
 				QString prox;
-				if ( ckEnableProxy->isChecked() )
+				if ( proxyEnabled )
 				{
-					if ( leProxyUser->text().isEmpty() )
+					if ( proxyUser.isEmpty() )
 					{
-						prox = "http_proxy://" + leProxyHost->text() + ":"
-									+ QString::number( sbProxyPort->value() ) +
+						prox = "http_proxy://" + proxyHost + ":"
+									+ QString::number( proxyPort ) +
 									"/http://";
 					}
 					else
 					{
 						prox = "http_proxy://" +
-							leProxyUser->text() + ":" +
-							leProxyPassword->text() + "@" +
-							leProxyHost->text() + ":" +
-							QString::number( sbProxyPort->value() ) +
+							proxyUser + ":" +
+							proxyPassword + "@" +
+							proxyHost + ":" +
+							QString::number( proxyPort ) +
 							"/http://";
 					}
 				}
@@ -219,14 +203,14 @@ void recwnd::progLinkReadResponse(bool err )
 					arg << "4096";
 					arg << "-dumpstream";
 					arg << "-dumpfile";
-					arg << leDestFile->text();
+					arg << progDestFile;
 					arg << link;
 					QProcess::execute( "mplayer", arg );
 					if ( retries < 4 )
 					{
 						// keyword found, let's check if we dumped something useful
-						QFile f( leDestFile->text() );
-						if ( f.size() < 10000000 )
+						QFile f( progDestFile );
+						if ( f.size() < minSize )
 						{
 							sleep( 120 );
 							retries++;
@@ -244,22 +228,71 @@ void recwnd::progLinkReadResponse(bool err )
 		}
 	}
 }
-void recwnd::program()
+
+void recwnd::delProgram()
 {
-	QDateTime progdt = dteStart->dateTime();
-	QDateTime curdt( QDateTime::currentDateTime() );
-	if ( progdt > curdt )
+	int cr = twProgs->currentRow();
+	if ( cr >= 0 )
 	{
-		uint delay = progdt.toTime_t() - curdt.toTime_t();
-		progLinksList << leUrl->text();
-		progKeywordsList << leKeyword->text();
-		progFilenamesList << leDestFile->text();
-		QTimer::singleShot(delay * 1000, this, SLOT(record()));
-		lwProgs->setVisible( true );
-		QString s;
-		s = leKeyword->text() + " at " + dteStart->dateTime().toString() + " to " + leDestFile->text() + " from " + leUrl->text();
-		new QListWidgetItem( s, lwProgs );
-		retries = 0;
+		twProgs->removeRow(cr);
+		numProgs--;
+	}
+}
+
+void recwnd::addProgram()
+{
+	twProgs->insertRow( numProgs );
+	QDateTime curdt( QDateTime::currentDateTime() );
+
+	QTableWidgetItem *tu = new QTableWidgetItem( leUrl->text() );
+	twProgs->setCellWidget(  numProgs, 1, new QDateTimeEdit( curdt ) );
+	twProgs->setItem( numProgs, 3, tu );
+	// (re)start the timer 
+	if ( !progTimer )
+	{
+		progTimer = new QTimer(this);
+     	connect( progTimer, SIGNAL(timeout()),
+				this, SLOT(checkProg()));
+	}
+	if ( !progTimer->isActive() ) progTimer->start(60000);	// every minute
+
+	numProgs++;
+}
+
+void recwnd::checkProg()
+{
+	QDateTime curdt( QDateTime::currentDateTime() );
+	int nb = twProgs->rowCount();
+	for ( int i = 0; i < nb; i++ )
+	{
+		QDateTimeEdit *te = (QDateTimeEdit *)twProgs->cellWidget( i, 1 );
+		if ( curdt >= te->dateTime() )
+		{
+			// launch prog
+			progKeyword = twProgs->item( i, 0 )->text();
+			progDestFile = twProgs->item( i, 2 )->text();
+			progUrl = twProgs->item( i, 3 )->text();
+			twProgs->removeRow( i );
+			if ( twProgs->rowCount() == 0 )
+			{
+				progTimer->stop();
+			}
+			this->record();
+		}
+	}
+}
+
+void recwnd::selDestFile()
+{
+	int cr = twProgs->currentRow();
+	if ( cr >= 0 )
+	{
+		QString fn = QFileDialog::getSaveFileName();
+		if ( !fn.isEmpty() )
+		{
+			QTableWidgetItem *tf = new QTableWidgetItem( fn );
+			twProgs->setItem( cr, 2, tf );
+		}
 	}
 }
 
@@ -268,14 +301,22 @@ void recwnd::get()
 	cancel = false;
 	lwVideos->clear();
 	clean();
-	if ( ckEnableProxy->isChecked() )
+	if ( proxyEnabled )
 	{
-		req->setProxy( leProxyHost->text(),
-				sbProxyPort->value(),
-				leProxyUser->text(),
-				leProxyPassword->text() );
+		req->setProxy( proxyHost,
+				proxyPort,
+				proxyUser,
+				proxyPassword );
 	}
-	QUrl url( leUrl->text() );
+	QUrl url;
+	if ( prog )
+	{
+		url = QUrl( progUrl );
+	}
+	else
+	{
+		url = QUrl( leUrl->text() );
+	}
 	req->setHost( url.host() );
 	req->get( url.path() );
 	pbCancelGet->setEnabled( true );
@@ -290,15 +331,15 @@ void recwnd::readResponse(bool err)
 	}
 	QList<QByteArray> l = req->readAll().split('\n');
 	QList<QByteArray>::Iterator it;
-	QRegExp vidregexp( "VideoListUne.*new VideoListItem.*jpg.*video_vid[0-9]*.shtml");
 	imageList.clear();
 	nameList.clear();
 	linkList.clear();
 	ctr = 0;
+	int nb = 0;
 	for ( it = l.begin(); it != l.end(); it++ )
 	{
 		QString s( *it );
-		if ( s.contains( vidregexp ) )
+		if ( s.contains( vidListRE ) )
 		{
 			// VideoListUne[1]=new VideoListItem('Mancini va partir', '', 'http://i.video.eurosport.fr/2008/03/12/424449-2776674-81-61.jpg', 'http://video.eurosport.fr/football/ligue-des-champions/2007-2008/video_vid67408.shtml', '2 257', 'Mer. 12/03/2008', '10:54','Football', '1', '0', '', '');
 			QStringList sl = s.split(',');
@@ -315,10 +356,25 @@ void recwnd::readResponse(bool err)
 				nameList << vidname;
 				linkList << link;
 			}
+			if ( ++nb > sbNumber->value() ) break;
 		}
 	}
 	progbarGet->setVisible( true );
-	progbarGet->setMaximum( imageList.size() );
+	int max = 0;
+	if ( sbNumber->value() != 0 )
+	{
+		if ( sbNumber->value() > imageList.size() )
+		{
+			max = imageList.size();
+		}
+		else
+			max = sbNumber->value();
+	}
+	else
+	{
+		max = imageList.size();
+	}
+	progbarGet->setMaximum( max );
 	progbarGet->setValue( 0 );
 	if ( imageList.size() > 0 )
 	{
@@ -353,12 +409,12 @@ void recwnd::getOneImage()
 	else
 	{
 		imReq = new QHttp( this );
-		if ( ckEnableProxy->isChecked() )
+		if ( proxyEnabled )
 		{
-			imReq->setProxy( leProxyHost->text(),
-					sbProxyPort->value(),
-					leProxyUser->text(),
-					leProxyPassword->text() );
+			imReq->setProxy( proxyHost,
+					proxyPort,
+					proxyUser,
+					proxyPassword );
 		}
 		imReq->setHost( imUrl.host() );
 		connect( imReq,
@@ -424,12 +480,12 @@ void recwnd::vidDoubleClicked ( QListWidgetItem * item )
 	{
 		QUrl link( linkList[ item->type() ] );
 		linkReq = new QHttp( this );
-		if ( ckEnableProxy->isChecked() )
+		if ( proxyEnabled )
 		{
-			linkReq->setProxy( leProxyHost->text(),
-					sbProxyPort->value(),
-					leProxyUser->text(),
-					leProxyPassword->text() );
+			linkReq->setProxy( proxyHost,
+					proxyPort,
+					proxyUser,
+					proxyPassword );
 		}
 		linkReq->setHost( link.host() );
 		connect( linkReq, SIGNAL(done(bool)),
@@ -447,11 +503,10 @@ void recwnd::linkReadResponse(bool err)
 	}
 	QList<QByteArray> l = linkReq->readAll().split('\n');
 	QList<QByteArray>::Iterator it;
-	QRegExp vidregexp( "var videoUrl=" );
 	for ( it = l.begin(); it != l.end(); it++ )
 	{
 		QString s( *it );
-		if ( s.contains( vidregexp ) )
+		if ( s.contains( vidLinkRE ) )
 		{
 			//  var videoUrl='http://vodf.eurosport.com/2008/3/12/foot_demission_mancini_fr-67408-700-384-288.flv';
 			QStringList sl = s.split('\'');
@@ -459,21 +514,21 @@ void recwnd::linkReadResponse(bool err)
 			if ( !link.isEmpty() )
 			{
 				QString prox;
-				if ( ckEnableProxy->isChecked() )
+				if ( proxyEnabled )
 				{
-					if ( leProxyUser->text().isEmpty() )
+					if ( proxyUser.isEmpty() )
 					{
-						prox = "http_proxy://" + leProxyHost->text() + ":"
-									+ QString::number( sbProxyPort->value() ) +
+						prox = "http_proxy://" + proxyHost + ":"
+									+ QString::number( proxyPort ) +
 									"/http://";
 					}
 					else
 					{
 						prox = "http_proxy://" +
-							leProxyUser->text() + ":" +
-							leProxyPassword->text() + "@" +
-							leProxyHost->text() + ":" +
-							QString::number( sbProxyPort->value() ) +
+							proxyUser + ":" +
+							proxyPassword + "@" +
+							proxyHost + ":" +
+							QString::number( proxyPort ) +
 							"/http://";
 					}
 				}
@@ -524,3 +579,8 @@ void recwnd::enregistrer( QString link )
 	QProcess::execute( "mplayer", arg );
 }
 
+void recwnd::showPrefs()
+{
+	prefswnd *pw = new prefswnd( this );
+	pw->exec();
+}

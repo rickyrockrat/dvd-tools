@@ -3,11 +3,11 @@ LANGUAGE	= C++
 
 CONFIG	+= qt warn_on
 
-SOURCES	+= main.cpp recwnd.cpp detailwnd.cpp
+SOURCES	+= main.cpp recwnd.cpp detailwnd.cpp prefswnd.cpp
 
-HEADERS += recwnd.h detailwnd.h
+HEADERS += recwnd.h detailwnd.h prefswnd.h
 
-FORMS	= recwnd.ui detailwnd.ui
+FORMS	= recwnd.ui detailwnd.ui prefswnd.ui
 
 recorder.path = /usr/bin
 recorder.files = recorder
