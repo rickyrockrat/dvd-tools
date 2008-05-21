@@ -132,6 +132,9 @@ qt4wndsub::qt4wndsub( QWidget *parent ) : QWidget(parent)
 	connect (pbNextWrongSub, SIGNAL(clicked()),
 		this, SLOT(nextWrongSub()));
 
+	connect( cbShift, SIGNAL(clicked()),
+		this, SLOT(checkShift()) 
+	);
 }
 
 void qt4wndsub::subeditclosed(QWidget* ed,QAbstractItemDelegate::EndEditHint h)
@@ -1896,6 +1899,7 @@ void qt4wndsub::nextWrongSub()
 {
 	static int i;
 	SubModel *inputSubsModel = (SubModel*)lvInputSubs->model();
+	if ( !inputSubsModel ) return;
 	QModelIndex index;
 	QVariant var;
 	Subtitle *_subtitle;

@@ -457,7 +457,11 @@
            </widget>
           </item>
           <item>
-           <widget class="QTimeEdit" name="timeFirstSub" />
+           <widget class="QTimeEdit" name="timeFirstSub" >
+            <property name="enabled" >
+             <bool>false</bool>
+            </property>
+           </widget>
           </item>
           <item>
            <widget class="QLabel" name="tlFirstSpeak" >
@@ -473,7 +477,11 @@
            </widget>
           </item>
           <item>
-           <widget class="QTimeEdit" name="timeFirstSpeak" />
+           <widget class="QTimeEdit" name="timeFirstSpeak" >
+            <property name="enabled" >
+             <bool>false</bool>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
@@ -508,7 +516,11 @@
            </widget>
           </item>
           <item>
-           <widget class="QTimeEdit" name="timeLastSub" />
+           <widget class="QTimeEdit" name="timeLastSub" >
+            <property name="enabled" >
+             <bool>false</bool>
+            </property>
+           </widget>
           </item>
           <item>
            <widget class="QLabel" name="tlLastSpeak" >
@@ -524,7 +536,11 @@
            </widget>
           </item>
           <item>
-           <widget class="QTimeEdit" name="timeLastSpeak" />
+           <widget class="QTimeEdit" name="timeLastSpeak" >
+            <property name="enabled" >
+             <bool>false</bool>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
@@ -1004,8 +1020,8 @@
    <slot>clicSelectInputFile()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>358</x>
+     <y>54</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -1020,8 +1036,8 @@
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>318</x>
+     <y>386</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -1036,8 +1052,8 @@
    <slot>clicProceed()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>31</x>
+     <y>386</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -1052,8 +1068,8 @@
    <slot>clickedSave()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>313</x>
+     <y>470</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -1068,8 +1084,8 @@
    <slot>clicSelectOutputFile()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>277</x>
+     <y>469</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -1084,8 +1100,8 @@
    <slot>filenameChanged()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>42</x>
+     <y>471</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -1100,8 +1116,8 @@
    <slot>checkExpand()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>42</x>
+     <y>176</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -1116,8 +1132,8 @@
    <slot>checkFps()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>42</x>
+     <y>204</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -1132,8 +1148,8 @@
    <slot>checkAuto()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>41</x>
+     <y>231</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -1148,8 +1164,8 @@
    <slot>checkAuto()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>41</x>
+     <y>231</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -1164,8 +1180,8 @@
    <slot>checkShiftPos()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>42</x>
+     <y>311</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>

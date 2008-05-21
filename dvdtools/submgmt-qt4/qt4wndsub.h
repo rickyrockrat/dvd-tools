@@ -15,7 +15,6 @@ Q_OBJECT
 public:
 	qt4wndsub(QWidget *parent = 0);
 
-	void checkShift();
 	void timeBasedProceed( Subtitle *s );
 	void frameBasedProceed( Subtitle *s );
 	void autoDetectFormat();
@@ -44,6 +43,7 @@ public:
 	QModelIndex *curItem;
 
 public slots:
+	void checkShift();
 	void clicSelectInputFile();
 	void clicProceed();
 	void clickedSave();
