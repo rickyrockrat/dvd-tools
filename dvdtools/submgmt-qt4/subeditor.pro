@@ -9,33 +9,30 @@ HEADERS	+= subtitle.h \
 	submodel.h \
 	subitemdelegate.h \
 	subeditor.h \
-	qt4wndsub.h \
-	qt4editsub.h \
 	util.h \
-	qt4genpngwnd.h
+	qt4subeditor.h
 
-SOURCES	+= main.cpp \
+SOURCES	+= main_se.cpp \
 	subtitle.cpp \
 	submodel.cpp \
 	subitemdelegate.cpp \
 	subeditor.cpp \
-	qt4wndsub.cpp \
 	util.cpp \
-	qt4genpngwnd.cpp
+	qt4subeditor.cpp
 
-FORMS	= qt4editsub.ui qt4genpngwnd.ui qt4wndsub.ui
+FORMS	= qt4subeditor.ui
 
-TARGET = submgmt
+TARGET = subeditor
 
-RESOURCES = submgmt.qrc
-
-
+RESOURCES = subeditor.qrc
 
 
-submgmt.path = /usr/bin
-submgmt.files = submgmt
 
-INSTALLS += submgmt
+
+subeditor.path = /usr/bin
+subeditor.files = subeditor
+
+INSTALLS += subeditor
 
 unix {
   UI_DIR = .ui

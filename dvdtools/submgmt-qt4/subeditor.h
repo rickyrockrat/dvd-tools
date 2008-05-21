@@ -8,6 +8,7 @@
 #include <QLineEdit>
 #include <QSpinBox>
 #include <QTimeEdit>
+#include <QPushButton>
 #include <QStyleOptionViewItem>
 #include "subtitle.h"
 

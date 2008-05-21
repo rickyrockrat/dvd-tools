@@ -48,3 +48,31 @@ bool SubModel::setData(const QModelIndex &index,
 	}
 	return false;
 }
+
+void SubModel::insertSub( Subtitle *s )
+{
+	insertRow( (int)_subs.size() );
+	_subs[ _subs.size()-1 ] = s;
+}
+
+bool SubModel::insertRows( int row, int count, const QModelIndex & parent )
+{
+	beginInsertRows( parent, row, row+count );
+	std::vector<Subtitle *>::iterator it;
+	it = _subs.begin() + row;
+	Subtitle *ns = new Subtitle();
+	_subs.insert(it, count, ns);
+	endInsertRows();
+	return true;
+}
+
+bool SubModel::removeRows( int row, int count, const QModelIndex & parent )
+{
+	beginRemoveRows(parent, row, row+count);
+	std::vector<Subtitle *>::iterator it;
+	it = _subs.begin() + row;
+	_subs.erase(it, it+count);
+	endRemoveRows();
+	return true;
+}
+

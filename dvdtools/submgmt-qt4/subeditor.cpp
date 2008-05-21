@@ -65,7 +65,6 @@ void SubEditor::init( const QStyleOptionViewItem &option )
 		frEnd->move( frBegin->size().width(), 0 );
 		frEnd->resize( frEnd->size().width(), fm.lineSpacing() );
 		frEnd->show();
-
 		teBegin->hide();
 		teEnd->hide();
 	}
@@ -100,3 +99,4 @@ void SubEditor::init( const QStyleOptionViewItem &option )
 		y += fm.lineSpacing();
 	}
 }
+
