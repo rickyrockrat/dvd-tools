@@ -1,5 +1,4 @@
 #include "subtitle.h"
-#include "qt4editsub.h"
 #include "submodel.h"
 #include "subitemdelegate.h"
 

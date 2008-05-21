@@ -10,7 +10,6 @@ HEADERS	+= subtitle.h \
 	subitemdelegate.h \
 	subeditor.h \
 	qt4wndsub.h \
-	qt4editsub.h \
 	util.h \
 	qt4genpngwnd.h
 
@@ -23,7 +22,7 @@ SOURCES	+= main.cpp \
 	util.cpp \
 	qt4genpngwnd.cpp
 
-FORMS	= qt4editsub.ui qt4genpngwnd.ui qt4wndsub.ui
+FORMS	= qt4genpngwnd.ui qt4wndsub.ui
 
 TARGET = submgmt
 
