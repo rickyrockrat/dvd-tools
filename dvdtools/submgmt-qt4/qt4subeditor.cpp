@@ -49,6 +49,12 @@ qt4subeditor::qt4subeditor( QMainWindow *parent ) : QMainWindow(parent)
 		SLOT(saveSubtitle())
 	);
 	connect(
+		pbSaveSubtitleAs,
+		SIGNAL(clicked()),
+		this,
+		SLOT(saveSubtitleAs())
+	);
+	connect(
 		pbExit,
 		SIGNAL(clicked()),
 		this,
@@ -98,6 +104,7 @@ qt4subeditor::qt4subeditor( QMainWindow *parent ) : QMainWindow(parent)
 		QString fn = qApp->arguments().at(1);
 		loadMovie( fn );
 	}
+	currentSubFilename = QString("");
 }
 
 void qt4subeditor::exitEditor( )
@@ -163,7 +170,7 @@ void qt4subeditor::readMplayer()
 		{
 			idx += 11;
 			QByteArray len = ba.mid( idx, ba.indexOf( '\n', idx ) - idx );
-			std::cout << len.constData() << std::endl;
+			//std::cout << len.constData() << std::endl;
 			lblLength->setText( len );
 			movieLength = (int)(len.toDouble() * 1000);
 			movieOpened = true;
@@ -173,12 +180,10 @@ void qt4subeditor::readMplayer()
 			idx = ba.indexOf( "ANS_TIME_POSITION=" );
 			if  ( idx != -1 )
 			{
-				std::cout << "reading TIME_POS";
 				idx += 18;
 				QByteArray pos = ba.mid( idx, ba.indexOf( '\n', idx ) - idx );
 				if ( flagSubEnd == true )
 				{
-					std::cout << " for subEnd" << std::endl;
 					subEnd = pos.toDouble();
 					QTime ts;
 					ts = timeFromMilli( subBegin * 1000 );
@@ -187,9 +192,9 @@ void qt4subeditor::readMplayer()
 
 					QByteArray b1( ts.toString(TIME_FMT).toAscii() );
 					QByteArray b2( te.toString(TIME_FMT).toAscii() );
-					std::cout << b1.constData() << " to " << b2.constData() << std::endl;
-					Subline *sul1 = new Subline( *new QString(""), Subline::Normal);
-					Subline *sul2 = new Subline( *new QString(""), Subline::Normal);
+					//std::cout << b1.constData() << " to " << b2.constData() << std::endl;
+					Subline *sul1 = new Subline( *new QString(" "), Subline::Normal);
+					Subline *sul2 = new Subline( *new QString(" "), Subline::Normal);
 					QVector<Subline> subs;
 					subs.push_back(*sul1);
 					subs.push_back(*sul2);
@@ -199,10 +204,11 @@ void qt4subeditor::readMplayer()
 
 					flagSubBegin = false;
 					flagSubEnd = false;
+					mplayer->write( "pause\n" );
 				}
 				else if ( flagSubBegin == true )
 				{
-					std::cout << " for subBegin" << std::endl;
+					//std::cout << " for subBegin" << std::endl;
 					subBegin = pos.toDouble();
 				}
 			}
@@ -299,13 +305,26 @@ void qt4subeditor::openSubtitle()
 		lvSubs->setModel( inputSubsModel );
 		SubItemDelegate *delI = new SubItemDelegate( lvSubs );
 		lvSubs->setItemDelegate( delI );
+		currentSubFilename = fn;
+		gbSubtitle->setTitle( fn );
     }
+}
+
+void qt4subeditor::saveSubtitleAs()
+{
+	QString fn = QFileDialog::getSaveFileName();
+	if ( !fn.isEmpty() ) saveSubToFile( fn );
 }
 
 void qt4subeditor::saveSubtitle()
 {
-	QString fn = QFileDialog::getSaveFileName();
-	if ( !fn.isEmpty() ) saveSubToFile( fn );
+	if ( !currentSubFilename.isEmpty() )
+		saveSubToFile( currentSubFilename );
+	else
+	{
+		QString fn = QFileDialog::getSaveFileName();
+		if ( !fn.isEmpty() ) saveSubToFile( fn );
+	}
 }
 
 void qt4subeditor::saveSubToFile( QString fn )

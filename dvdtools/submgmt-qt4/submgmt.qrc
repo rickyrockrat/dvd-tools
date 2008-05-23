@@ -1,6 +1,8 @@
 <RCC>
     <qresource prefix="/pix" >
-        <file>fileopen.xpm</file>
-        <file>submgmt_icon.png</file>
+        <file>pix/exit.png</file>
+        <file>pix/fileopen.png</file>
+        <file>pix/filesave.png</file>
+        <file>pix/submgmt_icon.png</file>
     </qresource>
 </RCC>

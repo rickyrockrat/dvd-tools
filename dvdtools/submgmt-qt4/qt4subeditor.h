@@ -24,6 +24,7 @@ public slots:
 	void newSubtitle();
 	void openSubtitle();
 	void saveSubtitle();
+	void saveSubtitleAs();
 	void readMplayer();
 	void exitEditor();
 	void fastBack();
@@ -47,5 +48,6 @@ private :
 	double subBegin;
 	double subEnd;
 	std::vector<Subtitle *>subvec;
+	QString currentSubFilename;
 };
 #endif
