@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/" >
         <file>pix/ic_open.png</file>
+        <file>pix/ic_record.png</file>
     </qresource>
 </RCC>

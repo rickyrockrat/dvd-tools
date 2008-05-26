@@ -12,6 +12,9 @@
   <property name="windowTitle" >
    <string>Recorder</string>
   </property>
+  <property name="windowIcon" >
+   <iconset resource="recwnd.qrc" >:/pix/ic_record.png</iconset>
+  </property>
   <widget class="QWidget" name="centralwidget" >
    <layout class="QVBoxLayout" >
     <item>
@@ -209,6 +212,8 @@
    </property>
   </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="recwnd.qrc" />
+ </resources>
  <connections/>
 </ui>

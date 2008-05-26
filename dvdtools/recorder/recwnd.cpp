@@ -72,8 +72,8 @@ void recwnd::readPrefs()
 		proxyUser = prefs.value("proxy/user").toString();
 		proxyPassword = prefs.value("proxy/password").toString();
 	}
-	vidLinkRE = QRegExp( prefs.value("misc/vidlinkre").toString() );
 	vidListRE = QRegExp( prefs.value("misc/vidlistre").toString() );
+	vidLinkRE = QRegExp( prefs.value("misc/vidlinkre").toString() );
 	defaultUrl = prefs.value("misc/defaulturl").toString();
 	retries = prefs.value("misc/maxretries").toInt();
 	minSize = prefs.value("misc/minsize").toInt();
@@ -303,6 +303,12 @@ void recwnd::get()
 	clean();
 	if ( proxyEnabled )
 	{
+		/*
+		qDebug() << proxyHost << "-";
+		qDebug() << proxyPort << "-";
+		qDebug() << proxyUser << "-";
+		qDebug() << proxyPassword << endl;
+		*/
 		req->setProxy( proxyHost,
 				proxyPort,
 				proxyUser,
@@ -317,6 +323,10 @@ void recwnd::get()
 	{
 		url = QUrl( leUrl->text() );
 	}
+	/*
+	qDebug() << url.host() << "(";
+	qDebug() << url.path() << endl;
+	*/
 	req->setHost( url.host() );
 	req->get( url.path() );
 	pbCancelGet->setEnabled( true );
@@ -339,6 +349,7 @@ void recwnd::readResponse(bool err)
 	for ( it = l.begin(); it != l.end(); it++ )
 	{
 		QString s( *it );
+		qDebug() << s << endl;
 		if ( s.contains( vidListRE ) )
 		{
 			// VideoListUne[1]=new VideoListItem('Mancini va partir', '', 'http://i.video.eurosport.fr/2008/03/12/424449-2776674-81-61.jpg', 'http://video.eurosport.fr/football/ligue-des-champions/2007-2008/video_vid67408.shtml', '2 257', 'Mer. 12/03/2008', '10:54','Football', '1', '0', '', '');
@@ -583,4 +594,5 @@ void recwnd::showPrefs()
 {
 	prefswnd *pw = new prefswnd( this );
 	pw->exec();
+	readPrefs();
 }
