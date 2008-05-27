@@ -20,7 +20,13 @@
     <item>
      <layout class="QVBoxLayout" >
       <item>
-       <widget class="QTreeWidget" name="lvDVD" />
+       <widget class="QTreeWidget" name="lvDVD" >
+        <column>
+         <property name="text" >
+          <string>1</string>
+         </property>
+        </column>
+       </widget>
       </item>
       <item>
        <widget class="QProgressBar" name="pbOccup" >
@@ -108,20 +114,20 @@
    <attribute name="toolBarBreak" >
     <bool>false</bool>
    </attribute>
+   <addaction name="aExit" />
+   <addaction name="aOpen" />
+   <addaction name="aSave" />
    <addaction name="aNewDVD" />
    <addaction name="aAddTitle" />
    <addaction name="aAddVideo" />
-   <addaction name="aEncode" />
+   <addaction name="aRemove" />
    <addaction name="aBgColor" />
    <addaction name="aFont" />
    <addaction name="aPreview" />
    <addaction name="aDirectPlay" />
    <addaction name="aMEncoder" />
-   <addaction name="aRemove" />
-   <addaction name="aOpen" />
-   <addaction name="aSave" />
    <addaction name="separator" />
-   <addaction name="aExit" />
+   <addaction name="aEncode" />
   </widget>
   <action name="aNewDVD" >
    <property name="icon" >

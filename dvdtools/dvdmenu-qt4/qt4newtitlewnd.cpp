@@ -65,7 +65,7 @@ void qt4newtitleWnd::openPic()
                     this,
                     "Choose a picture for the title",
                     QDir::currentPath(),
-                    "Picture (*.png;*.jpg)"
+                    "Picture (*.png *.jpg)"
 		    );
 	if ( !s.isNull() )
 		lePicture->setText( s );

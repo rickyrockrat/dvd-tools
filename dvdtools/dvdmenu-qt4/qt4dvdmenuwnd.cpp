@@ -109,23 +109,7 @@ void qt4dvdmenuWnd::addTitle()
 		a << nt->sub3;
 		a << nt->sub4;
 
-		if ( titleItem )
-			titleItem = new QTreeWidgetItem( titleItem, a);
-		else
-			titleItem = new QTreeWidgetItem( dvdItem, a);
-		/* FIXME
-		titleItem->setRenameEnabled( ID_NAME, true );
-		titleItem->setRenameEnabled( ID_PICTURE, true );
-		titleItem->setRenameEnabled( ID_ASPECT, true );
-		titleItem->setRenameEnabled( ID_AUDIO1, true );
-		titleItem->setRenameEnabled( ID_AUDIO2, true );
-		titleItem->setRenameEnabled( ID_SUB1, true );
-		titleItem->setRenameEnabled( ID_SUB2, true );
-		titleItem->setRenameEnabled( ID_SUB3, true );
-		titleItem->setRenameEnabled( ID_SUB4, true );
-		titleItem->setOpen( true );
-		*/
-		titleItem->setFlags( Qt::ItemIsEditable );
+		titleItem = new QTreeWidgetItem( dvdItem, a);
 		lvDVD->expandItem( titleItem );
 
 	}
@@ -171,10 +155,7 @@ void qt4dvdmenuWnd::addVideo()
 			tra << *it;
 			tra << CC_VIDEO;
 			tra << *it;
-			if ( videoItem )
-				videoItem = new QTreeWidgetItem( videoItem, tra );
-			else
-				videoItem = new QTreeWidgetItem( titleItem, tra );
+			videoItem = new QTreeWidgetItem( titleItem, tra );
 
 			QFileInfo fi( *it );
 			pbOccup->setValue( pbOccup->value()+int(fi.size()*1.2/1024) );
