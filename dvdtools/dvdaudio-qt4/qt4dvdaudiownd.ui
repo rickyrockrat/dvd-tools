@@ -1,0 +1,441 @@
+<ui version="4.0" >
+ <class>dvdaudioWnd</class>
+ <widget class="QMainWindow" name="dvdaudioWnd" >
+  <property name="enabled" >
+   <bool>true</bool>
+  </property>
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>527</width>
+    <height>463</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>DvD Audio</string>
+  </property>
+  <widget class="QWidget" name="widget" >
+   <layout class="QHBoxLayout" >
+    <item>
+     <layout class="QVBoxLayout" >
+      <item>
+       <widget class="QTreeWidget" name="lvDVD" >
+        <property name="enabled" >
+         <bool>true</bool>
+        </property>
+        <column>
+         <property name="text" >
+          <string>1</string>
+         </property>
+        </column>
+       </widget>
+      </item>
+      <item>
+       <widget class="QProgressBar" name="pbOccup" >
+        <property name="value" >
+         <number>24</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QVBoxLayout" >
+      <item>
+       <widget class="QGroupBox" name="groupBox" >
+        <property name="title" >
+         <string>Contents</string>
+        </property>
+        <layout class="QVBoxLayout" >
+         <item>
+          <widget class="QCheckBox" name="cbGenre" >
+           <property name="text" >
+            <string>Genre</string>
+           </property>
+           <property name="checked" >
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="cbArtist" >
+           <property name="text" >
+            <string>Artist</string>
+           </property>
+           <property name="checked" >
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="cbAlbum" >
+           <property name="text" >
+            <string>Album</string>
+           </property>
+           <property name="checked" >
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="cbYear" >
+           <property name="text" >
+            <string>Year</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="cbTitle" >
+           <property name="text" >
+            <string>Title</string>
+           </property>
+           <property name="checked" >
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="cbTrack" >
+           <property name="text" >
+            <string>Track</string>
+           </property>
+           <property name="checked" >
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="cbDuration" >
+           <property name="text" >
+            <string>Duration</string>
+           </property>
+           <property name="checked" >
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="cbBitrate" >
+           <property name="text" >
+            <string>Bitrate</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="groupBox_2" >
+        <property name="title" >
+         <string>Menu</string>
+        </property>
+        <layout class="QVBoxLayout" >
+         <item>
+          <widget class="QToolButton" name="pbMenuBg" >
+           <property name="text" >
+            <string>Background</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="textLabel1" >
+           <property name="text" >
+            <string>Font size</string>
+           </property>
+           <property name="wordWrap" >
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="sbFontSize" >
+           <property name="minimum" >
+            <number>28</number>
+           </property>
+           <property name="maximum" >
+            <number>70</number>
+           </property>
+           <property name="value" >
+            <number>28</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pbUp" >
+        <property name="text" >
+         <string/>
+        </property>
+        <property name="icon" >
+         <iconset resource="dvdaudio.qrc" >:/pix/pix/ic_up.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pbDown" >
+        <property name="text" >
+         <string/>
+        </property>
+        <property name="icon" >
+         <iconset resource="dvdaudio.qrc" >:/pix/pix/ic_down.png</iconset>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QToolBar" name="Toolbar" >
+   <property name="label" stdset="0" >
+    <string>Toolbar</string>
+   </property>
+   <attribute name="toolBarArea" >
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak" >
+    <bool>false</bool>
+   </attribute>
+   <addaction name="aNew" />
+   <addaction name="aOpen" />
+   <addaction name="aSave" />
+   <addaction name="separator" />
+   <addaction name="aNewDVD" />
+   <addaction name="aAddAlbum" />
+   <addaction name="aAddTracks" />
+   <addaction name="aRemove" />
+   <addaction name="separator" />
+   <addaction name="aFont" />
+   <addaction name="aBgColor" />
+   <addaction name="aPreview" />
+   <addaction name="separator" />
+   <addaction name="aMEncoder" />
+   <addaction name="aDirectPlay" />
+   <addaction name="separator" />
+   <addaction name="aEncode" />
+   <addaction name="aGenOnly" />
+  </widget>
+  <widget class="QMenuBar" name="MenuBarEditor" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>527</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="File" >
+    <property name="title" >
+     <string>&amp;File</string>
+    </property>
+    <addaction name="aExit" />
+   </widget>
+   <addaction name="File" />
+  </widget>
+  <action name="aNewDVD" >
+   <property name="icon" >
+    <iconset resource="dvdaudio.qrc" >:/pix/pix/ic_newdvd.png</iconset>
+   </property>
+   <property name="iconText" >
+    <string>New DVD</string>
+   </property>
+   <property name="name" stdset="0" >
+    <string>aNewDVD</string>
+   </property>
+  </action>
+  <action name="aAddAlbum" >
+   <property name="checkable" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="dvdaudio.qrc" >:/pix/pix/ic_album.png</iconset>
+   </property>
+   <property name="iconText" >
+    <string>Add Album</string>
+   </property>
+   <property name="name" stdset="0" >
+    <string>aAddAlbum</string>
+   </property>
+  </action>
+  <action name="aAddTracks" >
+   <property name="icon" >
+    <iconset resource="dvdaudio.qrc" >:/pix/pix/ic_track.png</iconset>
+   </property>
+   <property name="iconText" >
+    <string>Add Tracks</string>
+   </property>
+   <property name="name" stdset="0" >
+    <string>aAddTracks</string>
+   </property>
+  </action>
+  <action name="aFont" >
+   <property name="icon" >
+    <iconset resource="dvdaudio.qrc" >:/pix/pix/ic_font.png</iconset>
+   </property>
+   <property name="iconText" >
+    <string>Font</string>
+   </property>
+   <property name="name" stdset="0" >
+    <string>aFont</string>
+   </property>
+  </action>
+  <action name="aBgColor" >
+   <property name="icon" >
+    <iconset resource="dvdaudio.qrc" >:/pix/pix/ic_bgcolor.png</iconset>
+   </property>
+   <property name="iconText" >
+    <string>Background Color</string>
+   </property>
+   <property name="name" stdset="0" >
+    <string>aBgColor</string>
+   </property>
+  </action>
+  <action name="aPreview" >
+   <property name="icon" >
+    <iconset resource="dvdaudio.qrc" >:/pix/pix/ic_preview.png</iconset>
+   </property>
+   <property name="iconText" >
+    <string>Preview</string>
+   </property>
+   <property name="name" stdset="0" >
+    <string>aPreview</string>
+   </property>
+  </action>
+  <action name="aRemove" >
+   <property name="icon" >
+    <iconset resource="dvdaudio.qrc" >:/pix/pix/ic_remove.png</iconset>
+   </property>
+   <property name="iconText" >
+    <string>Remove</string>
+   </property>
+   <property name="name" stdset="0" >
+    <string>aRemove</string>
+   </property>
+  </action>
+  <action name="aEncode" >
+   <property name="icon" >
+    <iconset resource="dvdaudio.qrc" >:/pix/pix/ic_run.png</iconset>
+   </property>
+   <property name="iconText" >
+    <string>Encode</string>
+   </property>
+   <property name="name" stdset="0" >
+    <string>aEncode</string>
+   </property>
+  </action>
+  <action name="aExit" >
+   <property name="icon" >
+    <iconset resource="dvdaudio.qrc" >:/pix/pix/ic_exit.png</iconset>
+   </property>
+   <property name="iconText" >
+    <string>Exit</string>
+   </property>
+   <property name="name" stdset="0" >
+    <string>aExit</string>
+   </property>
+  </action>
+  <action name="aMEncoder" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="checked" >
+    <bool>true</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="dvdaudio.qrc" >:/pix/pix/ic_mencoder.png</iconset>
+   </property>
+   <property name="iconText" >
+    <string>Mencoder</string>
+   </property>
+   <property name="name" stdset="0" >
+    <string>aMEncoder</string>
+   </property>
+  </action>
+  <action name="aDirectPlay" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="checked" >
+    <bool>true</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="dvdaudio.qrc" >:/pix/pix/ic_directplay.png</iconset>
+   </property>
+   <property name="iconText" >
+    <string>Direct Play</string>
+   </property>
+   <property name="name" stdset="0" >
+    <string>aDirectPlay</string>
+   </property>
+  </action>
+  <action name="aNew" >
+   <property name="icon" >
+    <iconset resource="dvdaudio.qrc" >:/pix/pix/ic_new.png</iconset>
+   </property>
+   <property name="iconText" >
+    <string>New project</string>
+   </property>
+   <property name="name" stdset="0" >
+    <string>aNew</string>
+   </property>
+  </action>
+  <action name="aOpen" >
+   <property name="icon" >
+    <iconset resource="dvdaudio.qrc" >:/pix/pix/ic_open.png</iconset>
+   </property>
+   <property name="iconText" >
+    <string>Open project</string>
+   </property>
+   <property name="name" stdset="0" >
+    <string>aOpen</string>
+   </property>
+  </action>
+  <action name="aSave" >
+   <property name="icon" >
+    <iconset resource="dvdaudio.qrc" >:/pix/pix/ic_save.png</iconset>
+   </property>
+   <property name="iconText" >
+    <string>Save project</string>
+   </property>
+   <property name="name" stdset="0" >
+    <string>aSave</string>
+   </property>
+  </action>
+  <action name="aGenOnly" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="dvdaudio.qrc" >:/pix/pix/ic_gen.png</iconset>
+   </property>
+   <property name="iconText" >
+    <string>GenSH only</string>
+   </property>
+   <property name="toolTip" >
+    <string>Generate command file but doesn't run it</string>
+   </property>
+   <property name="name" stdset="0" >
+    <string>aGenOnly</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11" />
+ <includes>
+  <include location="global" >qdir.h</include>
+  <include location="global" >qmessagebox.h</include>
+  <include location="local" >trackpreview.h</include>
+  <include location="global" >qpixmap.h</include>
+  <include location="global" >qimage.h</include>
+  <include location="global" >qfile.h</include>
+  <include location="global" >qfontdialog.h</include>
+  <include location="global" >qcolordialog.h</include>
+  <include location="global" >qdom.h</include>
+  <include location="global" >vector</include>
+ </includes>
+ <resources>
+  <include location="dvdaudio.qrc" />
+ </resources>
+ <connections/>
+</ui>
