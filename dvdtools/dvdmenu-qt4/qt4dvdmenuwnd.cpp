@@ -154,7 +154,15 @@ void qt4dvdmenuWnd::addVideo()
 			QStringList tra;
 			tra << *it;
 			tra << CC_VIDEO;
-			tra << *it;
+			tra << " ";	// Chapters
+			tra << " ";	// Aspect
+			tra << " ";	// Audio1
+			tra << " ";	// Audio2
+			tra << " ";	// Sub1
+			tra << " ";	// Sub2
+			tra << " ";	// Sub3
+			tra << " ";	// Sub4
+			tra << *it;	// Filename
 			videoItem = new QTreeWidgetItem( titleItem, tra );
 
 			QFileInfo fi( *it );
@@ -641,7 +649,8 @@ void qt4dvdmenuWnd::encode()
 					stXml << (*it)->text(ID_ASPECT);
 					stXml << "\"/>" << endl;
 				}
-				if ( !(*it)->text(ID_AUDIO1).isEmpty() )
+				if ( ( !(*it)->text(ID_AUDIO1).isEmpty() )
+				&& ( (*it)->text(ID_AUDIO1).length() > 1 ) )
 				{
 					stXml << "<audio lang=\"";
 					stXml << (*it)->text(ID_AUDIO1);
@@ -651,31 +660,36 @@ void qt4dvdmenuWnd::encode()
 				{
 					stXml << "<audio lang=\"en\"/>" << endl;
 				}
-				if ( !(*it)->text(ID_AUDIO2).isEmpty() )
+				if ( ( !(*it)->text(ID_AUDIO2).isEmpty() )
+				&& ( (*it)->text(ID_AUDIO2).length() > 1 ) )
 				{
 					stXml << "<audio lang=\"";
 					stXml << (*it)->text(ID_AUDIO2);
 					stXml << "\"/>" << endl;
 				}
-				if ( !(*it)->text(ID_SUB1).isEmpty() )
+				if ( ( !(*it)->text(ID_SUB1).isEmpty() )
+				&& ( (*it)->text(ID_SUB1).length() > 1 ) )
 				{
 					stXml << "<subpicture lang=\"";
 					stXml << (*it)->text(ID_SUB1);
 					stXml << "\"/>" << endl;
 				}
-				if ( !(*it)->text(ID_SUB2).isEmpty() )
+				if ( ( !(*it)->text(ID_SUB2).isEmpty() )
+				&& ( (*it)->text(ID_SUB2).length() > 1 ) )
 				{
 					stXml << "<subpicture lang=\"";
 					stXml << (*it)->text(ID_SUB2);
 					stXml << "\"/>" << endl;
 				}
-				if ( !(*it)->text(ID_SUB3).isEmpty() )
+				if ( ( !(*it)->text(ID_SUB3).isEmpty() )
+				&& ( (*it)->text(ID_SUB3).length() > 1 ) )
 				{
 					stXml << "<subpicture lang=\"";
 					stXml << (*it)->text(ID_SUB3);
 					stXml << "\"/>" << endl;
 				}
-				if ( !(*it)->text(ID_SUB4).isEmpty() )
+				if ( ( !(*it)->text(ID_SUB4).isEmpty() )
+				&& ( (*it)->text(ID_SUB4).length() > 1 ) )
 				{
 					stXml << "<subpicture lang=\"";
 					stXml << (*it)->text(ID_SUB4);
@@ -688,10 +702,11 @@ void qt4dvdmenuWnd::encode()
 						( (*it1)->text(ID_IDENT) == CC_VIDEO ) )
 				{
 					stXml << "<vob file=\"" << (*it1)->text(ID_FILENAME);
-					if ( !(*it1)->text(ID_PICTURE).isEmpty())
+					if ( ( !(*it1)->text(ID_PICTURE).isEmpty())
+					&& ( !(*it1)->text(ID_PICTURE).length() > 0) )
 					{
 						stXml << "\" chapters=\"";
-						stXml << (*it1)->text(ID_PICTURE).isEmpty();
+						stXml << (*it1)->text(ID_PICTURE);
 					}
 					stXml << "\"></vob>" << endl;
 					it1++;
