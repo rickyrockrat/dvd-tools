@@ -6,14 +6,15 @@
     <x>0</x>
     <y>0</y>
     <width>422</width>
-    <height>398</height>
+    <height>465</height>
    </rect>
   </property>
   <property name="windowTitle" >
    <string>Recorder</string>
   </property>
   <property name="windowIcon" >
-   <iconset resource="recwnd.qrc" >:/pix/ic_record.png</iconset>
+   <iconset resource="recwnd.qrc" >
+    <normaloff>:/pix/ic_record.png</normaloff>:/pix/ic_record.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget" >
    <layout class="QVBoxLayout" >
@@ -39,7 +40,7 @@
       <item>
        <widget class="QLineEdit" name="leUrl" >
         <property name="text" >
-         <string>http://video.eurosport.fr/</string>
+         <string>http://atdhe.net</string>
         </property>
        </widget>
       </item>
@@ -59,7 +60,7 @@
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0" >
          <size>
           <width>40</width>
           <height>20</height>
@@ -95,6 +96,11 @@
         <column>
          <property name="text" >
           <string>Start</string>
+         </property>
+        </column>
+        <column>
+         <property name="text" >
+          <string>Duration</string>
          </property>
         </column>
         <column>
@@ -137,7 +143,7 @@
           <property name="orientation" >
            <enum>Qt::Vertical</enum>
           </property>
-          <property name="sizeHint" >
+          <property name="sizeHint" stdset="0" >
            <size>
             <width>20</width>
             <height>31</height>
@@ -163,7 +169,7 @@
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0" >
          <size>
           <width>291</width>
           <height>20</height>

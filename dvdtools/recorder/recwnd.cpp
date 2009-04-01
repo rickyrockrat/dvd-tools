@@ -72,11 +72,14 @@ void recwnd::readPrefs()
 		proxyUser = prefs.value("proxy/user").toString();
 		proxyPassword = prefs.value("proxy/password").toString();
 	}
+	QString s = prefs.value("misc/vidlistre").toString();
+	qDebug() << s << endl;
 	vidListRE = QRegExp( prefs.value("misc/vidlistre").toString() );
 	vidLinkRE = QRegExp( prefs.value("misc/vidlinkre").toString() );
 	defaultUrl = prefs.value("misc/defaulturl").toString();
 	retries = prefs.value("misc/maxretries").toInt();
 	minSize = prefs.value("misc/minsize").toInt();
+	obstinate = prefs.value("misc/obstinate").toBool();
 }
 
 void recwnd::ok()
@@ -111,6 +114,7 @@ void recwnd::record()
 
 void recwnd::recordStart()
 {
+	qDebug() << "recording started" << endl;
 	bool kwFound = false;
 	for ( int i = 0; i < linkList.size(); i++ )
 	{
@@ -121,6 +125,7 @@ void recwnd::recordStart()
 		|| ( s.contains( re ) ) )
 		{
 			kwFound = true;
+			/* this was for eurosport 
 			QUrl link( s );
 			progLinkReq = new QHttp( this );
 			if ( proxyEnabled )
@@ -135,6 +140,39 @@ void recwnd::recordStart()
 				this, SLOT(progLinkReadResponse(bool)));
 			progLinkReq->get(link.path());
 			break;
+			*/
+			/* this is for atdhe.net */
+			QStringList arg;
+			arg << s;
+
+			QProcess::execute( "firefox", arg );
+			sleep( 20 );	/* wait for plugin to start */
+			QStringList f;
+			f << "Flash*";
+			QStringList files = QDir::temp().entryList( f );
+			if ( files.size() == 0 ) break;
+			qDebug() << files[0];
+			arg.clear();
+			arg << "-n" << "100000" << "--follow=name" << QDir::tempPath() + "/" + files[0];
+			QProcess *tail = new QProcess( this );
+			tail->setStandardOutputFile( progDestFile, QIODevice::Truncate );
+			tail->setStandardErrorFile( "/tmp/progtail.err", QIODevice::Truncate );
+			tail->start( "tail", arg );
+			if ( tail->waitForStarted() )
+			{
+				if ( duration == 0 ) duration = -1;
+				qDebug() << " waiting " << duration << " milli" << endl;
+				if ( !tail->waitForFinished(duration) )
+				{
+					tail->terminate();
+				}
+				qDebug() << " prog tail : " << tail->exitStatus() << " " << tail->exitCode() << endl;
+			}
+			else
+			{
+				qDebug() << " prog tail non demarre" << endl;
+			}
+			return;
 		}
 	}
 	if ( ( !kwFound ) && ( retries < 4 ) )
@@ -142,6 +180,13 @@ void recwnd::recordStart()
 		// retry two mminute later
 		retries++;
 		QTimer::singleShot(120000, this, SLOT(record()));
+	}
+	else if ( ( kwFound ) && ( obstinate ) )
+	{
+		retries = 0;
+		progDestFile += QDateTime::currentDateTime().toString( "_hhmmss");
+		// retry one mminute later
+		QTimer::singleShot(6000, this, SLOT(record()));
 	}
 }
 
@@ -246,7 +291,8 @@ void recwnd::addProgram()
 
 	QTableWidgetItem *tu = new QTableWidgetItem( leUrl->text() );
 	twProgs->setCellWidget(  numProgs, 1, new QDateTimeEdit( curdt ) );
-	twProgs->setItem( numProgs, 3, tu );
+	twProgs->setCellWidget(  numProgs, 2, new QTimeEdit( ) );
+	twProgs->setItem( numProgs, 4, tu );
 	// (re)start the timer 
 	if ( !progTimer )
 	{
@@ -270,8 +316,20 @@ void recwnd::checkProg()
 		{
 			// launch prog
 			progKeyword = twProgs->item( i, 0 )->text();
-			progDestFile = twProgs->item( i, 2 )->text();
-			progUrl = twProgs->item( i, 3 )->text();
+			progDuration = (QTimeEdit *)twProgs->cellWidget( i, 2 );
+			progDestFile = twProgs->item( i, 3 )->text();
+			progUrl = twProgs->item( i, 4 )->text();
+			qDebug() << "prog : kw=" << progKeyword;
+			qDebug() << " dur=" << progDuration->time().toString();
+			int msec = 
+			progDuration->time().hour() * 60 * 60 +
+			progDuration->time().minute() * 60
+			;
+			duration = msec * 1000;
+			qDebug() << " msecs=" << msec;
+			qDebug() << " dest=" << progDestFile;
+			qDebug() << " url=" << progUrl;
+			qDebug() << endl;
 			twProgs->removeRow( i );
 			if ( twProgs->rowCount() == 0 )
 			{
@@ -291,7 +349,7 @@ void recwnd::selDestFile()
 		if ( !fn.isEmpty() )
 		{
 			QTableWidgetItem *tf = new QTableWidgetItem( fn );
-			twProgs->setItem( cr, 2, tf );
+			twProgs->setItem( cr, 3, tf );
 		}
 	}
 }
@@ -346,30 +404,47 @@ void recwnd::readResponse(bool err)
 	linkList.clear();
 	ctr = 0;
 	int nb = 0;
+	//qDebug() << vidListRE << endl;
 	for ( it = l.begin(); it != l.end(); it++ )
 	{
 		QString s( *it );
-		qDebug() << s << endl;
 		if ( s.contains( vidListRE ) )
 		{
-			// VideoListUne[1]=new VideoListItem('Mancini va partir', '', 'http://i.video.eurosport.fr/2008/03/12/424449-2776674-81-61.jpg', 'http://video.eurosport.fr/football/ligue-des-champions/2007-2008/video_vid67408.shtml', '2 257', 'Mer. 12/03/2008', '10:54','Football', '1', '0', '', '');
-			QStringList sl = s.split(',');
-			QStringList sl0 = sl[0].split('\'');
-			QString titre = sl0[1];
-			qDebug() << titre;
-			QString fn = sl[2].remove("'").remove(' ') ;
-			QString vidname = sl[0].section('\'', 1 ).remove("'").remove(' ') ;
-			QString link = sl[3].remove("'").remove(' ');
-			if ( !fn.isEmpty() )
+			//qDebug() << s << endl;
+			/* this was for the eurosport vids
+				QStringList sl = s.split(',');
+				QStringList sl0 = sl[0].split('\'');
+				QString titre = sl0[1];
+				qDebug() << titre;
+				QString fn = sl[2].remove("'").remove(' ') ;
+				QString vidname = sl[0].section('\'', 1 ).remove("'").remove(' ') ;
+				QString link = sl[3].remove("'").remove(' ');
+				if ( !fn.isEmpty() )
+				{
+					titleList << titre;
+					imageList << fn;
+					nameList << vidname;
+					linkList << link;
+				}
+				if ( ++nb > sbNumber->value() ) break;
+			*/
+			/* this is for atdhe.net vids : */
+			QStringList sl = s.split(' ');
+			QStringList sl0 = s.split('>');
+			if ( ( sl.size() > 4 ) && ( sl0.size() > 2 ) )
 			{
-				titleList << titre;
-				imageList << fn;
-				nameList << vidname;
-				linkList << link;
+				QStringList sl2 = sl[4].split("\"" );
+				linkList << "http://atdhe.net/" + sl2[1];
+				QStringList sl1 = sl0[3].split("<");
+				QString title = sl1[0];
+				titleList << title;
+				new QListWidgetItem( titleList[ctr], lwVideos, ctr );
+				ctr++;
 			}
-			if ( ++nb > sbNumber->value() ) break;
+
 		}
 	}
+	/*
 	progbarGet->setVisible( true );
 	int max = 0;
 	if ( sbNumber->value() != 0 )
@@ -391,6 +466,11 @@ void recwnd::readResponse(bool err)
 	{
 		ctr = 0;
 		getOneImage();
+	}
+	*/
+	if ( prog )
+	{
+		this->recordStart();
 	}
 }
 
@@ -487,6 +567,7 @@ void recwnd::imReqDone(bool /*error*/)
 
 void recwnd::vidDoubleClicked ( QListWidgetItem * item ) 
 {
+	/* this was for eurosport
 	if ( item )
 	{
 		QUrl link( linkList[ item->type() ] );
@@ -502,6 +583,14 @@ void recwnd::vidDoubleClicked ( QListWidgetItem * item )
 		connect( linkReq, SIGNAL(done(bool)),
 			this, SLOT(linkReadResponse(bool)));
 		linkReq->get(link.path());
+	}
+	*/
+	/* this is for atdhe.net */
+	if ( item )
+	{
+		detailwnd *dw = new detailwnd(this);
+		dw->setLink(linkList[ item->type() ]);
+		dw->exec();
 	}
 }
 

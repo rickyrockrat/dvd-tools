@@ -4,6 +4,7 @@
 #include "ui_recwnd.h"
 #include <QtNetwork/QHttp>
 #include <QFile>
+#include <QTimeEdit>
 #include <QMainWindow>
 
 class recwnd : public QMainWindow, public Ui::recWnd
@@ -48,6 +49,8 @@ private :
 	QString progDestFile;
 	QString progKeyword;
 	QString progUrl;
+	QTimeEdit *progDuration;
+	int duration;
 	int imGetId;
 	int ctr;
 	QFile *imFile;
@@ -66,5 +69,6 @@ private :
 	QRegExp vidListRE;
 	QString defaultUrl;
 	int minSize;
+	bool obstinate;
 };
 #endif	// _RECWND_H }

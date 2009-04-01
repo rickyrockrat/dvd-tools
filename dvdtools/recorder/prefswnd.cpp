@@ -42,6 +42,7 @@ void prefswnd::saveExit()
 	prefs.setValue("misc/defaulturl", leDefaultUrl->text() );
 	prefs.setValue("misc/maxretries", sbRetries->value() );
 	prefs.setValue("misc/minsize", sbMinSize->value() );
+	prefs.setValue("misc/obstinate", cbObstinate->isChecked() );
 
 	accept();
 }
@@ -68,6 +69,7 @@ void prefswnd::readPrefs()
 	QString defaultUrl = prefs.value("misc/defaulturl").toString();
 	int retries = prefs.value("misc/maxretries").toInt();
 	int minSize = prefs.value("misc/minsize").toInt();
+	bool obstinate = prefs.value("misc/obstinate").toBool();
 
 	ckEnableProxy->setChecked( proxyEnabled );
 	gbProxy->setEnabled( proxyEnabled );
@@ -80,5 +82,6 @@ void prefswnd::readPrefs()
 	leDefaultUrl->setText( defaultUrl );
 	sbRetries->setValue( retries );
 	sbMinSize->setValue( minSize );
+	cbObstinate->setChecked( obstinate );
 }
 

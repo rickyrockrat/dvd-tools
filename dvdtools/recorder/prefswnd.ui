@@ -6,7 +6,7 @@
     <x>0</x>
     <y>0</y>
     <width>300</width>
-    <height>303</height>
+    <height>328</height>
    </rect>
   </property>
   <property name="sizePolicy" >
@@ -196,6 +196,13 @@
       </widget>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="cbObstinate" >
+     <property name="text" >
+      <string>Obstinate donwload when programmed</string>
+     </property>
+    </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" >

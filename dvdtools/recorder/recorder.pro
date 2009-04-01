@@ -1,7 +1,7 @@
 TEMPLATE	= app
 LANGUAGE	= C++
 
-CONFIG	+= qt warn_on
+CONFIG	+= debug qt warn_on
 
 SOURCES	+= main.cpp recwnd.cpp detailwnd.cpp prefswnd.cpp
 
