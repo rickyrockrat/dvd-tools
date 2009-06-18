@@ -55,16 +55,16 @@ void qt4encodeWnd::demarrerA( )
 	setWindowTitle( "Authoring " );
 	setModal( true );
 	teAuthor->clear();
-	connect( procEncode, SIGNAL(readyReadStderr()),
+	connect( procEncode, SIGNAL(readyReadStandardError()),
 						this, SLOT(readAuthor()));
-	connect( procEncode, SIGNAL(processExited()),
-						this, SLOT(endAuthor()));
+	connect( procEncode, SIGNAL(finished(int, QProcess::ExitStatus)),
+						this, SLOT(endAuthor(int,  QProcess::ExitStatus)));
 	exec();
 }
 
-void qt4encodeWnd::endAuthor()
+void qt4encodeWnd::endAuthor( int exitCode, QProcess::ExitStatus exitStatus)
 {
-	if ( procEncode->exitStatus() == QProcess::NormalExit )
+	if ( exitStatus == QProcess::NormalExit )
 	{
 		teAuthor->append( "Authoring successful\n" );
 	}
@@ -72,7 +72,7 @@ void qt4encodeWnd::endAuthor()
 	{
 		QString s;
 		s.sprintf( "authoring failed with code : %d\n",
-					procEncode->exitStatus() );
+					exitCode );
 		teAuthor->append( s );
 	}
 	if ( !cbKeep->isChecked() ) accept();

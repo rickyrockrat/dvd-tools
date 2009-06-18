@@ -21,7 +21,7 @@ public slots:
 	void readEncode();
 	void demarrer(QString fn, int tf );
 	void demarrerA( );
-	void endAuthor();
+	void endAuthor( int, QProcess::ExitStatus);
 	void cancelJob();
 };
 #endif	// _QT4ENCODEWND_H }

@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/" >
+    <qresource>
         <file>pix/black.jpg</file>
         <file>pix/ic_bgcolor.png</file>
         <file>pix/ic_directplay.png</file>

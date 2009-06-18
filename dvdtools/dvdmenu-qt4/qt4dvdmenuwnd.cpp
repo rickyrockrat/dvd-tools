@@ -154,15 +154,6 @@ void qt4dvdmenuWnd::addVideo()
 			QStringList tra;
 			tra << *it;
 			tra << CC_VIDEO;
-			tra << " ";	// Chapters
-			tra << " ";	// Aspect
-			tra << " ";	// Audio1
-			tra << " ";	// Audio2
-			tra << " ";	// Sub1
-			tra << " ";	// Sub2
-			tra << " ";	// Sub3
-			tra << " ";	// Sub4
-			tra << *it;	// Filename
 			videoItem = new QTreeWidgetItem( titleItem, tra );
 
 			QFileInfo fi( *it );
@@ -242,9 +233,6 @@ void qt4dvdmenuWnd::openProject()
 			root << dvdname.value();
 			root << CC_DVD;
 			dvdItem = new QTreeWidgetItem( lvDVD, root );
-			/*FIXME dvdItem->setRenameEnabled( ID_NAME, true );
-			dvdItem->setOpen(true);
-			*/
 			lvDVD->expandItem( dvdItem );
 
 			QDomNode n = docElem.firstChild();
@@ -261,21 +249,7 @@ void qt4dvdmenuWnd::openProject()
 						QStringList t;
 						t <<  titlename.value(); 
 						t << CC_TITLE;
-						if ( titleItem )
-							titleItem = new QTreeWidgetItem( titleItem, t );
-						else
-							titleItem = new QTreeWidgetItem( dvdItem, t );
-						/*
-						titleItem->setRenameEnabled( ID_NAME, true );
-						titleItem->setRenameEnabled( ID_PICTURE, true );
-						titleItem->setRenameEnabled( ID_ASPECT, true );
-						titleItem->setRenameEnabled( ID_AUDIO1, true );
-						titleItem->setRenameEnabled( ID_AUDIO2, true );
-						titleItem->setRenameEnabled( ID_SUB1, true );
-						titleItem->setRenameEnabled( ID_SUB2, true );
-						titleItem->setRenameEnabled( ID_SUB3, true );
-						titleItem->setRenameEnabled( ID_SUB4, true );
-						*/
+						titleItem = new QTreeWidgetItem( dvdItem, t );
 
 						att = e.attributeNode( "ID_PICTURE" );
 						titleItem->setText( ID_PICTURE, QString/*::fromUtf8*/( att.value()) );
@@ -304,19 +278,11 @@ void qt4dvdmenuWnd::openProject()
 								{
 									att = e1.attributeNode( "ID_NAME" );
 									//std::cout << "track=" << att.value() << std::endl; 
-									if ( videoItem )
-										videoItem = new QTreeWidgetItem( videoItem, QStringList/*::fromUtf8*/( att.value() ) );
-									else
-										videoItem = new QTreeWidgetItem( titleItem, QStringList/*::fromUtf8*/( att.value() ) );
+									videoItem = new QTreeWidgetItem( titleItem, QStringList/*::fromUtf8*/( att.value() ) );
 									videoItem->setText( ID_IDENT, CC_VIDEO ); 
 
-									//videoItem->setRenameEnabled( ID_NAME, true );
 									att = e1.attributeNode( "ID_CHAPTERS" );
 									videoItem->setText( ID_PICTURE, QString/*::fromUtf8*/( att.value()));
-									//videoItem->setRenameEnabled( ID_PICTURE, true );
-									att = e1.attributeNode( "ID_FILENAME" );
-									videoItem->setText( ID_FILENAME, QString/*::fromUtf8*/( att.value()) );
-									//titleItem->setOpen( true );
 									lvDVD->expandItem( videoItem );
 								}
 							}
@@ -378,7 +344,6 @@ void qt4dvdmenuWnd::saveProject()
 				el = doc.createElement( "VIDEO" );
 				el.setAttribute( "ID_NAME", item->text( ID_NAME )/*.utf8()*/ );
 				el.setAttribute( "ID_CHAPTERS", item->text( ID_PICTURE )/*.utf8()*/ );
-				el.setAttribute( "ID_FILENAME", item->text(ID_FILENAME)/*.utf8()*/ );
 				titleEl.appendChild( el );
 			}
 			it++;
@@ -484,7 +449,7 @@ void qt4dvdmenuWnd::encode()
 					}
 					else
 					{
-						bg = QPixmap( ":/black.jpg" );
+						bg = QPixmap( ":/pix/black.jpg" );
 					}
 					name.sprintf( "bg%04d.ppm", pg );
 					QPixmap pic0 = drawMenu( bg, pg, npages );
@@ -496,7 +461,7 @@ void qt4dvdmenuWnd::encode()
 					outputhName.sprintf( "picH%04d.png", pg );
 					outputsName.sprintf( "picS%04d.png", pg );
 		
-					QPixmap bp1 = QPixmap( ":/black.jpg" );
+					QPixmap bp1 = QPixmap( ":/pix/black.jpg" );
 					std::vector<QRect> vr;
 
 					QRgb pal[ 4 ];
@@ -512,13 +477,13 @@ void qt4dvdmenuWnd::encode()
 
 					int nc = 2;
 
-					QPixmap bp2 = QPixmap( ":/black.jpg" );
+					QPixmap bp2 = QPixmap( ":/pix/black.jpg" );
 					QPixmap pic2 = drawButtons( bp2, Qt::yellow, pg, npages,&vr );
 					QImage img2 = pic2.toImage();
 					clipColors( img2, Qt::yellow );
 					img2.save( outputhName , "PNG" );
 
-					QPixmap bp3 = QPixmap( ":/black.jpg" );
+					QPixmap bp3 = QPixmap( ":/pix/black.jpg" );
 					QPixmap pic3 = drawButtons( bp3, Qt::blue, pg, npages,&vr );
 					QImage img3 = pic3.toImage();
 					clipColors( img3, Qt::blue );
@@ -661,35 +626,35 @@ void qt4dvdmenuWnd::encode()
 					stXml << "<audio lang=\"en\"/>" << endl;
 				}
 				if ( ( !(*it)->text(ID_AUDIO2).isEmpty() )
-				&& ( (*it)->text(ID_AUDIO2).length() > 1 ) )
+					&& ( (*it)->text(ID_AUDIO2).length() > 1 ) )
 				{
 					stXml << "<audio lang=\"";
 					stXml << (*it)->text(ID_AUDIO2);
 					stXml << "\"/>" << endl;
 				}
 				if ( ( !(*it)->text(ID_SUB1).isEmpty() )
-				&& ( (*it)->text(ID_SUB1).length() > 1 ) )
+					&& ( !(*it)->text(ID_SUB1).length() > 1 ) )
 				{
 					stXml << "<subpicture lang=\"";
 					stXml << (*it)->text(ID_SUB1);
 					stXml << "\"/>" << endl;
 				}
 				if ( ( !(*it)->text(ID_SUB2).isEmpty() )
-				&& ( (*it)->text(ID_SUB2).length() > 1 ) )
+					&& ( !(*it)->text(ID_SUB2).length() > 1 ) )
 				{
 					stXml << "<subpicture lang=\"";
 					stXml << (*it)->text(ID_SUB2);
 					stXml << "\"/>" << endl;
 				}
 				if ( ( !(*it)->text(ID_SUB3).isEmpty() )
-				&& ( (*it)->text(ID_SUB3).length() > 1 ) )
+					&& ( !(*it)->text(ID_SUB3).length() > 1 ) )
 				{
 					stXml << "<subpicture lang=\"";
 					stXml << (*it)->text(ID_SUB3);
 					stXml << "\"/>" << endl;
 				}
 				if ( ( !(*it)->text(ID_SUB4).isEmpty() )
-				&& ( (*it)->text(ID_SUB4).length() > 1 ) )
+					&& ( !(*it)->text(ID_SUB4).length() > 1 ) )
 				{
 					stXml << "<subpicture lang=\"";
 					stXml << (*it)->text(ID_SUB4);
@@ -701,9 +666,8 @@ void qt4dvdmenuWnd::encode()
 				while ( ( *it1 ) &&
 						( (*it1)->text(ID_IDENT) == CC_VIDEO ) )
 				{
-					stXml << "<vob file=\"" << (*it1)->text(ID_FILENAME);
-					if ( ( !(*it1)->text(ID_PICTURE).isEmpty())
-					&& ( !(*it1)->text(ID_PICTURE).length() > 0) )
+					stXml << "<vob file=\"" << (*it1)->text(ID_NAME);
+					if ( !(*it1)->text(ID_PICTURE).isEmpty())
 					{
 						stXml << "\" chapters=\"";
 						stXml << (*it1)->text(ID_PICTURE);
@@ -981,7 +945,7 @@ void qt4dvdmenuWnd::preview()
 		}
 		else
 		{
-			bg = QPixmap( ":/black.jpg" );
+			bg = QPixmap( ":/pix/black.jpg" );
 		}
 		std::vector<QRect> vr;
 		bg = drawMenu( bg, 0, n );
