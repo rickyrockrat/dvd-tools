@@ -23,8 +23,6 @@ FORMS	= qt4encodewnd.ui \
 
 RESOURCES = dvdmenu.qrc
 
-DESTDIR = /usr/bin
-
 target.path = /usr/bin
 
 INSTALLS += target
