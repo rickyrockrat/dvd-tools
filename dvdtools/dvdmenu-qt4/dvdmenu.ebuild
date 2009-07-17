@@ -1,6 +1,6 @@
 # Copyright 1999-2009 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /500g/src/dvdtools/cvs/dvdtools/dvdmenu-qt4/dvdmenu.ebuild,v 1.1 2009-07-17 08:27:31 savignien Exp $
+# $Header: /500g/src/dvdtools/cvs/dvdtools/dvdmenu-qt4/dvdmenu.ebuild,v 1.2 2009-07-17 09:02:41 savignien Exp $
 
 # inherit eutils python
 EAPI=2
@@ -32,7 +32,5 @@ src_compile() {
 }
 
 src_install() {
-	emake DESTDIR="${D}" install || die "make install died"
-
+	 emake INSTALL_ROOT="${D}" install || die "emake install"
 }
-
