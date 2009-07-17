@@ -1,3 +1,5 @@
+TARGET = dvdmenu
+
 TEMPLATE	= app
 LANGUAGE	= C++
 
@@ -21,10 +23,11 @@ FORMS	= qt4encodewnd.ui \
 
 RESOURCES = dvdmenu.qrc
 
-dvdmenu.path = /usr/bin
-dvdmenu.files = dvdmenu
+DESTDIR = /usr/bin
 
-INSTALLS += dvdmenu
+target.path = /usr/bin
+
+INSTALLS += target
 
 LIBS += -lQtXml
 
