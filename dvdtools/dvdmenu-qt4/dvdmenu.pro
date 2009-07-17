@@ -36,7 +36,6 @@ unix {
   UI_DIR = .ui
   MOC_DIR = .moc
   OBJECTS_DIR = .obj
-  QMAKE_CXXFLAGS = -g
 }
 
 
