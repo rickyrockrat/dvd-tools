@@ -20,7 +20,7 @@
 #define COL_LENGTH		5
 
 #define STR_DEFDDATA	"/data/musique/%G/%C/%W/%N - %P.%E"
-#define STR_DEFDPLAY	"/data/musique/Albums/%C/%T - %A.%M"
+#define STR_DEFDPLAY	"/data/musique/%G/Albums/%C/%T - %A.%M"
 
 wndQrip::wndQrip( QWidget *parent )
 	: QMainWindow( parent )
@@ -176,21 +176,21 @@ void wndQrip::extract()
 				stream << "...'" << endl;
 				stream << "flac -8 -o '" << destfn << "' '";
 				stream << " metaflac --set-tag 'AlbumTitle=";
-				stream << leAlbumTitle->text() << "'" << endl;
+				stream << leAlbumTitle->text() << "' '" << destfn << "'" << endl;
 				stream << " metaflac --set-tag 'AlbumArtist=";
-				stream << leAlbumArtist->text() << "'" << endl;
+				stream << leAlbumArtist->text() << "' '" << destfn << "'" << endl;
 				stream << " metaflac --set-tag 'AlbumGenre=";
-				stream << leAlbumGenre->text() << "'" << endl;
+				stream << leAlbumGenre->text() << "' '" << destfn << "'" << endl;
 				stream << " metaflac --set-tag 'Composer=";
-				stream << twTracks->item( i, COL_COMPOSER )->text() << "'" << endl;
+				stream << twTracks->item( i, COL_COMPOSER )->text() << "' '" << destfn << "'" << endl;
 				stream << " metaflac --set-tag 'Work=";
-				stream << twTracks->item( i, COL_WORK )->text() << "'" << endl;
+				stream << twTracks->item( i, COL_WORK )->text() << "' '" << destfn << "'" << endl;
 				stream << " metaflac --set-tag 'Work=";
-				stream << twTracks->item( i, COL_WORK )->text() << "'" << endl;
+				stream << twTracks->item( i, COL_WORK )->text() << "' '" << destfn << "'" << endl;
 				stream << " metaflac --set-tag 'TrackNo=";
-				stream << twTracks->item( i, COL_TRACKNO )->text() << "'" << endl;
+				stream << twTracks->item( i, COL_TRACKNO )->text() << "' '" << destfn << "'" << endl;
 				stream << " metaflac --set-tag 'TrackTitle=";
-				stream << twTracks->item( i, COL_TRACKTITLE )->text() << "'" << endl;
+				stream << twTracks->item( i, COL_TRACKTITLE )->text() << "' '" << destfn << "'" << endl;
 				QString wav = QString( destfn );
 				QString inf = QString( destfn );
 				wav.replace( ".flac", ".wav" );
