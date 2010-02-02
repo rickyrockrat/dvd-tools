@@ -46,8 +46,7 @@ void wndQrip::readInfo()
 	track_t i_tracks;
 	const char *psz_drive = NULL;
 
-	//CdIo_t *p_cdio = cdio_open(s.c_str(), DRIVER_DEVICE);
-	CdIo_t *p_cdio = cdio_open("/dev/cdrom", DRIVER_DEVICE);
+	CdIo_t *p_cdio = cdio_open(s.c_str(), DRIVER_DEVICE);
 	if ( !p_cdio )
 	{
 		cdio_destroy(p_cdio);
@@ -175,6 +174,12 @@ void wndQrip::extract()
 				stream << "echo 'Encoding track " << QString::number(i+1);
 				stream << "...'" << endl;
 				stream << "flac -8 -o '" << destfn << "' '";
+				QString wav = QString( destfn );
+				QString inf = QString( destfn );
+				wav.replace( ".flac", ".wav" );
+				inf.replace( ".flac", ".inf" );
+				stream << wav;
+				stream << "'" << endl;
 				stream << " metaflac --set-tag 'AlbumTitle=";
 				stream << leAlbumTitle->text() << "' '" << destfn << "'" << endl;
 				stream << " metaflac --set-tag 'AlbumArtist=";
@@ -191,12 +196,6 @@ void wndQrip::extract()
 				stream << twTracks->item( i, COL_TRACKNO )->text() << "' '" << destfn << "'" << endl;
 				stream << " metaflac --set-tag 'TrackTitle=";
 				stream << twTracks->item( i, COL_TRACKTITLE )->text() << "' '" << destfn << "'" << endl;
-				QString wav = QString( destfn );
-				QString inf = QString( destfn );
-				wav.replace( ".flac", ".wav" );
-				inf.replace( ".flac", ".inf" );
-				stream << wav;
-				stream << "'" << endl;
 				// TODO : demander rm ?
 				stream << "rm -f '" << wav << "' '";
 				stream << inf << "'" << endl;
@@ -309,10 +308,9 @@ track_t i_tracks,
 			&i_cddb_matches
 			) );
 	{
-
 		if (-1 == i_cddb_matches)
 			printf("%s: %s\n", program_name, cddb_error_str(cddb_errno(p_conn)));
-		else
+		else if ( p_cddb_disc )
 		{
 			printf("%s: Found %d matches in CDDB\n", program_name, i_cddb_matches);
 			if ( i_cddb_matches > 1 )

@@ -64,17 +64,28 @@ init_cddb(
   cddb_opts_t qripcddb_opts;
   qripcddb_opts.email = NULL;
   qripcddb_opts.server = NULL;
-  qripcddb_opts.port = 0;
-  qripcddb_opts.http = 1;	// 1 pour proxy : TODO a parametrer
+  qripcddb_opts.http = 1;	// http ou proxy
   qripcddb_opts.timeout = 30;
   qripcddb_opts.disable_cache = false;
   qripcddb_opts.cachedir = NULL;
   
   *pp_conn =  cddb_new();
 
-  // TODO : donner le choix du protocol dans l'ihm
-  if ( init_protocol( pp_conn, "proxy" ) < 0 )
-  	return false;
+  char *prox = getenv(ENV_HTTP_PROXY);
+  if (prox == NULL)
+  {
+	// "environment variable 'http_proxy' not set"
+    qripcddb_opts.port = 80;
+    if ( init_protocol( pp_conn, "http" ) < 0 )
+    	return false;
+  }
+  else
+  {
+	// "environment variable 'http_proxy' IS set"
+    qripcddb_opts.port = 0;
+    if ( init_protocol( pp_conn, "proxy" ) < 0 )
+    	return false;
+  }
 
   *pp_cddb_disc = NULL;
   
