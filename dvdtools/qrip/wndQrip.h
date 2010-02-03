@@ -14,13 +14,16 @@ public:
 	wndQrip( QWidget *parent = 0 );
 public slots :
 	void readInfo();
-	void multipleChecked();
+	void cellChanged(int, int);
+	void cellClicked(int, int);
 	void playlistChecked();
+	void selAll();
 	void extract();
 	void readEncodage();
 	void encodageFini(int, QProcess::ExitStatus);
 private :
 	void get_cddb_info(CdIo_t *, track_t, track_t );
+	QString cleanString( QString );
 	QProcess *proc;
 };
 

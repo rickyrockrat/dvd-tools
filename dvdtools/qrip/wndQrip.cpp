@@ -7,6 +7,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QTableWidgetItem>
+#include <QTextCodec>
 
 #include "qripcddb.h"
 
@@ -28,19 +29,76 @@ wndQrip::wndQrip( QWidget *parent )
 	setupUi(this);
 
 	connect( pbGo, SIGNAL(clicked()), this, SLOT(readInfo()) );
-	connect( cbMultiple, SIGNAL(stateChanged(int)), this, SLOT(multipleChecked()) );
-	connect( cbPlaylist, SIGNAL(stateChanged(int)), this, SLOT(playlistChecked()) );
+	connect( cbPlaylist, SIGNAL(stateChanged(int)),
+		this, SLOT(playlistChecked()) );
 	connect( pbExtract, SIGNAL(clicked()), this, SLOT(extract()) );
+	connect( twTracks, SIGNAL(cellClicked(int,int)),
+		this, SLOT(cellClicked(int,int)) );
 
 	leDestData->setText( STR_DEFDDATA );
 	leDestPlaylist->setText( STR_DEFDPLAY );
 	cbPlaylist->setChecked(true);
 	lblProgress->setText("");
 	proc = 0;
+	QTextCodec::setCodecForCStrings( QTextCodec::codecForName("UTF-8")) ;
+}
+
+void wndQrip::selAll( )
+{
+	qDebug() << "sel ALL" << endl;
+	QCheckBox *cb = (QCheckBox *)twTracks->cellWidget( 0, COL_SEL );
+	Qt::CheckState state;
+	if ( cb->isChecked() )
+	{
+		state = Qt::Checked;
+	}
+	else
+	{
+		state = Qt::Unchecked;
+	}
+	QTableWidgetItem *item;
+	for ( int i = 1; i < twTracks->rowCount(); i++ )
+	{
+		item = twTracks->item( i, COL_SEL );
+		item->setCheckState( state );
+	}
+}
+
+void wndQrip::cellClicked( int row, int col)
+{
+	//qDebug() << "row=" << row << " col=" << col << endl;
+}
+
+void wndQrip::cellChanged( int row, int col)
+{
+	if ( ( col == COL_COMPOSER ) || ( col == COL_WORK ) )
+	{
+		if ( !cbMultiple->isChecked() )
+		{
+			// on met a jour les autres lignes de la table
+			disconnect( twTracks, SIGNAL(cellChanged(int,int)),
+				this, SLOT(cellChanged(int,int)) );
+			QString val = twTracks->item( row, col )->text();
+			QTableWidgetItem *item;
+			for ( int i = 0; i < twTracks->rowCount(); i++ )
+			{
+				if ( i != row )
+				{
+					item = new QTableWidgetItem( val );
+					twTracks->setItem( i, col, item );
+				}
+			}
+			connect( twTracks, SIGNAL(cellChanged(int,int)),
+				this, SLOT(cellChanged(int,int)) );
+		}
+	}
 }
 
 void wndQrip::readInfo()
 {
+	disconnect( twTracks, SIGNAL(cellChanged(int,int)),
+		this, SLOT(cellChanged(int,int)) );
+
 	std::string s =  leDevice->text().toStdString();
 	track_t i_first_track;
 	track_t i_tracks;
@@ -63,11 +121,9 @@ void wndQrip::readInfo()
 	}
 
 	get_cddb_info( p_cdio, i_tracks, i_first_track );
+	connect( twTracks, SIGNAL(cellChanged(int,int)),
+		this, SLOT(cellChanged(int,int)) );
 
-}
-
-void wndQrip::multipleChecked()
-{
 }
 
 void wndQrip::playlistChecked()
@@ -88,13 +144,12 @@ void wndQrip::extract()
 	else
 		stmpdir = QString( tmpdir );
 
-	QCheckBox *cb;
 	QTableWidgetItem *item;
 	int ctr = 0;
-	for ( i = 0; i < twTracks->rowCount(); i++ )
+	for ( i = 1; i < twTracks->rowCount(); i++ )
 	{
-		cb = (QCheckBox *)twTracks->cellWidget( i, COL_SEL );
-		if ( cb->isChecked() )
+		item = twTracks->item( i, COL_SEL );
+		if ( item->checkState() == Qt::Checked )
 		{
 			ctr++;
 		}
@@ -116,10 +171,10 @@ void wndQrip::extract()
 	QDir dpl;
 	stream << "#!/bin/bash" << endl;
 	int passage = 0;
-	for ( i = 0; i < twTracks->rowCount(); i++ )
+	for ( i = 1; i < twTracks->rowCount(); i++ )
 	{
-		cb = (QCheckBox *)twTracks->cellWidget( i, COL_SEL );
-		if ( cb->isChecked() )
+		item = twTracks->item( i, COL_SEL );
+		if ( item->checkState() == Qt::Checked )
 		{
 			first = i;
 			QString destfn = leDestData->text();
@@ -139,23 +194,8 @@ void wndQrip::extract()
 
 			destfn.replace( QString("%E"), cbFormat->currentText() );
 
-			destfn.replace( QString("à"), QString( "a" ) );
-			destfn.replace( QString("â"), QString( "a" ) );
-			destfn.replace( QString("ä"), QString( "a" ) );
-			destfn.replace( QString("é"), QString( "e" ) );
-			destfn.replace( QString("è"), QString( "e" ) );
-			destfn.replace( QString("ê"), QString( "e" ) );
-			destfn.replace( QString("ë"), QString( "e" ) );
-			destfn.replace( QString("ù"), QString( "u" ) );
-			destfn.replace( QString("û"), QString( "u" ) );
-			destfn.replace( QString("ü"), QString( "u" ) );
-			destfn.replace( QString("î"), QString( "i" ) );
-			destfn.replace( QString("ï"), QString( "i" ) );
-			destfn.replace( QString("ô"), QString( "o" ) );
-			destfn.replace( QString("ö"), QString( "o" ) );
-			destfn.replace( QString("ç"), QString( "c" ) );
-			destfn.replace( QString("°"), QString( "o" ) );
-			
+			cleanString( destfn );
+
 			QString rep = QString( destfn);
 			destrep = rep.remove( rep.lastIndexOf( "/" ), rep.length() );
 			QDir().mkpath( destrep );
@@ -164,16 +204,19 @@ void wndQrip::extract()
 			
 			// commande à passer :
 			// cdda2wav -D <dev> -t <track no> <dest> (sans le .wav)
-			stream << "echo 'Extracting track " << QString::number(i+1);
+			stream << "echo 'Extracting track " << QString::number(i);
 			stream << "...'" << endl;
 			stream << "cdda2wav -D " << leDevice->text() << " -t ";
-			stream << QString::number(i+1) << " '" << destfn << "'" << endl;
+			stream << QString::number(i) << " '" << destfn << "'" << endl;
 
 			if ( cbFormat->currentText() == "flac" )
 			{
-				stream << "echo 'Encoding track " << QString::number(i+1);
+				stream << "echo 'Encoding track " << QString::number(i);
 				stream << "...'" << endl;
-				stream << "flac -8 -o '" << destfn << "' '";
+				stream << "flac -8 ";
+				if ( cbOverwrite->isChecked() ) 
+					stream << "-f ";
+				stream << "-o '" << destfn << "' '";
 				QString wav = QString( destfn );
 				QString inf = QString( destfn );
 				wav.replace( ".flac", ".wav" );
@@ -190,15 +233,15 @@ void wndQrip::extract()
 				stream << twTracks->item( i, COL_COMPOSER )->text() << "' '" << destfn << "'" << endl;
 				stream << " metaflac --set-tag 'Work=";
 				stream << twTracks->item( i, COL_WORK )->text() << "' '" << destfn << "'" << endl;
-				stream << " metaflac --set-tag 'Work=";
-				stream << twTracks->item( i, COL_WORK )->text() << "' '" << destfn << "'" << endl;
 				stream << " metaflac --set-tag 'TrackNo=";
 				stream << twTracks->item( i, COL_TRACKNO )->text() << "' '" << destfn << "'" << endl;
 				stream << " metaflac --set-tag 'TrackTitle=";
 				stream << twTracks->item( i, COL_TRACKTITLE )->text() << "' '" << destfn << "'" << endl;
-				// TODO : demander rm ?
-				stream << "rm -f '" << wav << "' '";
-				stream << inf << "'" << endl;
+				if ( cbRemove->isChecked() )
+				{
+					stream << "rm -f '" << wav << "' '";
+					stream << inf << "'" << endl;
+				}
 			}
 			if ( ( cbPlaylist->isChecked() ) && ( passage == 0 ) )
 			{
@@ -251,6 +294,10 @@ void wndQrip::extract()
 			stream << "' >> '" << destpl << "'" << endl;
 		}
 	}
+	if ( cbEject->isChecked() )
+	{
+		stream << "eject " << leDevice->text() << endl;
+	}
 	fRip.close();
 	proc = new QProcess( this );
 	connect( proc,
@@ -281,7 +328,6 @@ void wndQrip::encodageFini(int exitCode, QProcess::ExitStatus status )
 	if ( exitCode == 0 )
 	{
 		lblProgress->setText( "Encodage fini" );
-		// TODO : ejecter
 	}
 	else
 	{
@@ -324,46 +370,65 @@ track_t i_tracks,
 			{
 				unsigned int discid = cddb_disc_get_discid(p_cddb_disc);
 				const char *catstr = cddb_disc_get_category_str(p_cddb_disc);
+				leAlbumGenre->setText( cleanString( QString(catstr).toLower() ) );
 				unsigned int lenght = cddb_disc_get_length(p_cddb_disc);
 				int trackcount = cddb_disc_get_track_count(p_cddb_disc);
 				const char * title = cddb_disc_get_title(p_cddb_disc);
-				leAlbumTitle->setText( title );
+				leAlbumTitle->setText( cleanString(title) );
 				const char * artist = cddb_disc_get_artist(p_cddb_disc);
-				leAlbumArtist->setText( artist );
+				leAlbumArtist->setText( cleanString(artist) );
 			
-				//twTracks.clear();
-				twTracks->setRowCount( trackcount );
-				QCheckBox *cb;
 				QTableWidgetItem *item;
+				if ( trackcount > 0 )
+				{
+					twTracks->clear();
+					twTracks->setRowCount( trackcount + 1 );
+					QCheckBox *cb = new QCheckBox( "All" );
+					cb->setChecked(true);
+					connect( cb, SIGNAL(stateChanged(int)),
+							this, SLOT(selAll()) );
+					twTracks->setCellWidget( 0, COL_SEL, cb );
+
+					QPushButton *pb = new QPushButton( "Composer (%C)" );
+					twTracks->setCellWidget( 0, COL_COMPOSER, pb );
+					pb = new QPushButton( "Work (%W)" );
+					twTracks->setCellWidget( 0, COL_WORK, pb );
+					pb = new QPushButton( "Track no (%N)" );
+					twTracks->setCellWidget( 0, COL_TRACKNO, pb );
+					pb = new QPushButton( "Track title (%P)" );
+					twTracks->setCellWidget( 0, COL_TRACKTITLE, pb );
+					pb = new QPushButton( "Lenght (%L)" );
+					twTracks->setCellWidget( 0, COL_LENGTH, pb );
+				}
 
 				cddb_track_t *piste;
 				piste = cddb_disc_get_track_first(p_cddb_disc);
 				while ( piste != NULL )
 				{
-					int i = cddb_track_get_number(piste) - 1;
+					int i = cddb_track_get_number(piste);
 					int length = cddb_track_get_length(piste);	// en secondes
 					const char *tracktitle = cddb_track_get_title(piste);
 					const char *trackartist = cddb_track_get_artist(piste);
 					const char *extdata = cddb_track_get_ext_data(piste);
 
-					cb = new QCheckBox( twTracks );
-					cb->setChecked( true );
-					twTracks->setCellWidget( i, COL_SEL, cb );
+					item = new QTableWidgetItem( "" );
+					item->setFlags(Qt::ItemIsUserCheckable|Qt::ItemIsEnabled);
+					item->setCheckState(Qt::Checked);
+					twTracks->setItem( i, COL_SEL, item );
 
-					//item = new QTableWidgetItem( QString( artist ) );
-					item = new QTableWidgetItem( QString( trackartist ) );
+					item = new QTableWidgetItem( cleanString(QString( trackartist) ) );
 					twTracks->setItem( i, COL_COMPOSER, item );
 
-					item = new QTableWidgetItem( QString( title ) );
+					item = new QTableWidgetItem( cleanString(QString( title) ) );
 					twTracks->setItem( i, COL_WORK, item );
 
 					if ( i < 10 )
-						item = new QTableWidgetItem( QString( "0%1" ).arg( i+1 ) );
+						item = new QTableWidgetItem( QString( "0%1" ).arg( i ) );
 					else
-						item = new QTableWidgetItem( QString( "%1" ).arg( i+1 ) );
+						item = new QTableWidgetItem( QString( "%1" ).arg( i ) );
 					twTracks->setItem( i, COL_TRACKNO, item );
 
-					item = new QTableWidgetItem( QString( tracktitle ) );
+					item = new QTableWidgetItem( cleanString(QString( tracktitle) ) );
 					twTracks->setItem( i, COL_TRACKTITLE, item );
 
 					QTime t = QTime( 0, 0, 0, 0);
@@ -373,6 +438,7 @@ track_t i_tracks,
 
 					piste = cddb_disc_get_track_next(p_cddb_disc);
 				}
+				twTracks->resizeColumnsToContents();
 			}
 		}
 
@@ -381,4 +447,27 @@ track_t i_tracks,
 		libcddb_shutdown();
 	
 	}
+}
+
+QString wndQrip::cleanString( QString s )
+{
+	s.replace( QString("à"), QString( "a" ) );
+	s.replace( QString("â"), QString( "a" ) );
+	s.replace( QString("ä"), QString( "a" ) );
+	s.replace( QString("é"), QString( "e" ) );
+	s.replace( QString("è"), QString( "e" ) );
+	s.replace( QString("ê"), QString( "e" ) );
+	s.replace( QString("ë"), QString( "e" ) );
+	s.replace( QString("ù"), QString( "u" ) );
+	s.replace( QString("û"), QString( "u" ) );
+	s.replace( QString("ü"), QString( "u" ) );
+	s.replace( QString("î"), QString( "i" ) );
+	s.replace( QString("ï"), QString( "i" ) );
+	s.replace( QString("ô"), QString( "o" ) );
+	s.replace( QString("ö"), QString( "o" ) );
+	s.replace( QString("ç"), QString( "c" ) );
+	s.replace( QString("°"), QString( "o" ) );
+	
+	s.replace( QString("'"), QString( "" ) );
+	return s;
 }

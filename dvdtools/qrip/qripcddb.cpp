@@ -70,6 +70,8 @@ init_cddb(
   qripcddb_opts.cachedir = NULL;
   
   *pp_conn =  cddb_new();
+  
+  cddb_set_charset(*pp_conn, "UTF-8");
 
   char *prox = getenv(ENV_HTTP_PROXY);
   if (prox == NULL)
