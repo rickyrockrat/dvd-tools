@@ -88,6 +88,7 @@ void wndQrip::cellChanged( int row, int col)
 					twTracks->setItem( i, col, item );
 				}
 			}
+			twTracks->resizeColumnsToContents();
 			connect( twTracks, SIGNAL(cellChanged(int,int)),
 				this, SLOT(cellChanged(int,int)) );
 		}
@@ -359,15 +360,17 @@ track_t i_tracks,
 		else if ( p_cddb_disc )
 		{
 			printf("%s: Found %d matches in CDDB\n", program_name, i_cddb_matches);
+			/* using the first match for simplicity
 			if ( i_cddb_matches > 1 )
 			{
-			// TODO
+				// TODO
 				cddb_disc_print(p_cddb_disc);
 				cddb_query_next(p_conn, p_cddb_disc);
 				if (i != i_cddb_matches) cddb_read(p_conn, p_cddb_disc);
 			}
 			else
 			{
+			*/
 				unsigned int discid = cddb_disc_get_discid(p_cddb_disc);
 				const char *catstr = cddb_disc_get_category_str(p_cddb_disc);
 				leAlbumGenre->setText( cleanString( QString(catstr).toLower() ) );
@@ -439,7 +442,9 @@ track_t i_tracks,
 					piste = cddb_disc_get_track_next(p_cddb_disc);
 				}
 				twTracks->resizeColumnsToContents();
+			/*
 			}
+			*/
 		}
 
 		cddb_disc_destroy(p_cddb_disc);
@@ -469,5 +474,8 @@ QString wndQrip::cleanString( QString s )
 	s.replace( QString("°"), QString( "o" ) );
 	
 	s.replace( QString("'"), QString( "" ) );
+	s.replace( QString(";"), QString( "" ) );
+	s.replace( QString(":"), QString( "" ) );
+	s.replace( QString("\""), QString( "" ) );
 	return s;
 }
