@@ -152,12 +152,6 @@
       <attribute name="verticalHeaderVisible">
        <bool>false</bool>
       </attribute>
-      <attribute name="verticalHeaderVisible">
-       <bool>false</bool>
-      </attribute>
-      <attribute name="horizontalHeaderVisible">
-       <bool>false</bool>
-      </attribute>
       <column>
        <property name="text">
         <string>Extract</string>
@@ -327,6 +321,13 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_8">
       <item>
+       <widget class="QToolButton" name="tbEject">
+        <property name="text">
+         <string>Eject !</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QCheckBox" name="cbEject">
         <property name="text">
          <string>Eject when done</string>
@@ -353,6 +354,13 @@
         </property>
         <property name="checked">
          <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="cbLive">
+        <property name="text">
+         <string>Live tracks</string>
         </property>
        </widget>
       </item>

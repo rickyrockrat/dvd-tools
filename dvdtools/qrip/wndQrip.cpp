@@ -23,6 +23,9 @@
 #define STR_DEFDDATA	"/data/musique/%G/%C/%W/%N - %P.%E"
 #define STR_DEFDPLAY	"/data/musique/%G/Albums/%C/%T - %A.%M"
 
+#define STR_DEFLDDATA	"/data/musique/%G/%C/%W/%W.%E"
+#define STR_DEFLDPLAY	"/data/musique/%G/Albums/%C/%T - %A.%M"
+
 wndQrip::wndQrip( QWidget *parent )
 	: QMainWindow( parent )
 {
@@ -31,7 +34,10 @@ wndQrip::wndQrip( QWidget *parent )
 	connect( pbGo, SIGNAL(clicked()), this, SLOT(readInfo()) );
 	connect( cbPlaylist, SIGNAL(stateChanged(int)),
 		this, SLOT(playlistChecked()) );
+	connect( cbLive, SIGNAL(stateChanged(int)),
+		this, SLOT(liveChecked()) );
 	connect( pbExtract, SIGNAL(clicked()), this, SLOT(extract()) );
+	connect( tbEject, SIGNAL(clicked()), this, SLOT(eject()) );
 	connect( twTracks, SIGNAL(cellClicked(int,int)),
 		this, SLOT(cellClicked(int,int)) );
 
@@ -127,10 +133,30 @@ void wndQrip::readInfo()
 
 }
 
+void wndQrip::liveChecked()
+{
+	if ( cbLive->isChecked() )
+	{
+		leDestData->setText( STR_DEFLDDATA );
+	}
+	else
+	{
+		leDestData->setText( STR_DEFDDATA );
+	}
+}
+
 void wndQrip::playlistChecked()
 {
 	leDestPlaylist->setEnabled( cbPlaylist->isChecked() );
 	cbFormatPlaylist->setEnabled( cbPlaylist->isChecked() );
+}
+
+void wndQrip::eject()
+{
+	QProcess *p = new QProcess( this );
+	QStringList args;
+	args << leDevice->text();
+	p->start("eject", args );
 }
 
 void wndQrip::extract()
@@ -164,13 +190,45 @@ void wndQrip::extract()
 		// TODO message
 		return;
 	}
-	int first = 0;
-	QStringList tracks;
 	QTextStream stream( &fRip );
+	stream << "#!/bin/bash" << endl;
+	if ( cbLive->isChecked() )
+	{
+		this->liveTracks( stream );
+	}
+	else
+	{
+		this->normalTracks( stream );
+	}
+	if ( cbEject->isChecked() )
+	{
+		stream << "eject " << leDevice->text() << endl;
+	}
+	fRip.close();
+	proc = new QProcess( this );
+	connect( proc,
+		SIGNAL(readyReadStandardOutput()),
+		this,
+		SLOT(readEncodage()));
+	connect( proc,
+		SIGNAL(finished(int,QProcess::ExitStatus)),
+		this,
+		SLOT(encodageFini(int, QProcess::ExitStatus)));
+
+	QStringList args;
+	args << "/tmp/rip.sh";
+	proc->start("sh", args );
+}
+
+void wndQrip::normalTracks( QTextStream &stream )
+{
+	QTableWidgetItem *item;
 	QString destrep;
 	QString destpl;
 	QDir dpl;
-	stream << "#!/bin/bash" << endl;
+	
+	int i;
+	int first = 0;
 	int passage = 0;
 	for ( i = 1; i < twTracks->rowCount(); i++ )
 	{
@@ -266,22 +324,7 @@ void wndQrip::extract()
 				destpl.replace( QString("%E"), cbFormat->currentText() );
 				destpl.replace( QString("%M"), cbFormatPlaylist->currentText() );
 
-				destpl.replace( QString("à"), QString( "a" ) );
-				destpl.replace( QString("â"), QString( "a" ) );
-				destpl.replace( QString("ä"), QString( "a" ) );
-				destpl.replace( QString("é"), QString( "e" ) );
-				destpl.replace( QString("è"), QString( "e" ) );
-				destpl.replace( QString("ê"), QString( "e" ) );
-				destpl.replace( QString("ë"), QString( "e" ) );
-				destpl.replace( QString("ù"), QString( "u" ) );
-				destpl.replace( QString("û"), QString( "u" ) );
-				destpl.replace( QString("ü"), QString( "u" ) );
-				destpl.replace( QString("î"), QString( "i" ) );
-				destpl.replace( QString("ï"), QString( "i" ) );
-				destpl.replace( QString("ô"), QString( "o" ) );
-				destpl.replace( QString("ö"), QString( "o" ) );
-				destpl.replace( QString("ç"), QString( "c" ) );
-				destpl.replace( QString("°"), QString( "o" ) );
+				cleanString( destpl );
 
 				QString reppl = QString( destpl);
 				QString destreppl = reppl.remove( reppl.lastIndexOf( "/" ), reppl.length() );
@@ -295,24 +338,139 @@ void wndQrip::extract()
 			stream << "' >> '" << destpl << "'" << endl;
 		}
 	}
-	if ( cbEject->isChecked() )
-	{
-		stream << "eject " << leDevice->text() << endl;
-	}
-	fRip.close();
-	proc = new QProcess( this );
-	connect( proc,
-		SIGNAL(readyReadStandardOutput()),
-		this,
-		SLOT(readEncodage()));
-	connect( proc,
-		SIGNAL(finished(int,QProcess::ExitStatus)),
-		this,
-		SLOT(encodageFini(int, QProcess::ExitStatus)));
+}
 
-	QStringList args;
-	args << "/tmp/rip.sh";
-	proc->start("sh", args );
+void wndQrip::liveTracks( QTextStream &stream)
+{
+	QTableWidgetItem *item;
+	QString destrep;
+	QString destpl;
+	QDir dpl;
+	
+	int i, j;
+	int first = 0;
+	int passage = 0;
+	for ( i = 1; i < twTracks->rowCount(); i++ )
+	{
+		item = twTracks->item( i, COL_SEL );
+		if ( item->checkState() == Qt::Checked )
+		{
+			first = i;
+			QString destfn = leDestData->text();
+			destfn.replace( QString("%T"), leAlbumTitle->text() );
+			destfn.replace( QString("%A"), leAlbumArtist->text() );
+			destfn.replace( QString("%G"), leAlbumGenre->text() );
+			item = twTracks->item( i, COL_COMPOSER );
+			destfn.replace( QString("%C"), item->text() );
+			item = twTracks->item( i, COL_WORK );
+			destfn.replace( QString("%W"), item->text() );
+			item = twTracks->item( i, COL_TRACKNO );
+			destfn.replace( QString("%N"), item->text() );
+			item = twTracks->item( i, COL_TRACKTITLE );
+			destfn.replace( QString("%P"), item->text() );
+			item = twTracks->item( i, COL_LENGTH );
+			destfn.replace( QString("%L"), item->text() );
+
+			destfn.replace( QString("%E"), cbFormat->currentText() );
+
+			cleanString( destfn );
+
+			QString rep = QString( destfn);
+			destrep = rep.remove( rep.lastIndexOf( "/" ), rep.length() );
+			QDir().mkpath( destrep );
+			qDebug() << "r=" << destrep;
+			qDebug() << "d=" << destfn;
+			
+			// commande à passer :
+			// cdda2wav -D <dev> -t <track depart>+<track fin> <dest> (sans le .wav)
+			// dans le cas live, <dest> correspond par défaut a %W.%E
+			QString work = QString( twTracks->item( i, COL_WORK )->text() );
+			// recherche de la piste de fin
+			int lastTrack = i;
+			for ( j = i+1; j < twTracks->rowCount(); j++ )
+			{
+				if ( twTracks->item( j, COL_WORK )->text() != work )
+				{
+					lastTrack = j - 1;
+				}
+			}
+			stream << "echo 'Extracting live work " << work;
+			stream << "...'" << endl;
+			stream << "cdda2wav -D " << leDevice->text() << " -t ";
+			stream << QString::number(i);
+			if ( i != lastTrack )
+			{
+				stream << "+" << QString::number(lastTrack);
+			}
+			stream << " '" << destfn << "'" << endl;
+
+			if ( cbFormat->currentText() == "flac" )
+			{
+				stream << "echo 'Encoding live work " << work;
+				stream << "...'" << endl;
+				stream << "flac -8 ";
+				if ( cbOverwrite->isChecked() ) 
+					stream << "-f ";
+				stream << "-o '" << destfn << "' '";
+				QString wav = QString( destfn );
+				QString inf = QString( destfn );
+				wav.replace( ".flac", ".wav" );
+				inf.replace( ".flac", ".inf" );
+				stream << wav;
+				stream << "'" << endl;
+				stream << " metaflac --set-tag 'AlbumTitle=";
+				stream << leAlbumTitle->text() << "' '" << destfn << "'" << endl;
+				stream << " metaflac --set-tag 'AlbumArtist=";
+				stream << leAlbumArtist->text() << "' '" << destfn << "'" << endl;
+				stream << " metaflac --set-tag 'AlbumGenre=";
+				stream << leAlbumGenre->text() << "' '" << destfn << "'" << endl;
+				stream << " metaflac --set-tag 'Composer=";
+				stream << twTracks->item( i, COL_COMPOSER )->text() << "' '" << destfn << "'" << endl;
+				stream << " metaflac --set-tag 'Work=";
+				stream << work << "' '" << destfn << "'" << endl;
+				if ( cbRemove->isChecked() )
+				{
+					stream << "rm -f '" << wav << "' '";
+					stream << inf << "'" << endl;
+				}
+			}
+			if ( ( cbPlaylist->isChecked() ) && ( passage == 0 ) )
+			{
+				passage++;
+				destpl = leDestPlaylist->text();
+				destpl.replace( QString("%T"), leAlbumTitle->text() );
+				destpl.replace( QString("%A"), leAlbumArtist->text() );
+				destpl.replace( QString("%G"), leAlbumGenre->text() );
+				// on prend les infos de la premire piste selectionnee
+				item = twTracks->item( first, COL_COMPOSER );
+				destpl.replace( QString("%C"), item->text() );
+				item = twTracks->item( first, COL_WORK );
+				destpl.replace( QString("%W"), item->text() );
+				item = twTracks->item( first, COL_TRACKNO );
+				destpl.replace( QString("%N"), item->text() );
+				item = twTracks->item( first, COL_TRACKTITLE );
+				destpl.replace( QString("%P"), item->text() );
+				item = twTracks->item( first, COL_LENGTH );
+				destpl.replace( QString("%L"), item->text() );
+
+				destpl.replace( QString("%E"), cbFormat->currentText() );
+				destpl.replace( QString("%M"), cbFormatPlaylist->currentText() );
+
+				cleanString( destpl );
+
+				QString reppl = QString( destpl);
+				QString destreppl = reppl.remove( reppl.lastIndexOf( "/" ), reppl.length() );
+				QDir().mkpath( destreppl );
+				dpl= QDir( destreppl );
+				qDebug() << "pl r=" << destreppl;
+				qDebug() << "pl d=" << destpl;
+
+			}
+			stream << "echo '" << dpl.relativeFilePath( destfn );
+			stream << "' >> '" << destpl << "'" << endl;
+			i = lastTrack;
+		}
+	}
 }
 
 void wndQrip::readEncodage()
@@ -477,5 +635,6 @@ QString wndQrip::cleanString( QString s )
 	s.replace( QString(";"), QString( "" ) );
 	s.replace( QString(":"), QString( "" ) );
 	s.replace( QString("\""), QString( "" ) );
+	s.replace( QString("?"), QString( "" ) );
 	return s;
 }
