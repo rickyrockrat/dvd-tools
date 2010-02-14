@@ -283,19 +283,29 @@ void wndQrip::normalTracks( QTextStream &stream )
 				stream << wav;
 				stream << "'" << endl;
 				stream << " metaflac --set-tag 'AlbumTitle=";
-				stream << leAlbumTitle->text() << "' '" << destfn << "'" << endl;
+				QString albtit = leAlbumTitle->text();
+				cleanString ( albtit );
+				stream << albtit << "' '" << destfn << "'" << endl;
 				stream << " metaflac --set-tag 'AlbumArtist=";
-				stream << leAlbumArtist->text() << "' '" << destfn << "'" << endl;
+				QString albart = leAlbumArtist->text();
+				cleanString ( albart );
+				stream << albart << "' '" << destfn << "'" << endl;
 				stream << " metaflac --set-tag 'AlbumGenre=";
 				stream << leAlbumGenre->text() << "' '" << destfn << "'" << endl;
 				stream << " metaflac --set-tag 'Composer=";
-				stream << twTracks->item( i, COL_COMPOSER )->text() << "' '" << destfn << "'" << endl;
+				QString compo = twTracks->item( i, COL_COMPOSER )->text();
+				cleanString( compo );
+				stream << compo << "' '" << destfn << "'" << endl;
 				stream << " metaflac --set-tag 'Work=";
-				stream << twTracks->item( i, COL_WORK )->text() << "' '" << destfn << "'" << endl;
+				QString work = twTracks->item( i, COL_WORK )->text();
+				cleanString( work );
+				stream << work << "' '" << destfn << "'" << endl;
 				stream << " metaflac --set-tag 'TrackNo=";
 				stream << twTracks->item( i, COL_TRACKNO )->text() << "' '" << destfn << "'" << endl;
 				stream << " metaflac --set-tag 'TrackTitle=";
-				stream << twTracks->item( i, COL_TRACKTITLE )->text() << "' '" << destfn << "'" << endl;
+				QString tit = twTracks->item( i, COL_TRACKTITLE )->text();
+				cleanString( tit );
+				stream << tit << "' '" << destfn << "'" << endl;
 				if ( cbRemove->isChecked() )
 				{
 					stream << "rm -f '" << wav << "' '";
@@ -392,8 +402,14 @@ void wndQrip::liveTracks( QTextStream &stream)
 				if ( twTracks->item( j, COL_WORK )->text() != work )
 				{
 					lastTrack = j - 1;
+					break;
 				}
 			}
+			if ( j == twTracks->rowCount() )
+			{
+				lastTrack = twTracks->rowCount() - 1;
+			}
+			cleanString( work );
 			stream << "echo 'Extracting live work " << work;
 			stream << "...'" << endl;
 			stream << "cdda2wav -D " << leDevice->text() << " -t ";
@@ -419,13 +435,19 @@ void wndQrip::liveTracks( QTextStream &stream)
 				stream << wav;
 				stream << "'" << endl;
 				stream << " metaflac --set-tag 'AlbumTitle=";
-				stream << leAlbumTitle->text() << "' '" << destfn << "'" << endl;
+				QString albtit = leAlbumTitle->text();
+				cleanString ( albtit );
+				stream << albtit << "' '" << destfn << "'" << endl;
 				stream << " metaflac --set-tag 'AlbumArtist=";
-				stream << leAlbumArtist->text() << "' '" << destfn << "'" << endl;
+				QString albart = leAlbumArtist->text();
+				cleanString ( albart );
+				stream << albart << "' '" << destfn << "'" << endl;
 				stream << " metaflac --set-tag 'AlbumGenre=";
 				stream << leAlbumGenre->text() << "' '" << destfn << "'" << endl;
 				stream << " metaflac --set-tag 'Composer=";
-				stream << twTracks->item( i, COL_COMPOSER )->text() << "' '" << destfn << "'" << endl;
+				QString compo = twTracks->item( i, COL_COMPOSER )->text();
+				cleanString( compo );
+				stream << compo << "' '" << destfn << "'" << endl;
 				stream << " metaflac --set-tag 'Work=";
 				stream << work << "' '" << destfn << "'" << endl;
 				if ( cbRemove->isChecked() )
