@@ -29,20 +29,20 @@ public:
 
 int main( int argc, char ** argv )
 {
-	MyApp a( argc, argv );
-	qt4wndsub *w = new qt4wndsub(0);
+	QApplication a( argc, argv );
+	qt4wndsub w;
 
 	if ( argc == 2 )
 	{
 		if ( QFile::exists( argv[1] ) )
 		{
-			w->setInputFile( argv[1] );
-			w->autoDetectFormat();
-			w->loadSubFile(w->getInputFile());
-			w->showInputSubs();
+			w.setInputFile( argv[1] );
+			w.autoDetectFormat();
+			w.loadSubFile(w.getInputFile());
+			w.showInputSubs();
 		}
 	}
-	w->show();
+	w.show();
 	a.connect( &a, SIGNAL( lastWindowClosed() ), &a, SLOT( quit() ) );
 	return a.exec();
 }
