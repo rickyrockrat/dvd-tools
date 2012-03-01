@@ -6,14 +6,26 @@
 	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.0  (Unix)">
 	<META NAME="CREATED" CONTENT="0;0">
 	<META NAME="CHANGEDBY" CONTENT="David EGREMY">
-	<META NAME="CHANGED" CONTENT="20090623;15335800">
+	<META NAME="CHANGED" CONTENT="20090717;11393200">
+	<META NAME="Info 1" CONTENT="">
+	<META NAME="Info 2" CONTENT="">
+	<META NAME="Info 3" CONTENT="">
+	<META NAME="Info 4" CONTENT="">
+	<META NAME="CHANGEDBY" CONTENT="David EGREMY">
 </HEAD>
 <BODY LANG="fr-FR" DIR="LTR">
 <H1 ALIGN=CENTER>DVD Tools</H1>
-<H2 ALIGN=LEFT>dvdmenu <A HREF="https://sourceforge.net/project/showfiles.php?group_id=184940&amp;package_id=219410&amp;release_id=513633">Download</A></H2>
+<H2 ALIGN=LEFT>dvdmenu <A HREF="http://downloads.sourceforge.net/sourceforge/dvdtools/dvdmenu-0.4.tar.gz">Download</A></H2>
+<H3 ALIGN=LEFT>News for release 0.4</H3>
+<P ALIGN=LEFT>I corrected the build system (the dvdmenu.pro file) so
+it now can install dvdmenu (in /usr/bin).</P>
+<P ALIGN=LEFT>This was needed because I also wrote an ebuild for
+dvdmenu, that you can find <A HREF="http://dvdtools.sourceforge.net/dvdmenu-0.4.ebuild" NAME="dvdmenu-04.ebuild">here</A>.</P>
+<P ALIGN=LEFT>Evidently, only those who use a gentoo distribution
+will be happy but nonetheless, it is worth the effort.</P>
 <H3 ALIGN=LEFT>News for release 0.3</H3>
-<P ALIGN=LEFT>After quite a while I finally found  time and strength
-to port dvdmenu to Qt4. So not much of a news, you may but
+<P ALIGN=LEFT>After quite a while I finally found time and strength
+to port dvdmenu to Qt4. So not much of a news, you may say but
 nevertheless, the happy owners of a Qt4.4 installation can now enjoy
 dvdmenu as well.</P>
 <P ALIGN=LEFT>As usual, any feedback will be appreciated.</P>
@@ -58,6 +70,17 @@ to generate your menu.</P>
 <P ALIGN=LEFT><B><BR></B>$ tar zxvf dvdmenu-&lt;version&gt;.tar.gz<BR>$
 cd dvdmenu-&lt;version&gt;<BR>$ qmake dvdmenu.pro<BR>$ make<BR>$ make
 install</P>
+<H3 ALIGN=LEFT><B>Installation for gentoo</B></H3>
+<P ALIGN=LEFT STYLE="font-weight: normal">Download the ebuild and
+save it to a portage dir (ie /usr/portage/media-video/dvdmenu). As
+root, type the following :</P>
+<P ALIGN=LEFT STYLE="font-weight: normal"># cd
+/usr/portage/media-video/dvdmenu</P>
+<P ALIGN=LEFT STYLE="font-weight: normal"># ebuild dvdmenu-0.4.ebuild
+manifest</P>
+<P ALIGN=LEFT STYLE="font-weight: normal"># ebuidl dvdmenu-0.4.ebuild
+merge</P>
+<P ALIGN=LEFT STYLE="font-weight: normal">That's all.</P>
 <H3 ALIGN=LEFT><B>Notes :</B></H3>
 <P ALIGN=LEFT>It's a very early release, probably full of bugs, but
 it works for me so maybe it will be usefull to you. As usual, there
@@ -65,7 +88,7 @@ is no warranty of any kind !<BR>It only generate PAL menu. But you
 can add NTSC video files and thus create a mixed dvd, if your
 standalone dvd player supports it.</P>
 <H3 ALIGN=LEFT><B>Known bugs :</B></H3>
-<P ALIGN=LEFT><B>None at the moment.</B></P>
+<P ALIGN=LEFT STYLE="font-weight: normal">None at the moment.</P>
 <P><A HREF="http://sourceforge.net/"><IMG SRC="http://sflogo.sourceforge.net/sflogo.php?group_id=184940&amp;type=2" NAME="images2" ALT="SourceForge.net Logo" ALIGN=BOTTOM WIDTH=125 HEIGHT=37 BORDER=0></A>
 </P>
 </BODY>
