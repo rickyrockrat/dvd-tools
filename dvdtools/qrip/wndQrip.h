@@ -4,6 +4,7 @@
 #include <QProcess>
 #include <QTextStream>
 #include <cdio++/cdio.hpp>
+#include <cddb/cddb.h>
 
 #include "ui_wndQrip.h"
 
@@ -22,12 +23,19 @@ public slots :
 	void selAll();
 	void extract();
 	void eject();
+	void listenTrack();
+	void selWork();
+	void selComposer();
+	void selartist();
+	void selgenre();
 	void readEncodage();
 	void encodageFini(int, QProcess::ExitStatus);
 private :
 	void liveTracks( QTextStream &);
 	void normalTracks( QTextStream &);
-	void get_cddb_info(CdIo_t *, track_t, track_t );
+	void get_cddb_conn(cddb_conn_t ** );
+	void get_cddb_info(cddb_conn_t *, cddb_disc_t *, track_t, track_t );
+	void defaultTracks( int );
 	QString cleanString( QString );
 	QProcess *proc;
 };

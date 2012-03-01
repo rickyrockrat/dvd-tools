@@ -112,6 +112,13 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QToolButton" name="tbSelArtist">
+        <property name="text">
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
     <item>
@@ -142,6 +149,13 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QToolButton" name="tbSelGenre">
+        <property name="text">
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
     <item>
@@ -150,6 +164,12 @@
        <bool>false</bool>
       </attribute>
       <attribute name="verticalHeaderVisible">
+       <bool>false</bool>
+      </attribute>
+      <attribute name="verticalHeaderVisible">
+       <bool>false</bool>
+      </attribute>
+      <attribute name="horizontalHeaderVisible">
        <bool>false</bool>
       </attribute>
       <column>
@@ -164,7 +184,17 @@
       </column>
       <column>
        <property name="text">
+        <string>SelComp</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
         <string> Work (%W)</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>SelWork</string>
        </property>
       </column>
       <column>
@@ -180,6 +210,11 @@
       <column>
        <property name="text">
         <string>Length (%L)</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Listen</string>
        </property>
       </column>
      </widget>

@@ -102,7 +102,11 @@ init_cddb(
     cddb_set_email_address(*pp_conn, qripcddb_opts.email);
   
   if (NULL == qripcddb_opts.server) 
-    cddb_set_server_name(*pp_conn, "freedb.freedb.org");
+  {
+	cddb_set_server_port(*pp_conn, 80); 
+    cddb_set_server_name(*pp_conn, "freedb.org");
+	cddb_set_http_path_query(*pp_conn, "/~cddb/cddb.cgi");
+  }
   else 
     cddb_set_server_name(*pp_conn, qripcddb_opts.server);
   
