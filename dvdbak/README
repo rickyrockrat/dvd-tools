@@ -28,12 +28,14 @@ dvdbak -f back -m mtitle -t 1
 Will copy title 1 without encryption to a movie called CD_NAME.mpg
 
 The directory structure is hardcoded as follows:
-All paths are set in commond_dvd. This file must be in the same 
+All paths are set in dvdbak.common. This file must be in the same 
 directory as dvdbak.
 
 The default device is: /dev/sr0 (can be changed on the command line)
 
-The root of operations is set to: /bulk/media/movies
+The root of operations is set to: /bulk/media/movies (can also be 
+changed on the command line.)
+
 Under here are these directories:
 decrypted - output of dvdbackup
 iso.in - output of ddrescue
@@ -48,7 +50,9 @@ It also attempts to detect DVDs that have been purposefully corrupted,
 and gives recomendations on procedure given the information.
 
 Bad blocks does work, but some movies may have a glitch part way through
-I still need to work on these. I've already made patches to libdvdread.
+These still need some work, but 99% of the movies seem to work.
+Patches have already been made to libdvdread, and should be in 12.04 
+precise.
 
 These scripts could very easily be automated with UDEV by calling 
 dvd -i -i on DVD insertion, then dvd -f back once the title is found.
