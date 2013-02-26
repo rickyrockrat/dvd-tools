@@ -1,0 +1,26 @@
+Install is really simple. Copy dvdbak and dvdbak.common to some place like /usr/local/bin:
+
+sudo cp dvdbak* /usr/local/bin
+sudo chmod 7ff /usr/local/bin/dvdbak
+
+Then make sure all the tools are installed (ubuntu example):
+sudo apt-get install vobcopy ddrescue growisofs dvdbackup dvdauthor vlc mplayer \
+ genisoimage transcode wodim dvdrip 
+
+Also you will need to make sure libdvdread and libdvdcss is installed if you 
+need to handle encrypted disks. 
+ 
+It may be illegal for you to use decryption software in your location, and I highly 
+recommend that you do not use this if it is forbidden for you.
+
+
+Handbrake can be found below, and is highly recommended, since it correctly detects
+the main menu title most of the time.
+
+http://handbrake.fr/downloads.php
+https://edge.launchpad.net/~stebbins/+archive/handbrake-releases
+http://handbrake.fr/rotation.php?file=HandBrake-0.9.8.tar.bz2
+http://sourceforge.net/projects/handbrake
+
+You only need HandBrakeCLI installed - the GUI is not necessary.
+

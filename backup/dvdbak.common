@@ -1,0 +1,673 @@
+# This file is part of dvdbak -  Save/restore DVDs
+# Copyright 2011-2013 Rickyrockrat <gpib at rickyrockrat dot net>
+#	 This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+# default image...DVD device
+image="/dev/sr0"
+#search strings for for dvdrip generic file
+dvdrip_rpath="REPLACEME"
+dvdrip_rdev="REPLACEDVD"
+dvdrip_rtitle="REPLACETITLE"
+
+# functions
+# first arg is the new root
+set_paths () {
+# location of root for the _dir vars
+root="$1"
+# location of decrypted movies, used by dvdbackup
+de_dir="$root/decrypted"
+#location of dvdrip directory
+dvdrip_dir="$de_dir/dvdrip-data"
+#location of generic setup file for dvdrip
+dvdrip_conf="$dvdrip_dir/REPLACEME.rip"
+
+# location of encrypted movies - verbatium copy from DVD"
+iso_in="$root/iso.in"
+# location of unencrypted ISOs - output from mkisofs
+iso_out="$root/iso.out"
+# location of re-authored DVDs - output from dvdauthor
+dvd_out="$root/dvdauth"
+log="$root/log.txt"
+# make sure these directories exist when this file is included.
+mkdir -p "$de_dir"
+mkdir -p "$iso_in"
+mkdir -p "$iso_out"
+mkdir -p "$dvd_out"
+}
+
+# Make sure there is enough hard drive space for a DVD
+check_space () {
+while read dev sz use av garb; do 
+  let avail=av
+  let G=avail/1000000
+#  echo "$dev Available ${G}G ($avail)"; 
+done<<EOF
+$(df |grep bulk)
+EOF
+if [ $avail -lt 8000000 ]; then
+  echo "Your Available Disk space is only ${G}G. Do you want to continue?(y/n)"
+  read ans
+  if [ "$ans" != 'y' ]; then
+   exit 1
+  fi
+fi
+}
+
+# attempt to explain the directory setup
+display_sys_info () {
+ echo "This collection of scripts are an attempt to back up DVDs to the HDD"
+ echo "Movie giants have decided to make things difficult to backup movies YOU
+ echo "OWN. In some locations, use of this software could be illegal. It is up to 
+ echo "YOU to make sure you are complying with the laws where you live."
+ echo "This software DOES NOT have any decryption capablilites by itself."
+ echo "The directory layout is as follows:"
+ echo ""
+ echo "The root directory is '$root', and the place were all media operations"
+ echo "are performed. Under this are these directories"
+ echo "default image...DVD device                             '$image'"
+ echo "location of decrypted movies, used by dvdbackup        '$de_di'"
+ echo "location of encrypted movies - verbatium copy from DVD '$iso_in'"
+ echo "location of unencrypted ISOs - output from mkisofs and dvdauthor '$iso_out'"
+ echo "location of re-authored DVDs - output from dvdauthor  '$dvd_out'"
+ echo ""
+ echo "Script names and options"
+ echo "common_dvd - common file for all scripts. Contains varible definitions"
+ echo "             and functions. Most of the functionality is here"
+ echo "dvd - main script, called with the following parameters and options"
+ echo ""
+ echo "Common Functions <>=optional []= mandatory paramters"
+ echo "   image is either DVD device or ISO image"
+ echo "get_movie_name [image]  -get the title of the image, i.e. movie name"
+ echo "find_main_title [image] -find the main feature of the image (i.e. title number"
+ echo "vlc_copy [image] [title] [fname] -use VLC to decrypt the movie. "
+ echo "  Output is a .mpg file with original (but decrypted) video and audio"
+ echo "The dvdbackup_* functions have optional parameters. They default to"
+ echo "   image            = $image"
+ echo "   output_directory = $de_dir"
+ echo "   if you want to specify the output directory, you must specify image"
+ echo "   they all decrypt and builds outdir/TITLE/VIDEO_TS directory"
+ echo "dvdbackup_mirror <image> <output_directory> -use dvdbackup to mirror drive"
+ echo "dvdbackup_main <image> <output_directory> -use dvdbackup to snag main feature only"
+ echo "dvdbackup_title [title] <image> <output_directory> -use dvdbackup to snag the title specified only" 
+ echo "make_dvd_iso [input_directory] <output_file> - build a dvd given a dvd-authored directory. Output defaults to $iso_out/basename (of input)"
+ echo "image_info [image] - show some info about the image."
+echo "author_dvd in_directory <out_dir> <file_list> -create title/table of contents for DVD. "
+ echo "   Use with dvdbackup_main, and before make_dvd"
+ echo "   in_directory should be the top level, i.e. MOVIE_NAME"
+ echo "   out_directory should be direcotry where authored dvds will be placed"
+ echo "      This is optional, but required if using file_list. Defaults to dvd_out"
+ echo "   file_list is the optional file list. Default is to use VIDEO_TS directory"
+}
+#
+# Use handbrake to find the main title - takes a REALLY long time
+# set htitle, hmain_info
+# image
+handbrake_main (){
+  echo "Wait a LONG time while we use Handbrake to find main feature"
+  HandBrakeCLI -i "$1" -t 0 >HB.log 2>&1
+  hmain_info=$(grep -B 1 -A 37 -i main HB.log)
+  htitle=$(echo "$hmain_info"|grep -m 1 " title"|sed 's!.* title \(.*\):.*!\1!')
+}
+#************************************************************************
+# confirm "Go ahead and continue?"
+#if [ $? -ne 0 ]; then
+#  echo "Unmount before continuing"
+#  exit 1
+#fi
+#************************************************************************
+confirm () {
+        if [ "1" = "$YES" ]; then
+                return 0
+        fi
+        if [ -n "$1" ]; then
+                echo "$1 y/N?"
+                read  -s CONFIRM
+        else
+                read -s -p "y/N?" CONFIRM
+        fi
+        if [ -z "$CONFIRM" ] || ( [ "$CONFIRM" != "y" ] && [ "$CONFIRM" != "Y" ]); then
+                return 1
+        fi
+        return 0;
+}
+# catvob -  dump a list of VOB files or concatenate them into one movie.
+# Intended to be used after a mirror using dvdbak
+catvob () {
+	echo "$#"
+if [ $# -lt 1 ]; then
+  echo "usage: catvob movie title zero"
+  echo " if just the movie parameter is provided, it will list the directory"
+  echo " if both movie and title are provided, it will cat the VOBs"
+  echo " if zero is provided, it will include VOB 0, which usually contains the DVD menu"
+  exit 1
+elif [ -z "$2" ]; then
+   ls -l "$de_dir/$1/VIDEO_TS"
+else
+  if [ $# -eq 2 ]; then
+    LIST=$(ls "$de_dir/$1/VIDEO_TS/VTS_$T"*.VOB|grep -v _0.VOB)
+  else
+    LIST=$(ls "$de_dir/$1/VIDEO_TS/VTS_$T"*.VOB)
+  fi
+  T=$(printf "%02d" $2)
+  for f in $LIST; do
+	file="$file $f"
+  done
+  echo "$file"
+  if [ -n "$NAME" ]; then
+    _NAME="$root/$NAME"
+  else
+    _NAME="$root/$1.VOB"
+  fi
+  if [ -e "$_NAME" ]; then
+    echo "Refuse to overwrite '$_NAME'"
+    exit 1
+  fi
+  cat $file >"$_NAME"
+fi
+}
+# device <speed>
+# where device is from cd-find (1,0,1) and speed is all or fast
+cd_erase() {
+SPEED=fast
+if [ -n "$2" ]; then 
+  case $2 in
+  fast);;
+  all) SPEED=all;;
+  *) echo "Invalid speed '$2'"
+   exit 1;;
+  esac
+fi
+cdrecord -v  -speed=10 -dev=$1 -blank=$SPEED
+}
+# dev image"
+# Where device is 3 digits from cd-find (0,1,0)"
+#  and image is path to .iso
+cd_burn () {
+cdrecord -v -speed=10 dev="$1" -data $2
+}
+#
+# Check and verify if DVD will be obviously too big
+# image
+verify_output_filesize () {
+get_reported_filesum "$1"
+  if [ $filesum -gt 10000 ]; then
+    echo "This is a Disney Sucks Rotten Eggs DVD."
+    echo "They have corrupted the iso entries so"
+    echo "more files appear on the DVD than there is space for"
+    echo "The most reliable method is to use a byte copy and/or"
+    echo "A title or main feature dvdbackup"
+    confirm "This will create a $filesum MB directory. Continue anyway?"
+    if [ $? -ne 0 ]; then
+      echo "User Requested Abort."
+      exit 1
+    fi
+  else
+   echo "Output will be $filesize MB"
+  fi
+}
+# progname  usage texts
+show_name_usage () {
+   name=$(basename $1)
+   echo "Usage:$name $2"
+}
+# get the title of the image, i.e. movie name
+# image
+get_movie_name () {
+movie_name=$(isoinfo -d -i "$1"|grep -i "volume id"|sed 's!.* \(.*\)!\1!')
+}
+# get list of all files on image and thier sizes, then sum them
+# image
+get_reported_filesum (){
+while read d a b c sz garbage; do
+ let filesum=filesum+sz
+done << EOF
+$(isoinfo -l -i "$1")
+EOF
+let filesum=filesum/1000000
+}
+# find a unique name given a full path to movie file
+# path
+find_unique_name () {
+  if [ ! -e "$1" ]; then
+    unique="$1"
+    return
+  else
+    ext=$(basename "$1")
+    path=$(dirname "$1")
+    base=$(echo "$ext"|sed 's!\(.*\)\..*!\1!')
+    ext=$(echo "$ext"|sed 's!.*\.!!')
+  #  echo "p=$path b=$base e=$ext"
+    let i=0
+    echo "Warning! $path/$base.$ext exists. Finding unique name"
+    while [ -e "$path/${base}${i}.${ext}" ]; do
+      let i=i+1
+      echo "Try $path/${base}${i}.${ext}"
+    done
+  fi
+  unique="$path/${base}${i}.${ext}"
+  echo "We are using '$unique' instead of '$1'"
+}
+# find a unique name given a directory and a movie name
+# dir name
+find_unique_dir_name () {
+  if [ ! -e "$1/$2" ]; then
+    unique="$1/$2"
+  else
+    let i=0
+    echo "$1/$2 exists. Finding unique name"
+    while [ -e "$1/${2}${i}" ]; do
+      echo "Try $1/${2}${i}"
+      let i=i+1
+    done
+  fi
+  unique="$1/${2}${i}"
+}
+# find the main feature of the image using dvdbackup
+# image
+find_main_title () {
+main_title=$(dvdbackup -i "$1" -I 2>>$log|grep "Title set"|grep "main feature is"|tr -d '[:alpha:][:punct:][:space:]')
+}
+# Get file size in MB
+# input is filename, output is size in MB
+file_size () {
+if [ -d "$1" ]; then
+  s=$(du -sb "$1"|sed 's!\([0-9]*\).*!\1!')
+else
+  s=$(stat -c %s "$1")
+fi
+let fsize=s/1000000
+}
+# display the file and it's size
+# file
+show_filesize() {
+  file_size "$1"
+  echo "$1 is $fsize MB"
+}
+# this is broken. Only works on Wall-e. Not on Tangled
+# Use VLC to play movie until title is found
+# image
+vlc_main_title () { 
+  echo "This function is broken for most movies. Try something else if it takes forever to find main title."
+#  exit 1
+  # launch vlc in background
+  vlc -vvv --intf dummy  --sout "#standard{access=file,mux=ts,dst=$root/__vlc.tmp__}" "$1" >"$root/log.vlc" 2>&1 &
+  sleep 1
+  #get the process id
+  pid=$(ps aux |grep "vlc -vvv"|grep -v "grep"|sed 's!.... *\([0-9]*\) *.*!\1!')
+  echo "vlc=$pid"
+  if [ -z "$pid" ]; then
+    echo "VLC died. Look at log.vlc"
+    vmain_title=0
+    exit 1
+  fi
+  t=0
+  # wait for log file to show title.
+  while [ "$t" = "0" ]; do
+    t=$(grep buttonUpdate $root/log.vlc|sed 's!.*t=\(.*\)!\1!'|sort -g -r|grep -m 1 .)
+    if [ -z "$t" ]; then
+      t=0
+    fi
+  done
+  # kill vlc
+  kill $pid
+  rm "$root/__vlc.tmp__"
+  echo "main title for vlc is $t"
+  vmain_title=$t
+}
+#Check title, set unique name
+# if mode is 'dir', do nothing, otherwise add .mpg to filename.
+# mode title root image fname
+check_title_set_unique () {
+ if [ -z "$3" ]; then
+    echo "Root not specified. Programming error"
+    exit 1
+  fi
+  myroot="$3"
+  if [ -z "$2" ]; then
+    echo "Title not specified. This is almost guaranteed to fail"
+    exit 1
+  fi
+  if [ -z "$5" ]; then
+    get_movie_name "$4"
+    if [ "$1" = "dir" ]; then
+      out="$movie_name"
+    else
+      out="$movie_name.mpg"
+    fi
+  else
+    out="$5"
+  fi
+  if [ "$1" = "dir" ]; then
+    find_unique_dir_name "$myroot/$out"
+  else
+    find_unique_name "$myroot/$out"
+  fi
+  if [ -e "$unique" ]; then
+    echo "$FUNCNAME: file/directory '$unique' exists. Refusing to overwrite"
+    exit 1
+  fi
+
+}
+
+# use vlc to copy the audio/video
+# image title fname
+vlc_copy () {
+  check_title_set_unique "file" "$2" "$root" "$1" "$3"
+  vlc "dvdsimple://${1}@${2}" --intf dummy --sout "#standard{access=file,mux=ts,dst=$unique}" vlc://quit
+  show_filesize "$unique"
+}
+
+# use dvdrip to copy the audio/video
+# execflow -n 19 tccat -t dvd -T 1,-1,1 -i \/dev\/sr0 | dvdrip-splitpipe -f REPLACEME/tmp/REPLACEME-001-nav.log 1024 REPLACEME/vob/001//REPLACEME vob  | tcextract -a 0 -x ac3 -t vob | tcdecode -x ac3 | tcscan -x pcm && echo EXECFLOW_OK
+# image title fname
+drtools_title () {
+  echo "transcode_title '$1' '$2' '$3'"
+  EJECT="0"
+#  check_title_set_unique "file" "$2" "$root" "$1" "$3"
+#  tccat -t dvd -T "$2,-1,1" -i "$1" >$unique 
+
+  check_title_set_unique "dir" "$2" "$root" "$1" "$3"
+  mname=$(basename "$unique")
+  tdir="$dvdrip_dir/$mname"
+  mkdir -p "$tdir"
+  execflow -n 19 tccat -t dvd -T "$2",-1,1 -i "$1" | dvdrip-splitpipe -f "$tir/nav.log" 1024 "$tdir" vob  | tcextract -a 0 -x ac3 -t vob | tcdecode -x ac3 | tcscan -x pcm
+  show_filesize "$unique"
+}
+# use dvdrip to copy the audio/video
+# image title fname
+dvdrip_title () {
+  echo "dvdrip_title '$1' '$2' '$3'"
+  EJECT="0"
+  check_title_set_unique "dir" "$2" "$dvdrip_dir" "$1" "$3"
+  mname=$(basename "$unique")
+  myt=$2
+  let myt=myt-1
+  echo "sed 's!${dvdrip_rpath}!${dvdrip_dir}/${mname}!;s!${dvdrip_rdev}!${1}!' $dvdrip_conf"
+  sed "s!${dvdrip_rpath}!${dvdrip_dir}/${mname}!;s!${dvdrip_rdev}!${1}!;s!${dvdrip_rtitle}!${myt}!" "$dvdrip_conf" >"$dvdrip_dir/$mname.rip"
+  
+  #dvdrip -f transcode -t $2 "$dvdrip_dir/$mname.rip"
+  show_filesize "$unique"
+}
+
+# use mplayer to copy the audio/video
+# image title fname
+mplayer_title () {
+  check_title_set_unique "file" "$2" "$root" "$1" "$3"
+  echo "using dvd://${2} -dvd-device \"$1\" -dumpstream -dumpfile \"$unique\""
+  mplayer dvd://${2} -dvd-device "$1" -dumpstream -dumpfile "$unique"
+  show_filesize "$unique"
+}
+
+
+# use vlc to copy the audio/video
+# <image> <fname>
+vlc_copy_main () {
+  echo "This function Broken (vlc_main_title broken). Try another method if it takes long time to find title."
+  #exit 1
+  if [ -z "$1" ]; then
+    dev="$image"
+  else
+    dev="$1"
+  fi
+  if [ -z "$2" ]; then
+    get_movie_name "$dev"
+    out="$movie_name.mpg"
+  else
+    out="$2"
+  fi
+  if [ -e "$root/$out" ]; then
+    echo "$FUNCNAME: file '$root/$out' exists. Refusing to overwrite"
+    exit 1
+  fi
+  vlc_main_title "$dev"
+  vlc_copy "$dev" "$vmain_title" "$root/$out"
+}
+# given an image and directory, find a unique name
+# image dir
+set_unique_dir () {
+  if [ ! -e "$1" ] || [ ! -e "$2" ]; then
+    echo "$FUNCNAME: either '$1' or '$2' does not exist"
+    exit 1
+  fi
+  get_movie_name "$1"
+  find_unique_dir_name "$2" "$movie_name"
+  uni_base=$(basename "$unique")
+  _x=$(basename $dvb_out)
+  if [ "$_x" = "$uni_base" ]; then
+    dout=$(dirname $dvb_out)
+  else
+    dout="$dvb_out"
+  fi
+}
+# set paramter or default depending on what was given.
+# used for dvdbackup_* functions
+# image, directory
+prep_dvdbackup () {
+ if [ -z "$2" ]; then
+  dvb_out="$de_dir"
+ else
+  dvb_out="$2"
+ fi
+ if [ -z "$1" ]; then
+  dvb_dev="$image"
+ else
+  dvb_dev="$1"
+ fi
+  echo "DVD device/image='$dvb_dev'"
+  echo "DVD output dir='$dvb_out'"
+}
+# use dvdbackup to mirror drive - decrypts & builds TITLE/VIDEO_TS dir
+# image output_directory
+dvdbackup_mirror () {
+  prep_dvdbackup "$1" "$2"
+  verify_output_filesize "$dvb_dev"
+  set_unique_dir "$dvb_dev" "$dvb_out"
+  echo "output='$unique', input '$dvb_dev'"
+  dvdbackup -M -i "$dvb_dev" -o "$dout" -n "$uni_base"
+  show_filesize "$unique"
+}
+# use dvdbackup to snag main feature only - decrypts & builds TITLE/VIDEO_TS dir
+# image output_directory
+dvdbackup_main () {
+  prep_dvdbackup "$1" "$2"
+  set_unique_dir "$dvb_dev" "$dvb_out"
+  echo "output='$unique', input '$dvb_dev'"
+  echo "dvb_out=$dvb_out, name=$uni_base"
+  dvdbackup -F -i "$dvb_dev" -o "$dout" -n "$uni_base"
+  show_filesize "$unique"
+}
+# use dvdbackup to snag the title specified only 
+#    - decrypts & builds TITLE/VIDEO_TS dir
+# title image output_directory
+dvdbackup_title () {
+  if [ -z "$1" ]; then
+    echo "$FUNCNAME: title not specified"
+    exit 1
+  fi
+  prep_dvdbackup "$2" "$3"
+  set_unique_dir "$dvb_dev" "$dvb_out"
+  echo "output='$dvb_out/$uni_base', title '$1' input '$dvb_dev'"
+  dvdbackup  -T "$1" -i "$dvb_dev" -o "$dout" -n "$uni_base"
+  show_filesize "$dvb_out/$uni_base"
+}
+# backup using ddrescue
+# image outfile 
+backup_byte () {
+  if [ -n "$1" ]; then
+    image="$1"
+  fi
+  if [ -z "$2" ]; then
+    get_movie_name "$1"
+    outf="$iso_in/$movie_name.iso"
+  else
+    outf="$2"
+  fi
+  fname=$(basename "$outf")
+  dname=$(dirname "$outf")
+  find_unique_dir_name "$dname" "$fname"
+  outf="$unique"
+  if [ -e "$outf" ]; then 
+    echo "$FUNCNAME: '$outf' exists. Refusing to overwrite"
+    exit 1
+  fi
+#  verify_output_filesize "$image"
+  echo "output going to '$outf'"
+  ddrescue -b 2048 "$image" "$outf"
+  show_filesize "$outf"
+}
+# build a dvd given a dvd-authored directory
+# input_directory output
+make_dvd_iso () {
+  if [ ! -e "$1" ]; then
+    if [ -e "$dvd_out/$1" ]; then 
+      input="$dvd_out/$1"
+    else
+      echo "$FUNCNAME: Either no directory or '$1' does not exist"
+      exit 1
+    fi
+  else
+    input="$1"
+  fi
+  o=$(basename "$input")
+  if [ -z "$2" ]; then 
+   out="$iso_out/$o.iso"
+  else
+   out="$2"
+  fi
+  if [ -e "$out" ]; then
+    echo "'$out' exists. Refusing to overwrite"
+    exit 1
+  fi
+  mkisofs -dvd-video -V "$o" -o "$out" "$input"
+  echo "$FUNCNAME: '$input' input and '$out' output"
+}
+# just show info about the image
+# image verbosity
+image_info () {
+echo "This may take several minutes...."
+get_movie_name "$1"
+find_unique_dir_name "$de_dir" "$movie_name"
+find_main_title "$1"
+get_reported_filesum "$1"
+vobcopy -I
+if [ $2 -gt 1 ]; then
+  handbrake_main "$1"
+fi
+if [ $2 -gt 1 ]; then
+  cat HB.log
+fi
+#echo "Using VLC to play movie until we hit main title"
+#vlc_main_title "$1"
+echo "movie name is $movie_name"
+echo "unique name is $unique"
+echo "main title is $main_title"
+if [ $2 -gt 1 ]; then
+  echo "Handbrake reports the main title is '$htitle'"
+  echo " Main title information:"
+  echo "$hmain_info"
+fi
+#echo "VLC reports main title is $vmain_title"
+echo "total reported size is $filesum MB"
+if [ $filesum -gt 10000 ]; then
+ echo " Reported file size is over 10G."
+ echo "  the main, title, byte, or vlcmain methods should " 
+ echo "  work with this image. mirror will create a huge directory"
+ #echo "  Title $vmain_title should be the correct title for vlc"
+ echo "  Title $main_title should be the correct title for title"
+ echo "just use dvd -f back -b main"
+ echo "Check the end of the movie. Use Handbrake title if it's truncated"
+else
+ echo "The mirror, main, or title functions (vlc,mtitle,main) should work with this movie"
+fi
+}
+# input should be a .VOB or other video file.
+get_video_size() {
+if [ ! -e "$1" ]; then
+ echo "$FUNCNAME: '$1' does not exist"
+ exit 1
+fi
+video_size=$(ffmpeg -i "$1" 2>&1|grep Video|sed 's!.*Video: .*,.*, \(.*\)\[.*!\1!')
+}
+# create the file list in the VIDEO_TS dir
+# directory
+set_default_vob_list () {
+vob_list=$(ls "$1"/*.VOB|grep "[1-9]\.VOB"|tr '\n' ' ')
+}
+# Create title/table of contents for DVD. 
+# Use with dvdbackup_main, and before make_dvd
+# paramters
+#  in_directory <out_dir> <file_list>
+#   in_directory should be the top level, i.e. MOVIE_NAME
+#   out_directory should be direcotry where authored dvds will be placed
+#    This is optional, but required if using file_list. Defaults to dvd_out
+#   file_list is the optional file list. Default is to use VIDEO_TS directory
+author_dvd () {
+  VF=$(cat ~/.config/video_format|grep NTSC)
+  if [ -z "$VF" ]; then 
+    echo "NTSC not set in your ~/.config/video_format file"
+    echo "  dvdauthor is going to fail setting contents"
+  fi
+  if [ -z "$2" ]; then
+    tout="$dvd_out"
+  else
+    tout="$2"
+  fi
+  if [ ! -e "$1" ]; then
+    if [ -e "$de_dir/$1" ]; then
+      tin="$de_dir/$1"
+    else
+      echo "Input dir not set or not exist '$1'"
+    fi
+  else
+    tin="$1"
+  fi
+  if [ -z "$3" ]; then
+    set_default_vob_list "$tin/VIDEO_TS"
+  else
+    vob_list="$3" 
+  fi
+  movie_name=$(basename "$tin")
+  find_unique_dir_name "$tout" "$movie_name"
+  tout=$(dirname "$unique")
+  output="$unique"
+  movie_name=$(basename "$unique")
+  marker_file="$tout/$movie_name.title_done"
+  echo "using file list '$vob_list'"
+  echo "input is '$tin' output is '$output'"
+  if [ -e "$output" ] && [ ! -e "$marker_file" ]; then
+    echo "'$output' exists. Refusing to overwrite"
+    exit 1
+  fi
+  mkdir -p "$output"
+  if [ -e "$marker_file" ]; then
+    echo "found marker file '$marker_file', so skipping title"
+    echo " if you want to set the title, then remove this file"
+  else
+# title set -o output directory, 
+    dvdauthor -t -o "$output" $vob_list
+    if [ "$?" = "0" ]; then
+      echo "Title done. Setting marker file in $marker_file"
+      touch "$marker_file"
+    fi
+  fi
+# set the table of contents VIDEO_TS.IFO and VIDEO_TS.BUP
+  dvdauthor -o "$output" -T
+  if [ "$?" != "0" ]; then
+    echo "dvdauthor table of contents failed. Is 'NTSC' in your ~/.config/video_format?"
+  else 
+    echo "DVD Authoring done. Run make_dvd_iso to build DVD image"
+    echo "Input from $tin. Output in $output"
+  fi
+}

@@ -1,0 +1,87 @@
+#!/bin/bash
+# Create a new playlist and add this file
+# Copyright 2011-2013 Rickyrockrat <gpib at rickyrockrat dot net>
+#	 This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+#  audtool2 playlist-addurl-to-new-playlist file:////bulk/media/Music/newsboys/boys_will_be_boyz/isreal.mp3
+#tree --noreport -fi /bulk/media/Music/newsboys|while read f; do if [ ! -d "$f" ]; then echo "Adding $f"; audtool2 --playlist-addurl "file://$f"; fi done
+# audatious running :
+# RUN=$(ps aux|grep -v grep|grep -c audacious2) #audacious running = 1
+usage () {
+  echo "usage: $0 <options>"
+  echo " -d dirname - set directory to add all files to"
+  echo " -h this screen"
+  echo " -n Create a new play list, then add the files"
+  exit 1
+}
+is_running () {
+ P=$(audtool2 --current-song|grep -ic "No song playing")
+ if [ "$P" = "1" ]; then
+   echo "Audacious is not running. Start it then try again"
+   exit 1
+ fi
+}
+set_opt () {
+  if [ $NEW -eq 1 ]; then
+    echo "Creating new playlist, adding '$1'"
+    OPT="--playlist-addurl-to-new-playlist"
+    let NEW=NEW+1
+   else
+     echo "Adding '$1'"
+     OPT="--playlist-addurl"
+   fi
+}
+DIR=""
+FILE=""
+let NEW=0
+if [ $# -lt 1 ]; then
+  usage
+fi
+while  getopts d:f:hn opt ; do
+  #echo "opt=$opt arg=$OPTARG"
+  case $opt in
+    d) DIR="$OPTARG" ;;
+    f) FILE="$OPTARG";;
+    n) let NEW=1 ;;
+    h) usage; exit 1;;
+    *) echo "Invalid option $OPTARG"
+       usage;
+       exit 1
+       ;;
+  esac
+done
+if [ -n "$FILE" ]; then
+  RDIR=$(readlink -f "$FILE")
+  if [ ! -f "$RDIR" ]; then
+    echo "'$FILE' is not a file"
+    exit 1
+  fi
+ is_running
+ set_opt "$FILE"
+ audtool2 $OPT "file://$RDIR" 
+ exit 0
+fi
+RDIR=$(readlink -f "$DIR")
+if [ ! -d "$DIR" ] || [ ! -d "$RDIR" ]; then
+  echo "'$DIR' is not a directory"
+  exit 1
+fi
+is_running
+tree --noreport -fi "$RDIR"|while read f; do
+  if [ ! -d "$f" ]; then
+    set_opt "$f"
+    audtool2 $OPT "file://$f"
+  fi
+
+done

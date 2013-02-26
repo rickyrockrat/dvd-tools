@@ -1,0 +1,69 @@
+dvdbak - a collection of utilites to allow you to backup your DVDs. 
+
+This is NOT intended to be used for illegal activities, and use of these
+scripts and the tools they rely on my be illegal in your area.
+
+You are responsible to know about this, and you agree to accept all 
+responsibility for using these scripts illegally.
+
+The use case for this is a family with children who own DVDs.  Most 
+people realize that giving a child a DVD is very similar to throwing it
+away.  It most likely will not last long.
+
+The scripts here tie a number of tools together to be able to backup
+movies and DVDs. 
+mplayer, dvdbackup, dvdrip, vlc, handbrake, ddrescue, isoinfo, mkisofs, 
+vobcopy, ffmpeg, and cdrecord are all here, because some of these 
+work with some movies and some don't.  
+
+The usage information is obtained with dvdbak -h.
+
+Generally, the dvd main movie can be backed up using this sequence:
+
+dvdbak -i -i
+
+The Handbrake title is almost always the correct one. Then:
+
+dvdbak -f back -m mtitle -t 1
+Will copy title 1 without encryption to a movie called CD_NAME.mpg
+
+The directory structure is hardcoded as follows:
+All paths are set in commond_dvd. This file must be in the same 
+directory as dvdbak.
+
+The default device is: /dev/sr0 (can be changed on the command line)
+
+The root of operations is set to: /bulk/media/movies
+Under here are these directories:
+decrypted - output of dvdbackup
+iso.in - output of ddrescue
+iso.out - output of dvd mkisofs (-f dvd)
+dvdauth - output of dvd auth (-f auth)
+
+Great care has been taken to prevent overwiting of existing files. If in
+-b mode, the scripts just start incrementing a number at the end of the 
+movie name starting at 0.
+
+It also attempts to detect DVDs that have been purposefully corrupted,
+and gives recomendations on procedure given the information.
+
+Bad blocks does work, but some movies may have a glitch part way through
+I still need to work on these. I've already made patches to libdvdread.
+
+These scripts could very easily be automated with UDEV by calling 
+dvd -i -i on DVD insertion, then dvd -f back once the title is found.
+
+The DVD ejects automatically when the script finishes.
+If you want to grab the previews, I use VLC to find them (by playing the
+movie) and writing down the title numbers. Then use something like this:
+
+for i in 3 4 5; do dvdbak -f back -b mtitle -n Preview$i.mpg -x -t $i; done; eject /dev/sr0
+
+This will generate a Peview3.mpg Preview4.mpg Preview5.mpg.
+
+These scripts do not attempt to re-encrypt the DVD content, so you will
+need to find another way to accomplish that.
+
+
+
+
